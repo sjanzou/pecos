@@ -79,7 +79,6 @@ Range Bounds:
   Datalog Temperature: [-40, 55]
   Datalog Voltage: [9.6, 16]
   Time Per Scan: [None, 2]
-  GHI Relative Error: [None, 0.2]
   Ambient Temperature: [-20,45]
   Box Temperature: [-20,90]
   Module Temperature 1: [-20,90]

@@ -14,4 +14,3 @@ the U.S. Government retains certain rights in this software."""
 
 __license__ = "Revised BSD License"
 
-from PerformanceMonitoring_RTC import PerformanceMonitoring_RTC
