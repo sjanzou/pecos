@@ -1,0 +1,129 @@
+General:
+  Name: PV                      # System name, string
+  Database: [MET]          # Database name(s), list of strings
+  Date Format: _%Y_%m_%d        # Date format (i.e. _2014_03_25), string
+  File Directory: C:\kaklise\src\pecos\examples\pv\Data          # File Directory, string
+  Index Column: TIMESTAMP       # Column name to use for database index
+  
+Specifications:
+  Latitude: 35.054           # Latitude in decimal degrees (+N), string
+  Longitude: -106.539         # Longitude in decimal degrees (+E), string
+  Altitude: 1663                 # Elevation in meters, float
+  Timezone: 'US/Mountain'
+  Isc: 10000                    # Short-circuit current (A), float
+  Imp: 10000                    # Current at max power point (A), float
+  Voc: 10000                    # Open-circuit voltage (V), float
+  Vmp: 10000                    # Voltage at max power point (V), float
+  Pmp: 10000                    # Power at max power point (W), float
+  Ns: 100                       # Number of cells in series, float
+  Np: 100                       # Number of cell-strings in parallel, float
+  DC power rating: 6000         # REMOVE WHEN SPECS ARE CORRECT
+  Frequency: 60                 # Expected timestamp frequency (s), float 
+  Min Sun Elevation: 5          # used in time filter
+  
+Translation: 
+  MET: 
+    DHI: [Diffuse_Wm2_Avg]
+    DNI: [Direct_Wm2_Avg]
+    GHI: [Global_Wm2_Avg] 
+    Air Pressure: [Pressure_mBar_Avg]
+    Wind Speed: [WS_ms_Mean, WS_ms_3sec_Max]
+    Wind Speed Stdev: [WS_ms_Std]
+    Wind Direction: [Wdir_Mean]
+    Wind Direction Stdev: [Wdir_Std]
+    Relative Humidity: [RH_pct_Avg]
+    Datalog Temperature: [Panel_Temp_C_Avg]
+    Datalog Voltage: [Battery_V_Avg]
+    Time Per Scan: [ProcessTime_S_Max]
+    GHI Raw: [Global_mV_Avg]
+    Rainfall Total: [Rain_mm_Tot]
+    Rainfall: [Rain_mm_Daily]
+    GHI Temperature: [Temp_CMP22_C_Avg]
+  Baseline6kW:
+    Ambient Temperature: [LocalAmbientTemp_Avg]
+    Box Temperature: [ICP7019_1CJCTemp_Avg, ICP7019_2CJCTemp_Avg, 
+    ICP7019_3CJCTemp_Avg, ICP7019_4CJCTemp_Avg, ICP7019_5CJCTemp_Avg,
+    ICP7019_6CJCTemp_Avg, ICP7019_7CJCTemp_Avg]
+    Module Temperature 1: [ModTemp1_Avg, ModTemp2_Avg, ModTemp3_Avg, ModTemp4_Avg, 
+    ModTemp5_Avg, ModTemp6_Avg, ModTemp7_Avg, ModTemp8_Avg]
+    Module Temperature 2: [ModTemp9_Avg, ModTemp10_Avg, ModTemp11_Avg, 
+    ModTemp12_Avg, ModTemp13_Avg, ModTemp14_Avg, ModTemp15_Avg,ModTemp16_Avg]
+    DC Voltage: [Sys1Vdc_Avg, Sys2Vdc_Avg]
+    DC Current 1: [Sys1Str1Idc_Avg, Sys1Str2Idc_Avg]
+    DC Current 2: [Sys2Str1Idc_Avg, Sys2Str2Idc_Avg]
+    AC Voltage: [Sys1Vac_Avg, Sys2Vac_Avg]
+    AC Current: [Sys1Iac_Avg, Sys2Iac_Avg]
+    AC Power: [Sys1Wac_Avg, Sys2Wac_Avg]
+    AC VAR: [Sys1VARac_Avg, Sys2VARac_Avg]
+    Power Factor: [Sys1PowerFactor_Avg, Sys2PowerFactor_Avg]
+    Frequency: [Sys1Frequency_Avg, Sys2Frequency_Avg]
+    POA: [POAIrrad1_Avg]
+    Ref Cell Irradiance: [RefCell1Irrad_Avg, RefCell2Irrad_Avg]
+    Ref Cell Temperature: [RefCell1Temp_Avg, RefCell2Temp_Avg]
+    Ref Cell Raw: [RefCell1R_Avg, RefCell2R_Avg]
+
+Composite Signals: 
+- DC Current: "np.sum([DC Current 1],axis=1), np.sum([DC Current 2],axis=1)"
+- DC Power: "np.multiply([DC Current],[DC Voltage])"
+- Inverter Efficiency: "np.divide([AC Power],[DC Power])"
+
+Corrupt Values: [-999]
+  
+Range Bounds:
+  DHI: [0, 600]
+  GHI: [0, 1500]
+  DNI: [0, 1400]
+  Relative Humidity: [0, 100]
+  Wind Speed: [0, 40]
+  Wind Direction: [0, 360]
+  Datalog Temperature: [-40, 55]
+  Datalog Voltage: [9.6, 16]
+  Time Per Scan: [None, 2]
+  GHI Relative Error: [None, 0.2]
+  Ambient Temperature: [-20,45]
+  Box Temperature: [-20,90]
+  Module Temperature 1: [-20,90]
+  Module Temperature 2: [-20,90]
+  DC Voltage: [0, "[Vmp]*[Ns]*1.2"]
+  DC Current: [0, "[Imp]*[Np]*1.4"]
+  DC Power: [0, "[Pmp]*1.4"]
+  AC Voltage: [0, None]
+  AC Current: [0, None]
+  AC Power: [0, None]
+  Inverter Efficiency: [0.75, 1.01]
+  Power Factor: [-1, 1]
+  Frequency: [57, 63]
+  POA: [0, 1400]
+
+Increment Bounds: 
+  DHI: [0.000000001, None, 60]
+  DNI: [0.000000001, None, 60] 
+  GHI: [0.000000001, None, 60]
+  Air Pressure: [0.000000001, None, 60]
+  Wind Speed: [0.000000001, None, 60]
+  Wind Speed Stdev: [0.000000001, None, 60]
+  Wind Direction: [0.000000001, None, 60]
+  Wind Direction Stdev: [0.000000001, None, 60]
+  Relative Humidity: [0.000000001, None, 60]
+  #Datalog Temperature: [0.000000001, None, 60]
+  #Datalog Voltage: [0.000000001, None, 60]
+  Time Per Scan: [0.000000001, None, 60]
+  GHI Raw: [0.000000001, None, 60]
+  GHI Temperature: [0.000000001, None, 60]
+  Ambient Temperature: [0.000000001, None, 60]
+  Box Temperature : [0.000000001, None, 60]
+  Module Temperature 1: [0.000000001, None, 60]
+  Module Temperature 2: [0.000000001, None, 60]
+  DC Voltage: [0.000000001, None, 60]
+  DC Current: [0.000000001, None, 60]
+  DC Power: [0.000000001, None, 60]
+  AC Voltage: [0.000000001, None, 60]
+  AC Current: [0.000000001, None, 60]
+  AC Power: [0.000000001, None, 60]
+  AC VAR: [0.000000001, None, 60]
+  Power Factor: [0.000000001, None, 60]
+  Frequency: [0.000000001, None, 60]
+  POA: [0.000000001, None, 60]
+  Ref Cell Irradiance: [0.000000001, None, 60]
+  Ref Cell Temperature: [0.000000001, None, 60]
+  Ref Cell Raw: [0.000000001, None, 60]

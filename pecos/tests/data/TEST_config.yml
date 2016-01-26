@@ -1,0 +1,52 @@
+General:
+  Name: TEST                    # PV system name, string
+  Database: [TEST_db1] # Database name(s), list of strings
+  Application: RTC
+  Type: PV
+  Date Format: _%Y_%m_%d        # Date format (i.e. _2014_03_25), string
+  File Format: TOA5             # File format (TOA5 is currently the only format option), string
+  File Encoding:         # File encoding, string
+  File Directory: C:\kaklise\Solar\Database Performance Monitoring\pm\pm\tests\data # File Directory, string
+  Index Column: TIMESTAMP       # Column name to use for database index
+  Frequency: 3600        # Expected data frequency (s), float
+
+Specifications: 
+  Latitude: '35:02:59'          # Latitude in decimal degrees (+N), string
+  Longitude: '-106:35:59'       # Longitude in decimal degrees (+E), string
+  Elevation: 1490               # Elevation in meters, float
+  Horizon: '-0:34'              # Horizon in decimal degrees, string
+  UTC Offset: -7                # UTC Offset in hours, float
+  Isc:          # Short-circut current (A), float
+  Imp: 1.42     # Current at max power point (A), float
+  Voc:          # Open-circuit voltage (V), float
+  Vmp: 57.9     # Voltage at max power point (V), float
+  Pmp:          # Power at max power point (W), float
+  Ns: 6         # Number of cells in series, float
+  Np: 9         # Number of cell-strings in parallel, float
+
+Translation: 
+  TEST_db1: 
+    Range: [Range1, Range2]
+    Deviation: [Deviation1]
+    Corrupt: [Corrupt1]
+    Missing: [Missing1, Missing2]
+    All: [Range1, Range2, Deviation1, Corrupt1, Missing1, Missing2]
+    Composite: [(R1-sum(M))/R1, (R2-sum(M))/R2, M1*D^2, M2*D^2, mean(All)-10]
+  
+Composite Equations: 
+- Comp1 (R-sum(M))/R: "([Range] - [Missing].sum(axis=1))/[Range]" 
+- Comp2 M*D^2: "[Missing]*np.power([Deviation],2)" 
+- Comp3 mean(ALL)-10: "([All]).mean(axis=1) - 10"
+
+Time Filter: "([SunAz] < 180) * ([SunEl] > 20) + ([SunAz] > 180) * ([SunEl] > 10)"
+  
+Check Corrupt: [-999]
+
+Check Deviation: [Range, Deviation]
+  
+Check Range:
+  Range: [-20,90]
+  Deviation: [-20,90]
+  Corrupt: [-20,90]
+  Missing: [-20,90]
+  

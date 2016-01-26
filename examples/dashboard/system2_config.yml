@@ -1,0 +1,10 @@
+Specifications: 
+  Frequency: 3600
+  Time Filter Min: 4
+  Time Filter Max: 20
+  
+Translation: 
+  Random: [A,B,C]
+
+Range Bounds:
+  Random: [-0.8, 0.8]
