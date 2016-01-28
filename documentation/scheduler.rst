@@ -1,4 +1,4 @@
-Task Scheduler 
+Task scheduler 
 ===============
 
 To run Pecos on an automated schedule, create a task using your operating systems

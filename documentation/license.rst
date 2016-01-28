@@ -1,4 +1,4 @@
-Copyright and License
+Copyright and license
 ==========================
 **PENDING**
 

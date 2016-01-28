@@ -1,4 +1,4 @@
-Time Series Data
+Time series data
 ==================
 
 Pandas DataFrames store 2D data with labeled columns.  Pecos uses Pandas DataFrames
@@ -17,7 +17,7 @@ The :doc:`PerformanceMonitoring</apidoc/pecos.PerformanceMonitoring>` class is
 the base class used by Pecos to define performance monitoring analysis. 
 To get started, an instance of the PerformanceMonitoring class is created::
 
-	pm = pecos.PerformanceMonitoring()
+	pm = pecos.monitoring.PerformanceMonitoring()
 
 The DataFrame can then be added to the PerformanceMonitoring object as follows::
 	

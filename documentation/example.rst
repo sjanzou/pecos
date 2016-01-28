@@ -1,4 +1,4 @@
-Simple Example
+Simple example
 ================
 
 A simple example is included in the examples/simple directory.  

@@ -16,7 +16,7 @@ and bounds for range and increment tests.
 
 .. literalinclude:: ../examples/simple/simple_config.yml
 
-Evaluating Strings
+Evaluating strings
 -------------------
 In the configuration file, composite signals and time filters can be defined 
 using strings of python code. 

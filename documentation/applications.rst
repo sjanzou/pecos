@@ -19,15 +19,7 @@ The example combines application specific functions in **pv_application.py**,
 which computes the sun position using pvlib, 
 generates custom graphics and performance metrics. 
 
-Dashboards
------------
-To compare performance of several systems, key graphics and metrics
-can be gathered in a dashboard view.  This summary can be linked to the HTML report
-for more detailed information.
-
-Pecos includes a dashboard example, **dashboard_driver.py**, in the examples/dashboard directory.
-
-Performance Metrics
+Performance metrics
 ---------------------
 The performance metrics file, created by Pecos, can be used for additional 
 analysis.

@@ -23,22 +23,27 @@ increment_bounds = {
     'Linear': [0.0001, None],
     'Random': [0.0001, None],
     'Wave': [0.0001, 0.5]}
+    
+ # Define output files and directories
+results_directory = 'Results'
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
+results_subdirectory = os.path.join(results_directory, system_name + '_2015_01_01')
+if not os.path.exists(results_subdirectory):
+    os.makedirs(results_subdirectory)
+metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
+test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
+report_file =  os.path.join(results_subdirectory, system_name + '.html')
+
+
 
 # Create an PerformanceMonitoring instance
-pm = pecos.PerformanceMonitoring()
+pm = pecos.monitoring.PerformanceMonitoring()
 
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
 pm.add_translation_dictonary(trans, system_name)
-
-# Set options to create results directories
-pm.options.results_directory = 'Results'
-pm.options.results_subdirectory_root = system_name
-pm.options.results_subdirectory_prefix = df.index.date[0].strftime('_%Y_%m_%d')
-pm.options.make_results_directory()
-pm.options.make_results_subdirectory()
-pm.options.clean_results_subdirectory()
 
 # Check timestamp
 pm.check_timestamp(expected_frequency)
@@ -72,16 +77,15 @@ for key,value in increment_bounds.items():
     pm.check_increment(value, key) 
     
 # Compute metrics
-QCI = pm.compute_QCI()
+QCI = pecos.metrics.qci(pm)
  
 # Create a custom graphic
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
 df.plot(ax=ax, ylim=[-1.5,1.5])
-plt.savefig(os.path.join(pm.options.results_subdirectory, system_name+'_custom_1.jpg')) 
+plt.savefig(os.path.join(results_subdirectory, system_name+'_custom_1.jpg')) 
 
-# Generate report
-pm.write_performance_metric_file(QCI)
-pm.write_test_results_file()
-pm.write_HTML_report()
-
+# Write metrics, test results, and report files
+pecos.io.write_metrics(metrics_file, QCI)
+pecos.io.write_test_results(test_results_file, pm.test_results)
+pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, QCI)

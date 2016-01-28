@@ -1,4 +1,4 @@
-Quality Control Tests
+Quality control tests
 ======================
 
 Pecos includes several quality control tests.

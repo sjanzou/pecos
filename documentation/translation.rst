@@ -1,4 +1,4 @@
-Translation Dictionary
+Translation dictionary
 ---------------------
 A translation dictionary maps database column names into common names.  
 By default, Pecos assumes the translation is 1:1 (i.e. raw column names are used).

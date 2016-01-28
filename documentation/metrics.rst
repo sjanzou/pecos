@@ -1,4 +1,4 @@
-Performance Metrics
+Performance metrics
 ==========================
 
 Pecos can be used to track performance of time series data over time.  
@@ -22,11 +22,12 @@ For example, if the data consists of  10 columns and 720 times that are
 used in the analysis, then :math:`|DT|` = 7200.  If 7000 data points pass all 
 quality control tests, then the QCI is 0.972.
 
-To compute QCI and add it to the performance metrics file::
+To compute QCI::
 
-	QCI = pm.compute_QCI()
-	pm.add_performance_metric(QCI)
+	QCI = pecos.metrics.qci(pm)
 
-Other metrics can be added using the **add_performance_metric** method::
+Additional metrics can be added to the QCI dataframe and saved to a file::
 
-	pm.add_performance_metric(stats)
+	pecos.io.write_metrics(metrics_filename, QCI)
+
+If 'metrics_filename' already exists, the metrics will be appended to the file.

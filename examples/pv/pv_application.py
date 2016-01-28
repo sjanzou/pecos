@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import pvlib
-from pecos.generate_graphics import plot_timeseries, plot_scatter
+from pecos.graphics import plot_timeseries, plot_scatter
 import os
 
 
@@ -22,13 +22,11 @@ def calculate_time_filter(index, specs):
 
     return time_filter
     
-def graphics(pm):
+def graphics(filename, pm):
     
     data = pm.df
     trans = pm.trans
     tfilter = pm.tfilter
-    
-    filename = os.path.join(pm.options.results_subdirectory, pm.options.results_subdirectory_root)
     
     # DC Power
     plt.figure(figsize = (5.0,2.5))
@@ -68,7 +66,7 @@ def graphics(pm):
     plot_timeseries(plotdata, tfilter, yaxis_min=-200, yaxis_max=1200)
     plt.legend(['GHI', 'DHI', 'DNI'], fontsize=8) 
     plt.ylabel('Irradiance', fontsize=8) 
-    plt.savefig(filename +'_custom.jpg', format='jpg', dpi=1000)
+    plt.savefig(filename +'_custom3.jpg', format='jpg', dpi=1000)
     plt.close()  
         
 def metrics(pm):

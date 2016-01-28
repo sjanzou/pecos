@@ -37,9 +37,9 @@ Test results includes the following information:
 
 Pecos can be used to generate an HTML report, test results CSV file, and a performance metrics CSV File.
 
-HTML report
-----------------------
-The HTML report include the start and end time for analysis, custom graphics 
+Monitoring report
+-------------------------------
+The monitoring report include the start and end time for analysis, custom graphics 
 and performance metrics, a table that includes test results, graphics associated 
 with the test results (highlighting data points that failed a quality control tests), 
 notes on runtime errors and warnings, and (optionally) the configuration options 
@@ -68,12 +68,36 @@ used in the analysis.
 
 * **Configuration Options:**
   Optional.  Configuration options used in the analysis.
-  
-Test Results CSV File
+
+The following method can be used to write a monitoring report::
+
+	pecos.io.write_monitoring_report()
+
+Test results
 ----------------------
 The test results CSV file contains informantion stored in pm.test_results.
 
-Performance Metrics CSV File
+The following method can be used to write a monitoring report::
+
+	pecos.io.write_test_results()
+	
+Performance metrics
 -----------------------------
-The performance metrics CSV file contains metrics added during analysis, values 
-are appended each time an analysis is run.
+The performance metrics CSV file contains metrics.  
+Values are appended each time an analysis is run.
+
+The following method can be used to write a monitoring report::
+
+	pecos.io.write_metrics()
+	
+Dashboard
+-----------
+To compare performance of several systems, key graphics and metrics
+can be gathered in a dashboard view.  This summary can be linked to the HTML report
+for more detailed information.
+Pecos includes a dashboard example, **dashboard_driver.py**, in the examples/dashboard directory.
+
+The following method can be used to write a monitoring report::
+
+	pecos.io.write_dashboard()
+	

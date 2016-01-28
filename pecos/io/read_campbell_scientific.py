@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def read_campbell_scientific_file(file_name, index_col='TIMESTAMP', encoding=None):
+def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
     """
     Read Campbell Scientific CSV file
     

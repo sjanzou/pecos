@@ -1,4 +1,4 @@
-Composite Signals
+Composite signals
 ==================
 
 Composite signals are used to generate new data columns based on existing data.  

@@ -1,4 +1,4 @@
-Time Filter
+Time filter
 =============
 
 A time filter is a boolean time series that indicates if specific timestamps should be

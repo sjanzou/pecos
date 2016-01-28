@@ -47,7 +47,7 @@ The software can be customized for specific applications.
    applications
    license
    developers
-   API Documentation <apidoc/pecos>
+   API documentation <apidoc/pecos>
 
 Indices and tables
 ==================
