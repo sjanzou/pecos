@@ -7,9 +7,9 @@ To install using pip (**NOT COMPLETE**)::
 
 	pip install pecos 
 	
-To build from source using git (**NOT COMPLETE**)::
+To build from source using git (**NOT COMPLETE, this should be moved to https://github.com/pecos**)::
 
-	git clone https://github.com/pecos 
+	git clone S:\kaklise\src\pecos 
 	cd pecos
 	python setup.py install
 

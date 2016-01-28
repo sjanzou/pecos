@@ -27,7 +27,7 @@ Translation:
     DNI: [Direct_Wm2_Avg]
     GHI: [Global_Wm2_Avg] 
     Air Pressure: [Pressure_mBar_Avg]
-    Wind Speed: [WS_ms_Mean, WS_ms_3sec_Max]
+    Wind Speed: [WS_ms_Mean]
     Wind Speed Stdev: [WS_ms_Std]
     Wind Direction: [Wdir_Mean]
     Wind Direction Stdev: [Wdir_Std]

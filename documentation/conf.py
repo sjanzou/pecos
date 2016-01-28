@@ -38,7 +38,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'numpydoc',
-    'sphinx.ext.pngmath',
     'sphinx.ext.intersphinx',
 ]
 
