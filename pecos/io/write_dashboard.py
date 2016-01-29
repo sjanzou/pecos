@@ -91,7 +91,8 @@ def _html_template(column_names, row_names, content, title, footnote, logo):
         for column in column_names:
             template = template + """
             <td align="center" valign="middle">"""
-            if content[row, column]['include']:
+            try:
+                content[row, column]
                 # Add text
                 if content[row, column]['text']:
                     template = template + content[row, column]['text'] + """<br>"""
@@ -105,6 +106,8 @@ def _html_template(column_names, row_names, content, title, footnote, logo):
                 # Add link
                 if content[row, column]['link']:
                     template = template + """<A href=\"""" + content[row, column]['link'] + """\">""" + content[row, column]['link text'] + """</A>"""
+            except:
+                pass
             template = template + """</td>"""
        
         template = template + """

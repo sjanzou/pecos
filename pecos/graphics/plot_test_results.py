@@ -6,8 +6,8 @@ logger = logging.getLogger(__name__)
 
 def plot_test_results(filename, pm):
     """
-    Create QC graphics.  
-    QC graphics include data that failed a quality control test.
+    Create test results graphics.  
+    Graphics include data that failed a quality control test.
     """
     if pm.test_results.empty:
         return

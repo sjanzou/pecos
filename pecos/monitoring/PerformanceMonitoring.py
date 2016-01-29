@@ -2,13 +2,6 @@ import pandas as pd
 import numpy as np
 import re
 import logging
-import os
-import datetime
-from glob import glob
-from os.path import abspath, dirname, join
-from string import Template
-import pprint
-import pecos
 
 none_list = ['','none','None','NONE', None, [], {}]
 nan_list = ['nan','NaN','NAN']
@@ -27,8 +20,6 @@ class PerformanceMonitoring(object):
         self.test_results = pd.DataFrame(columns=['System Name', 'Variable Name', 
                                                 'Start Date', 'End Date', 
                                                 'Timesteps', 'Error Flag']) 
-            
-        self._performance_metrics = pd.DataFrame()
     
     def add_dataframe(self, df, system_name):
         """

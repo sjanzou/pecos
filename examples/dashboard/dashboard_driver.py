@@ -81,8 +81,7 @@ for location_name in locations:
             
         graphics = glob(abspath(join(results_subdirectory, '*custom*.jpg')))
         metrics_table = QCI.transpose().to_html(bold_rows=False, header=False)
-        content = {'include': True, 
-                   'text': "Example text for " + location_system, 
+        content = {'text': "Example text for " + location_system, 
                    'graphics': graphics, 
                    'table':  metrics_table, 
                    'link': abspath(report_file),
