@@ -17,9 +17,9 @@ file_date = [datetime.datetime(2014,01,01,0,0,0)]
 def test_check_timestamp():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
-    df = pecos.read_campbell_scientific_file(file_name, 'TIMESTAMP')
+    df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
     trans = config['Translation'][system_name]
-    pm = pecos.PerformanceMonitoring()
+    pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
 
@@ -35,14 +35,14 @@ def test_check_timestamp():
     """
     assert_equal(sum(pm.test_results['Error Flag'] == 'Nonmonotonic timestamp'), 3)
     assert_equal(sum(pm.test_results['Error Flag'] == 'Duplicate timestamp'), 3)
-    assert_equal(sum(pm.test_results['Timesteps']), 8)
+    assert_equal(sum(pm.test_results['Timesteps']), 12)
 
 def test_check_missing():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
-    df = pecos.read_campbell_scientific_file(file_name, 'TIMESTAMP')
+    df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
     trans = config['Translation'][system_name]
-    pm = pecos.PerformanceMonitoring()
+    pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
     
@@ -81,9 +81,9 @@ def test_check_missing():
 def test_check_corrupt():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
-    df = pecos.read_campbell_scientific_file(file_name, 'TIMESTAMP')
+    df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
     trans = config['Translation'][system_name]
-    pm = pecos.PerformanceMonitoring()
+    pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
     
@@ -118,9 +118,9 @@ def test_check_corrupt():
 def test_check_range():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
-    df = pecos.read_campbell_scientific_file(file_name, 'TIMESTAMP')
+    df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
     trans = config['Translation'][system_name]
-    pm = pecos.PerformanceMonitoring()
+    pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
     
@@ -133,9 +133,9 @@ def test_check_range():
 def test_composite_signal():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
-    df = pecos.read_campbell_scientific_file(file_name, 'TIMESTAMP')
+    df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
     trans = config['Translation'][system_name]
-    pm = pecos.PerformanceMonitoring()
+    pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
     
@@ -162,5 +162,5 @@ if __name__ == '__main__':
     #test_check_missing()
     #test_check_corrupt()
     #test_check_deviation()
-    test_check_range()
+    #test_check_range()
     test_composite_signal()
