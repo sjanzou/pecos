@@ -15,7 +15,7 @@ results_directory = 'Results'
 if not os.path.exists(results_directory):
     os.makedirs(results_directory)
 dashboard_filename = os.path.join(results_directory, 'Dashboard_example.html')
-dashboard_content = pd.DataFrame(index=systems, columns=locations) 
+dashboard_content = {} 
 
 for location_name in locations:
     for system_name in systems:
@@ -85,7 +85,8 @@ for location_name in locations:
                    'text': "Example text for " + location_system, 
                    'graphics': graphics, 
                    'table':  metrics_table, 
-                   'link': abspath(report_file)}
-        dashboard_content.loc[system_name, location_name] = content
+                   'link': abspath(report_file),
+                   'link text': 'Link to Report'}
+        dashboard_content[(system_name, location_name)] = content
         
-pecos.io.write_dashboard(dashboard_filename, dashboard_content)
+pecos.io.write_dashboard(dashboard_filename, locations, systems, dashboard_content)

@@ -5,7 +5,7 @@ import pecos
 
 logger = logging.getLogger(__name__)
     
-def write_dashboard(filename, content, title='Pecos Dashboard', footnote='', logo=False):
+def write_dashboard(filename, column_names, row_names, content, title='Pecos Dashboard', footnote='', logo=False):
     """
     Generate a Pecos report
     
@@ -29,7 +29,7 @@ def write_dashboard(filename, content, title='Pecos Dashboard', footnote='', log
     pd.set_option('display.max_colwidth', -1)
     pd.set_option('display.width', 40)
     
-    html_string = _html_template(content, title, footnote, logo)
+    html_string = _html_template(column_names, row_names, content, title, footnote, logo)
     
     # Write html file
 #    filename = join('Results', 'dashboard_' + title + ".html")
@@ -39,7 +39,7 @@ def write_dashboard(filename, content, title='Pecos Dashboard', footnote='', log
     
     logger.info("")
         
-def _html_template(content, title, footnote, logo):
+def _html_template(column_names, row_names, content, title, footnote, logo):
     
     template = """
     <!DOCTYPE html>
@@ -76,35 +76,35 @@ def _html_template(content, title, footnote, logo):
     <thead>
     <tr>
     <th></th>"""
-    for column in content.columns:
+    for column in column_names:
         template = template +  """
         <th align="center" valign="middle">""" + column + """</th>"""
     template = template + """
     </tr>
     </thead>
     <tbody>"""
-    for row in content.index:
+    for row in row_names:
         template = template + """
         <tr>"""
         template = template +  """
         <th align="center" valign="middle">""" + row + """</th>"""
-        for column in content.columns:
+        for column in column_names:
             template = template + """
             <td align="center" valign="middle">"""
-            if content.loc[row, column]['include']:
+            if content[row, column]['include']:
                 # Add text
-                if content.loc[row, column]['text']:
-                    template = template + content.loc[row, column]['text'] + """<br>"""
+                if content[row, column]['text']:
+                    template = template + content[row, column]['text'] + """<br>"""
                 # Add graphics
-                if len(content.loc[row, column]['graphics']) > 0:
-                    for im in content.loc[row, column]['graphics']:
+                if len(content[row, column]['graphics']) > 0:
+                    for im in content[row, column]['graphics']:
                         template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"250"><br>"""
                 # Add table
-                if content.loc[row, column]['table']:
-                    template = template + content.loc[row, column]['table'] + """<br>"""
+                if content[row, column]['table']:
+                    template = template + content[row, column]['table'] + """<br>"""
                 # Add link
-                if content.loc[row, column]['link']:
-                    template = template + """<A href=\"""" + content.loc[row, column]['link'] + """\">Link to Report</A>"""
+                if content[row, column]['link']:
+                    template = template + """<A href=\"""" + content[row, column]['link'] + """\">""" + content[row, column]['link text'] + """</A>"""
             template = template + """</td>"""
        
         template = template + """
