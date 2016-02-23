@@ -13,14 +13,25 @@ def plot_timeseries(data, tfilter, test_results_group=None, xaxis_min=None, xaxi
     Parameters
     ----------
     data : pd.Series
-        data, indexed by time
+        Data, indexed by time
         
     tfilter : pd.Series
-        boolean values used to include time filter in the plot 
+        Boolean values used to include time filter in the plot 
         
     test_results_group : pd.Series (optional)
-        QC results grouped by variable name
+        Test results grouped by variable name
+    
+    xaxis_min : float (optional)
+        X-axis minimum        
         
+    xaxis_max : float (optional)
+        X-axis maximum    
+        
+    yaxis_min : float (optional)
+        Y-axis minimum            
+        
+    yaxis_max : float (optional)
+        Y-axis maximum   
     """
     
     ax = plt.gca()

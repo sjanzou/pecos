@@ -14,6 +14,18 @@ def plot_scatter(x,y,xaxis_min=None, xaxis_max=None, yaxis_min=None, yaxis_max=N
     
     y : pd.Series
         y data
+    
+    xaxis_min : float (optional)
+        X-axis minimum        
+        
+    xaxis_max : float (optional)
+        X-axis maximum    
+        
+    yaxis_min : float (optional)
+        Y-axis minimum            
+        
+    yaxis_max : float (optional)
+        Y-axis maximum         
     """
     
     ax = plt.gca()

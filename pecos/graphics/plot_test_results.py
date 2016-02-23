@@ -8,6 +8,14 @@ def plot_test_results(filename, pm):
     """
     Create test results graphics.  
     Graphics include data that failed a quality control test.
+    
+    Parameters
+    ----------
+    filename : string
+        Filename root, each graphic is appended with '_pecos_*.jpg' where * is an integer
+    
+    pm : PerformanceMonitoring object
+        Contains data (pm.df) and test results (pm.test_results)
     """
     if pm.test_results.empty:
         return

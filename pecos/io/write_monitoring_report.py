@@ -11,15 +11,21 @@ from string import Template
 
 logger = logging.getLogger(__name__)
 
-def write_monitoring_report(filename, subdirectory, pm, metrics=pd.DataFrame(), config={}, logo=False):
+def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={}, logo=False):
     """
-    Generate a Pecos report
+    Generate a performance monitoring report
     
     Parameters
     ----------
+    filename : string
+    
+    subdirectory : 
+    
     pm : PerformanceMonitoring object
-        Contains data (pm.df), test results (pm.test_results), and options (pm.options)
+        Contains data (pm.df) and test results (pm.test_results)
         
+    metrics : pd.DataFrame (optional)
+    
     config : dict (optional)
         Configuration options, to be printed at the end of the report
     
@@ -63,8 +69,8 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=pd.DataFrame(), 
     qc_graphic_files = glob(abspath(join(subdirectory, '*pecos*.jpg')))
     
     # Convert to html format
-    #pd.set_option('display.max_colwidth',60)
-    #pd.options.display.show_dimensions = False
+    if metrics is None:
+        metrics = pd.DataFrame()
     warnings_html = pm.test_results.to_html(justify='left')
     metrics_html = metrics.to_html(justify='left')
     notes_html = notes_df.to_html(justify='left', header=False)
