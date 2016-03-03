@@ -63,10 +63,10 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     pecos.graphics.plot_test_results(join(subdirectory, 'test'), pm)
     
     # Gather custom graphic
-    custom_graphic_files = glob(abspath(join(subdirectory, '*custom*.jpg')))
+    custom_graphic_files = sorted(glob(abspath(join(subdirectory, '*custom*.jpg'))))
 
     # Gather test results graphics
-    qc_graphic_files = glob(abspath(join(subdirectory, '*pecos*.jpg')))
+    qc_graphic_files = sorted(glob(abspath(join(subdirectory, '*pecos*.jpg'))))
     
     # Convert to html format
     if metrics is None:
