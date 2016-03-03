@@ -63,7 +63,7 @@ Results are saved in examples/simple/Results.  Results include:
 
 * Test results CSV file, **Simple_2015_01_01/Simple_test_results.csv**, includes information from the summary tables
 
-* Performance metric CSV file, **Simple_performance_metrics.csv**, includes a quality control index based on the analysis.  
+* Performance metric CSV file, **Simple_metrics.csv**, includes a quality control index based on the analysis.  
 
 .. raw:: html
-   :file: ../examples/simple/Results/Simple_2015_01_01/Simple.html
+   :file: ..\examples\simple\Results\Simple_2015_01_01\Simple.html

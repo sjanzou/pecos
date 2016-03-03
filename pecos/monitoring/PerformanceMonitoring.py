@@ -4,7 +4,6 @@ import re
 import logging
 
 none_list = ['','none','None','NONE', None, [], {}]
-nan_list = ['nan','NaN','NAN']
 
 logger = logging.getLogger(__name__)
     
@@ -21,13 +20,21 @@ class PerformanceMonitoring(object):
                                                 'Start Date', 'End Date', 
                                                 'Timesteps', 'Error Flag']) 
     
-    def add_dataframe(self, df, system_name):
+    def add_dataframe(self, df, system_name, add_identity_translation_dictonary = False):
         """
         Add dataframe to the PerformanceMonitoring class
         
         Parameters
         -----------
         df : pd.Dataframe
+            Dataframe to add to the Performance Monitoring class
+        
+        system_name : string
+            System name
+            
+        add_identity_translation_dictonary : bool (default = False)
+            Add a 1:1 translation dictonary to the Performance Monitoring class
+            using all column names in df
         """
         temp = df.copy()
         
@@ -40,11 +47,12 @@ class PerformanceMonitoring(object):
             self.df = temp.copy()     
 
         # define identifty translation
-        trans = {}
-        for col in df.columns:
-            trans[col] = [col]
-        
-        self.add_translation_dictonary(trans, system_name)
+        if add_identity_translation_dictonary:
+            trans = {}
+            for col in df.columns:
+                trans[col] = [col]
+            
+            self.add_translation_dictonary(trans, system_name)
             
     def add_translation_dictonary(self, trans, system_name):
         """
@@ -53,8 +61,10 @@ class PerformanceMonitoring(object):
         Parameters
         -----------
         trans : dictonary
+            Translation dictonary
         
         system_name : string
+            System name
         """    
         # Combine variable name with system name (System: Variable)
         for key, values in trans.iteritems():
@@ -68,33 +78,14 @@ class PerformanceMonitoring(object):
         
         Parameters
         ----------
-        time_filter : pd.Series
+        time_filter : pd.Series 
+            Time filter containing boolean values for each time index
         """
         if isinstance(time_filter, pd.DataFrame):
             self.tfilter = pd.Series(data = time_filter.values[:,0], index = self.df.index)
         else:
             self.tfilter = time_filter
-            
-#    def add_tfilter(self, composite_eq, specs={}):
-#        """
-#        Add a time filter to the PerformanceMonitoring class
-#        
-#        Parameters
-#        ----------
-#        composite_eq : string
-#            Composite equation for tfilter
-#        
-#        specs : dict
-#            Constants to use in the composite equation
-#        """
-#        if self.df.empty:
-#            return
-#            
-#        logger.info("Create composite signal: tfilter")
-#                
-#        composite_signal = self.evaluate_string('', composite_eq, specs)
-#        self.tfilter = pd.Series(data = composite_signal.values[:,0], index = self.df.index)
-    
+
     def add_signal(self, col_name, df):
         """
         Add signal to the PerformanceMonitoring dataframe
@@ -102,10 +93,10 @@ class PerformanceMonitoring(object):
         Parameters
         -----------
         col_name : string
-            Column name
+            Column name to add to translation dictonary
         
         df : pd.DataFarame
-            Data
+            DataFrame to add to df
         """
         df = pd.DataFrame(df)
         
@@ -140,8 +131,8 @@ class PerformanceMonitoring(object):
         min_failures : int
             Minimum number of consecutive failures required for reporting
         
-        variable_name : bool
-            Add variable name to QC results (default = True), set to False for timestamp tests
+        variable_name : bool  (default = True)
+            Add variable name to QC results, set to False for timestamp tests
         """
         if len(mask.columns) == 1 and mask.columns[0] == 0:
             sub_df = self.df
@@ -209,7 +200,13 @@ class PerformanceMonitoring(object):
         frequency : int
             Expected timeseries frequency, in seconds
         
-        min_failures : int
+        expected_start_time : Timestamp (default = None)
+            Expected start time. If not specified, the minimimum timestamp is used.
+        
+        expected_end_time : Timestamp (default = None)
+            Expected end time. If not specified, the maximum timestamp is used.
+        
+        min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
         """
         logger.info("Check timestamp")
@@ -269,10 +266,10 @@ class PerformanceMonitoring(object):
         Parameters
         ----------
         bound : list
-            [lower bound, upper bound], None can be used in place of a bound
+            [lower bound, upper bound], None can be used in place of a lower or upper bound
             
-        key : string (default = None (all columns))
-            Translation dictonary key
+        key : string (default = None)
+            Translation dictonary key.  If not specified, all columns are used in the test.
         
         specs : dict (default = {})
             Constants used in bound
@@ -335,10 +332,10 @@ class PerformanceMonitoring(object):
         Parameters
         ----------
         bound : list
-            [lower bound, upper bound], None can be used in place of a bound
+            [lower bound, upper bound], None can be used in place of a lower or upper bound
         
-        key : string (default = None (all columns))
-            Translation dictonary key
+        key : string (default = None)
+            Translation dictonary key. If not specified, all columns are used in the test.
             
         specs : dict (default = {})
             Constants used in bound
@@ -412,10 +409,10 @@ class PerformanceMonitoring(object):
         
         Parameters
         ----------
-        key : string
-            Translation dictonary key
+        key : string (default = None)
+            Translation dictonary key. If not specified, all columns are used in the test.
         
-        min_failures : int
+        min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
         """
         logger.info("Check for missing data")
@@ -456,10 +453,10 @@ class PerformanceMonitoring(object):
         corrupt_values : list
             List of corrupt data values
             
-        key : string
-            Translation dictonary key
+        key : string (default = None)
+            Translation dictonary key. If not specified, all columns are used in the test.
         
-        min_failures : int
+        min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
         """
         logger.info("Check for corrupt data")
@@ -490,40 +487,55 @@ class PerformanceMonitoring(object):
             self.df[mask] = np.nan
             self.append_test_results(mask, 'Corrupt data', min_failures=min_failures)
              
-    def evaluate_string(self, col_name, string, specs={}):
+    def evaluate_string(self, col_name, string_to_eval, specs={}):
         """
-        Evaluate python string.  [keywords] are expanded to 
-        self.df[self.trans[keyword]]
-        or 
-        specs[keyword]
+        Returns the evaluated python equation written as a string (BETA).  
+        For each [keyword] in string_to_eval, 
+        [keyword] is first expanded to self.df[self.trans[keyword]], 
+        if that fails, then [keyword] is expanded to specs[keyword].
+
+        Parameters
+        ----------
+        col_name : string
+            Column name for the new signal
         
+        string_to_eval : string
+            String to evaluate
+        
+        specs : dict (default = {})
+            Constants used as keywords
+            
+        Returns
+        --------
+        signal : pd.DataFrame or pd.Series
+            DataFrame or Series with results of the evaluated string
         """
 
-        match = re.findall(r"\[(.*?)\]", string)
+        match = re.findall(r"\[(.*?)\]", string_to_eval)
         for m in set(match):
             m = m.replace('[','') # check for list
             
             if m == 'ELAPSED_TIME':
                 ELAPSED_TIME = self.get_elapsed_time()
-                string = string.replace("["+m+"]",m)
+                string_to_eval = string_to_eval.replace("["+m+"]",m)
             elif m == 'CLOCK_TIME':
                 CLOCK_TIME = self.get_clock_time()
-                string = string.replace("["+m+"]",m)
+                string_to_eval = string_to_eval.replace("["+m+"]",m)
             else:
                 try:
                     self.df[self.trans[m]]
                     datastr = "self.df[self.trans['" + m + "']]"
-                    string = string.replace("["+m+"]",datastr)
+                    string_to_eval = string_to_eval.replace("["+m+"]",datastr)
                 except:
                     try:
                         specs[m]
                         datastr = "specs['" + m + "']"
-                        string = string.replace("["+m+"]",datastr)
+                        string_to_eval = string_to_eval.replace("["+m+"]",datastr)
                     except:
                         pass
                     
         try:
-            signal = eval(string)
+            signal = eval(string_to_eval)
             if type(signal) is tuple:
                 col_name = [col_name + " " + str(i+1)  for i in range(len(signal))]
                 signal = pd.concat(signal, axis=1)
@@ -540,18 +552,34 @@ class PerformanceMonitoring(object):
                 signal.index = self.df.index
         except:
             signal = None
-            logger.warning("Insufficient data for Composite Signals: " + col_name + ' -- ' + string)
+            logger.warning("Insufficient data for Composite Signals: " + col_name + ' -- ' + string_to_eval)
                              
         return signal
 
     def get_elapsed_time(self):
+        """
+        Returns elapsed time in seconds from the dataframe index
+        
+        Returns
+        --------
+        elapsed_time : pd.DataFrame
+            Elapsed time of the dataframe index 
+        """
         elapsed_time = ((self.df.index - self.df.index[0]).values)/1000000000 # convert ns to s
         elapsed_time = pd.DataFrame(data=elapsed_time, index=self.df.index, dtype=int)
         
         return elapsed_time
     
     def get_clock_time(self):
-        clock_time = ((self.df.index - pd.Timestamp('2016-01-01 00:00:00')).values)/1000000000 # convert ns to s
+        """
+        Returns clock time in seconds from the dataframe index
+        
+        Returns
+        --------
+        clock_time : pd.DataFrame
+            Clock time of the dataframe index
+        """
+        clock_time = ((self.df.index - self.df.index[0]).values)/1000000000 # convert ns to s
         clock_time = pd.DataFrame(data=clock_time, index=self.df.index, dtype=int)
         clock_time = np.mod(clock_time, 86400)
         
@@ -560,6 +588,17 @@ class PerformanceMonitoring(object):
     def get_test_results_mask(self, key=None):
         """
         Return a mask of data-times that failed a quality control test
+        
+        Parameters
+        -----------
+        key : string (default = None)
+            Translation dictonary key. If not specified, all columns are used
+            
+        Returns
+        --------
+        test_results_mask : pd.DataFrame
+            DataFrame containing boolean values for each data point, True =  
+            data point pass all tests, False = data point did not pass at least one test.
         """
         if self.df.empty:
             logger.info("Empty database")
@@ -574,7 +613,7 @@ class PerformanceMonitoring(object):
         else:
             df = self.df 
             
-        warning = ~pd.isnull(df)
+        test_results_mask = ~pd.isnull(df)
         for i in self.test_results.index:
             variable = self.test_results.loc[i, 'Variable Name']
             start_date = self.test_results.loc[i, 'Start Date']
@@ -583,498 +622,8 @@ class PerformanceMonitoring(object):
             if error_flag in ['Nonmonotonic timestamp', 'Duplicate timestamp']:
                 continue
             if variable == '':
-                warning.loc[start_date:end_date] = False
+                test_results_mask.loc[start_date:end_date] = False
             else:
-                warning.loc[start_date:end_date,variable] = False
+                test_results_mask.loc[start_date:end_date,variable] = False
             
-        return warning
-        
-#    def reindex_dataframe(self, frequency, start_time=None,  end_time=None):
-#        """
-#        Reindex dataframe with new start and end time
-#        
-#        Parameters
-#        ----------
-#        frequency : int
-#            time index frequency in seconds
-#        
-#        start_time : datetime.datetime
-#            Start time, i.e. datetime.datetime(2016, 1, 1, 0, 0, 0)
-#            
-#        end_time : datetime.datetime
-#            End time, i.e. datetime.datetime(2016, 1, 1, 23, 59, 59)
-#        """
-#        if start_time is None:
-#            temp = self.df.index[0]
-#            start_time = datetime.datetime(temp.year, temp.month, temp.day, temp.hour, temp.minute, temp.second)
-#        if end_time is None:
-#            temp = self.df.index[-1]
-#            end_time = datetime.datetime(temp.year, temp.month, temp.day, temp.hour, temp.minute, temp.second)
-#            
-#        rng = pd.date_range(start=start_time, end=end_time, freq=str(frequency) + 's')
-#        
-#        self.df = self.df.reindex(index=rng)
-    
-#    def remove_unused_columns(self):
-#        """
-#        Remove data not used in the translation dictonary
-#        """
-#        # # Remove columns not included in trans
-#        col_to_keep = sum(self.trans.values(),[]) 
-#        col_to_keep = [col for col in self.df.columns if col in col_to_keep]
-#        try:
-#            self.df = self.df[col_to_keep]
-#        except:
-#            logger.warning(col_to_keep + " not found in the database.  Check the translation dictonary.")
-#    
-    
-
-    
-#    def plot_test_results(self):
-#        """
-#        Create QC graphics.  
-#        QC graphics include data that failed a quality control test.
-#        """
-#        if self.test_results.empty:
-#            return
-#            
-#        import matplotlib.pyplot as plt
-#        from pecos.graphics import plot_timeseries
-#        
-#        filename = os.path.join(self.options.results_subdirectory, self.options.results_subdirectory_root)
-#        
-#        graphic = 0
-#          
-#        tfilter = self.tfilter
-#        
-#        grouped = self.test_results.groupby(['System Name', 'Variable Name'])
-#         
-#        for name, test_results_group in grouped:
-#            if name[1] == ' ':
-#                continue
-#            elif name[0] == '':
-#                col_name = str(name[1])
-#            else:
-#                col_name = str(name[0]) + ":" + str(name[1])
-#            
-#            
-#            if test_results_group['Error Flag'].all() in ['Duplicate timestamp', 'Missing data', 'Corrupt data', 'Missing timestamp', 'Nonmonotonic timestamp']:
-#                continue
-#            logger.info("Creating graphic for " + col_name)
-#            plt.figure(figsize = (7.0,2.5))
-#            plot_timeseries(self.df[col_name], tfilter, test_results_group = test_results_group)
-#
-#            ax = plt.gca()
-#            box = ax.get_position()
-#            ax.set_position([box.x0, box.y0, box.width*0.65, box.height])
-#            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=8) 
-#            plt.title(col_name, fontsize=8)
-#           
-#            plt.savefig(filename +'_pecos_'+str(graphic)+'.jpg', format='jpg', dpi=500)
-#            graphic = graphic + 1
-#            plt.close()
-#
-#    def compute_QCI(self):
-#        """
-#        Compute QC metric
-#        
-#        Parameters
-#        ----------
-#        add_metric : bool
-#            Add quality control index (QCI) to the stats file
-#            
-#        Returns
-#        -------
-#        qci : pd.Series
-#            Quality control index (QCI)
-#        """
-#        logger.info("Compute QCI")
-#        
-#        tfilter = self.tfilter
-#        df = self.df[tfilter]
-#        dates = [df.index[0].date() + datetime.timedelta(days=x) for x in range(0, (df.index[-1].date()-df.index[0].date()).days+1)]
-#        
-#        mask = self.get_test_results_mask()
-#        mask = mask[tfilter]
-#                
-#        stats = pd.DataFrame(index=pd.to_datetime(dates))
-#        
-#        if mask.empty:
-#            for date in dates:
-#                stats.loc[date, 'Quality Control Index'] = 0
-#        else:
-#            for date in dates:
-#                mask_date = mask.loc[date.strftime('%m/%d/%Y')]
-#                
-#                # Quality Control Index
-#                QCIndex = mask_date.sum().sum()/float(mask_date.shape[0]*mask_date.shape[1])
-#                if np.isnan(QCIndex):
-#                    QCIndex = 0
-#                stats.loc[date, 'Quality Control Index'] = QCIndex
-#        
-#        return stats   
-#        
-##    def group_test_results(self):
-##
-##        formatted_test_results = pd.DataFrame(columns=self.test_results.columns)
-##                                             
-##        key = self.test_results['Error Flag']
-##        grouped = self.test_results.groupby(key)
-##        for error_flag, group in grouped:
-##            try:
-##                #test_results_md = grouped.get_group(error_flag)
-##                grouped2 = group.groupby(['Start Date', 'End Date', 'Timesteps', 'System Name'])
-##                for name, group2 in grouped2:
-##                    temp = group2['Variable Name']
-##                    #var = np.array([v.rsplit(': ').pop() for v in var])
-##                    if temp.shape[0] == 1:
-##                        var = temp.values[0]
-##                    else:
-##                        var = []
-##                        for key, value in temp.iteritems():
-##                            var.append(str(value))
-##                    var = str(var)
-##                    var = var.replace("'","")
-##                    s = pd.Series([name[3], var, str(name[0]), str(name[1]), name[2], error_flag], index=self.test_results.columns)
-##                    formatted_test_results = formatted_test_results.append(s, ignore_index=True)  
-##            except:
-##                pass
-##        
-##        formatted_test_results.sort(['System Name', 'Variable Name'], inplace=True)
-##        formatted_test_results.index = np.arange(1, formatted_test_results.shape[0]+1)
-##        
-##        self.test_results = formatted_test_results
-#    
-#    def write_performance_metric_file(self, stats):
-#        """
-#        Add metric to the stats file
-#        
-#        Parameters
-#        -----------
-#        stat : pd.Series
-#            Data to add to the stats file
-#        """
-#        logger.info("Add metric")
-#        
-#        if self.df.empty:
-#            logger.info("Empty database")
-#            return
-#            
-#        fname = os.path.join(self.options.results_directory, self.options.results_subdirectory_root + '_performance_metrics.csv')
-#
-#        try:
-#            previous_stats = pd.read_csv(fname, index_col='TIMESTEP', parse_dates=True)
-#        except:
-#            previous_stats = pd.DataFrame()
-#        
-#        stats = stats.combine_first(previous_stats) 
-#        
-#        self._performance_metrics = stats.loc[stats.index]
-#        
-#        fout = open(fname, 'w')
-#        stats.to_csv(fout, index_label='TIMESTEP', na_rep = 'NaN')
-#        fout.close()
-#    
-#    
-#    def write_test_results_file(self):
-#        self.test_results.sort(['System Name', 'Variable Name'], inplace=True)
-#        self.test_results.index = np.arange(1, self.test_results.shape[0]+1)
-#        
-#        fname = join(self.options.results_subdirectory, self.options.results_subdirectory_root + "_test_results.csv")
-#        logger.info("Writing test results csv file " + fname)
-#        fout = open(fname, 'w')
-#        #fout.write('Missing Data\n')
-#        #missing_data.to_csv(fout, na_rep = 'NaN')
-#        #fout.write('Warnings\n')
-#        self.test_results.to_csv(fout, na_rep = 'NaN')
-#        fout.close()
-#        
-#    def write_HTML_report(self, config={}, logo=False):
-#        """
-#        Generate a Pecos report
-#        
-#        Parameters
-#        ----------
-#        pm : PerformanceMonitoring object
-#            Contains data (pm.df), test results (pm.test_results), and options (pm.options)
-#            
-#        config : dict (optional)
-#            Configuration options, to be printed at the end of the report
-#        
-#        logo : string (optional)
-#            Graphic to be added to the report header
-#        """
-#        
-#        logger.info("Writing HTML report")
-#        
-#        if self.df.empty:
-#            logger.warning("Empty database")
-#            start_time = 'NaN'
-#            end_time = 'NaN'
-#            logger.warning("Empty database")
-#        else:
-#            start_time = self.df.index[0]
-#            end_time = self.df.index[-1]
-#        
-#        # Set pandas display option     
-#        pd.set_option('display.max_colwidth', -1)
-#        pd.set_option('display.width', 40)
-#        
-#        # Collect notes (from the logger file)
-#        logfiledir = logfiledir = os.path.join(dirname(abspath(__file__)),'..', 'logger')
-#        f = open(join(logfiledir,'logfile'), 'r')
-#        notes = f.read()
-#        f.close()
-#        notes_df = pd.DataFrame(notes.splitlines())
-#        notes_df.index += 1
-#        
-#        self.test_results.sort(['System Name', 'Variable Name'], inplace=True)
-#        self.test_results.index = np.arange(1, self.test_results.shape[0]+1)
-#        
-#        # Generate graphics
-#        self.plot_test_results()
-#        
-#        # Gather custom graphic
-#        custom_graphic_files = glob(abspath(join(self.options.results_subdirectory, '*custom*.jpg')))
-#    
-#        # Gather performance metrics graphic
-#        pm_graphic_files = glob(abspath(join(self.options.results_subdirectory, '*performance_metrics*.jpg')))
-#        
-#        # Gather test results graphics
-#        qc_graphic_files = glob(abspath(join(self.options.results_subdirectory, 
-#                                             self.options.results_subdirectory_root + '*pecos*.jpg')))
-#        
-#        # Convert to html format
-#        #pd.set_option('display.max_colwidth',60)
-#        #pd.options.display.show_dimensions = False
-#        warnings_html = self.test_results.to_html(justify='left')
-#        metrics_html = self._performance_metrics.to_html(justify='left')
-#        notes_html = notes_df.to_html(justify='left', header=False)
-#        
-#        sub_dict = {'database': self.options.results_subdirectory_root,
-#                    'start_time': str(start_time), #data.df.index[0]),
-#                    'end_time': str(end_time), #data.df.index[-1]),
-#                    'num_notes': str(notes_df.shape[0]),
-#                    'notes': notes_html, #.replace('\n', '<br>'),
-#                    'num_missing_data': str(0),
-#                    #'missing_data': missing_html,
-#                    'num_warnings': str(self.test_results.shape[0]),
-#                    'warnings': warnings_html,
-#                    'graphics_path': os.path.abspath(self.options.results_subdirectory),
-#                    'qc_graphics': qc_graphic_files,
-#                    'pm_graphics': pm_graphic_files,
-#                    'general_graphics': custom_graphic_files,
-#                    #'num_data': data.df.shape[0],
-#                    'num_metrics': str(self._performance_metrics.shape[0]),
-#                    'metrics': metrics_html,
-#                    'config': config}
-#        html_string = _html_template(sub_dict, logo, encode_flag=False)
-#        
-#        # Write html file
-#        html_fname = join(self.options.results_subdirectory, self.options.results_subdirectory_root + ".html")
-#        html_file = open(html_fname,"w")
-#        html_file.write(html_string)
-#        html_file.close()
-#        
-#        logger.info("")
-#    
-##def _format_missing_data(test_results):
-##    missing_data = pd.DataFrame(columns=test_results.columns)
-##                                         
-##    key = test_results['Error Flag']
-##    grouped = test_results.groupby(key)
-##    try:
-##        for error_flag in ['Missing data', 'Missing timestamp', 'Corrupt data']:
-##            try:
-##                test_results_md = grouped.get_group(error_flag)
-##                grouped2 = test_results_md.groupby(['Start Date', 'End Date', 'Timesteps', 'System Name'])
-##                #grouped = test_results_md.groupby(['Start Date', 'End Date', 'Timesteps', 0]) #'System Name'])
-##                #pd.set_printoptions(max_colwidth=100)
-##                for name, group in grouped2:
-##                    var = group['Variable Name'].values   
-##                    var = np.array([v.rsplit(': ').pop() for v in var])
-##                    s = pd.Series([name[3], var, str(name[0]), str(name[1]), name[2], error_flag], index=test_results.columns)
-##                    missing_data = missing_data.append(s, ignore_index=True)  
-##            except:
-##                pass
-##
-##    except:
-##        pass
-##    
-##    return missing_data
-##    
-##def _format_test_results(test_results):
-##    
-##    temp = test_results['Variable Name'].apply(lambda x: pd.Series(x.split(':'))).stack()
-##    temp.sortlevel(1)
-##    for i in range(test_results.shape[0]):
-##        if len(temp[i]) == 2:
-##            test_results.loc[i,'System Name'] = temp[i][0]
-##            test_results.loc[i,'Variable Name'] = temp[i][1]
-##            
-##    formatted_test_results = pd.DataFrame(columns=test_results.columns)
-##                                         
-##    key = test_results['Error Flag']
-##    grouped = test_results.groupby(key)
-##    for test_results_group in grouped:
-##        error_flag = test_results_group[0]
-##        try:
-##            #test_results_md = grouped.get_group(error_flag)
-##            grouped2 = test_results_group.groupby(['Start Date', 'End Date', 'Timesteps', 'System Name'])
-##            for name, group in grouped2:
-##                var = group['Variable Name'].values   
-##                var = np.array([v.rsplit(': ').pop() for v in var])
-##                s = pd.Series([name[3], var, str(name[0]), str(name[1]), name[2], error_flag], index=test_results.columns)
-##                formatted_test_results = formatted_test_results.append(s, ignore_index=True)  
-##        except:
-##            pass
-##        
-##    test_results = formatted_test_results
-#    
-#def _html_template(sub_dict, logo=False, encode_flag=False):
-#    
-#    template = """
-#    <!DOCTYPE html>
-#    <html lang="en-US">
-#    <head>
-#    <title>$database</title>
-#    <meta charset="UTF-8" />
-#    </head>
-#    <table border="0" width="100%">
-#    <col style="width:70%">
-#    <col style="width:30%">
-#    <tr>
-#    <td align="left" valign="center">"""
-#    if logo:
-#        template = template + """
-#        <img  src=\"""" + logo + """\" alt='Logo' />"""
-#
-#    template = template + """
-#    </td>
-#    <td align="right" valign="center">"""
-#    template = template + """ 
-#    </td>
-#    </tr>
-#    </table>
-#    <hr>
-#    <H2>$database Report</H2>
-#    """
-#    #if sub_dict['num_data'] > 0:
-#    template = template + """
-#    Start time: $start_time <br>
-#    End time:  $end_time <br>
-#    Test Failures: $num_warnings <br>        
-#    Notes: $num_notes <br>
-#    <br>"""
-#    for im in sub_dict['general_graphics']:
-#        if encode_flag:
-#            with open(im, "rb") as f:
-#                data = f.read()
-#                img_encode = data.encode("base64")
-#            template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"500\"><br>"""
-#        else:
-#            template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"700\"><br>"""
-#    
-#    if int(sub_dict['num_metrics']) > 0:
-#        template = template + """
-#        <H3>Performance Metrics:</H3>
-#        $metrics
-#        <br>"""
-#        for im in sub_dict['pm_graphics']:
-#            if encode_flag:
-#                with open(im, "rb") as f:
-#                    data = f.read()
-#                    img_encode = data.encode("base64")
-#                template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"500\"><br>"""
-#            else:
-#                template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"700\"><br>"""
-#    
-#        
-#    #if sub_dict['num_data'] > 0:
-#    if int(sub_dict['num_missing_data']) > 0:
-#        template = template + """
-#        <H3>Missing/Corrupt Data:</H3>
-#        $missing_data
-#        <br>"""
-#    if int(sub_dict['num_warnings']) > 0:
-#        template = template + """
-#        <H3>Test Results:</H3>
-#        $warnings
-#        <br>"""
-#        for im in sub_dict['qc_graphics']:
-#            if encode_flag:
-#                with open(im, "rb") as f:
-#                    data = f.read()
-#                    img_encode = data.encode("base64")
-#                template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"500\"><br>"""
-#            else:
-#                template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"700\"><br>"""
-#    
-#    if int(sub_dict['num_notes']) > 0:
-#        template = template + """
-#        <H3>Notes:</H3>
-#        $notes <br>
-#        <br>"""
-#    else:
-#        template = template + """
-#        <H3>Notes:</H3> None<br><br>"""
-#    
-#    if sub_dict['config']:
-#        config = pprint.pformat(sub_dict['config'])
-#        template = template + """
-#        <b>Configuration Options:</b><br>
-#        <pre>""" + config + """</pre><br><br>"""
-#    
-#    template = template + """
-#    This report was generated by <A href="https://pypi.python.org/pypi/pecos">Pecos</A> """
-#    date = datetime.datetime.now()
-#    datestr = date.strftime('%m/%d/%Y')
-#    template = template + pecos.__version__ + ", " + datestr
-#    template = template + """
-#    <hr>
-#    </html>"""
-#    
-#    template = Template(template)
-#    
-#    html_string = template.substitute(sub_dict)
-#    
-#    return html_string
-#         
-#
-#    
-#class PerformanceMonitoringOptions(object):
-#
-#
-#    def __init__(self):
-#        """
-#        A class to manage Performance Monitoring options
-#        """
-#        self.results_directory = 'results'
-#        self.results_subdirectory_root = 'subdir'
-#        self.results_subdirectory_prefix = '_prefix'
-#        
-#    def make_results_directory(self):       
-#        """
-#        Make results directory
-#        """
-#        if not os.path.exists(self.results_directory):
-#            os.makedirs(self.results_directory)
-#        
-#    def make_results_subdirectory(self):
-#        """
-#        Make results subdirectory
-#        """
-#        self.results_subdirectory = os.path.join(self.results_directory, self.results_subdirectory_root + self.results_subdirectory_prefix)
-#        
-#        if not os.path.exists(self.results_subdirectory):
-#            os.makedirs(self.results_subdirectory)
-#        
-#    def clean_results_subdirectory(self):
-#        """
-#        Clean results subdirectory.  This removes all files in pm.results_subdirectory
-#        """
-#        self.results_subdirectory = os.path.join(self.results_directory, self.results_subdirectory_root + self.results_subdirectory_prefix)
-#        
-#        for file_name in glob(os.path.join(self.results_subdirectory, '*')):
-#            os.remove(file_name)
-#        
+        return test_results_mask

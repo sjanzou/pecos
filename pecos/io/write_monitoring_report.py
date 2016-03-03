@@ -18,8 +18,10 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     Parameters
     ----------
     filename : string
+        Filename with full path
     
-    subdirectory : 
+    subdirectory : string
+        Full path to directory containing results
     
     pm : PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)

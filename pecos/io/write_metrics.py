@@ -5,11 +5,14 @@ logger = logging.getLogger(__name__)
 
 def write_metrics(filename, metrics):
     """
-    Add metric to the stats file
+    Write metrics file
     
     Parameters
     -----------
-    stat : pd.Series
+    filename : string
+        Filename with full path
+    
+    metrics : pd.Series
         Data to add to the stats file
     """
     logger.info("Write metrics file")
