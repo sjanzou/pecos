@@ -251,7 +251,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'pecos.tex', u'Performance Monitoring using Pecos, Documentation and Use Cases',
+  ('index_latex', 'pecos.tex', u'Performance Monitoring using Pecos, Documentation and Use Cases',
    u'', 'howto', 'True'),
 ]
 

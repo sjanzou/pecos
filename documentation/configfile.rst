@@ -16,15 +16,13 @@ and bounds for range and increment tests.
 
 .. literalinclude:: ../examples/simple/simple_config.yml
 
-Evaluating strings
--------------------
 In the configuration file, composite signals and time filters can be defined 
 using strings of python code. 
 Numpy (and other python modules if needed) can be used for computation.  
 Code strings should be thoroughly tested.  
 A list of key:value pairs can be used to specify the order of evaluation.
 
-Keywords in [] are expanded using the following rules:
+Keywords in {} are expanded using the following rules:
 
 1. Keywords ELAPSED_TIME and CLOCK_TIME return time in seconds
 

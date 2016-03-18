@@ -3,13 +3,13 @@ Installation
 
 Pecos can be installed as a python package using pip or from source using git.  
 
-To install using pip (**NOT COMPLETE**)::
+To install using pip::
 
 	pip install pecos 
 	
-To build from source using git (**NOT COMPLETE, this should be moved to https://github.com/pecos**)::
+To build from source using git::
 
-	git clone S:\kaklise\src\pecos 
+	git clone https://github.com/pecos
 	cd pecos
 	python setup.py install
 
