@@ -45,6 +45,7 @@ for db_name in trans.keys():
         db_files = glob(os.path.join(general['File Directory'], db_name + analysis_date + '*'))
         for db_file in db_files:
             df = pecos.io.read_campbell_scientific(db_file, general['Index Column'], encoding='utf-16')
+            df.index = df.index.tz_localize(specs['Timezone'])
             pm.add_dataframe(df, db_name)
     pm.add_translation_dictonary(trans[db_name], db_name)
     

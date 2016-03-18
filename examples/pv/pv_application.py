@@ -15,8 +15,8 @@ def calculate_time_filter(index, specs):
     Location.altitude = specs['Altitude']
     Location.tz = specs['Timezone']
     
-    solarposition = pvlib.solarposition.ephemeris(index, Location)
-    solarposition.index = solarposition.index.tz_localize(tz=None)
+    solarposition = pvlib.solarposition.ephemeris(index, specs['Latitude'], specs['Longitude'])
+    #solarposition.index = solarposition.index.tz_localize(tz=None)
 
     time_filter = solarposition['apparent_elevation'] > specs['Min Sun Elevation']
 

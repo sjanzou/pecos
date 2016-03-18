@@ -18,7 +18,7 @@ corrupt_values = [-999]
 range_bounds = {
     'Random': [0, 1],
     'Wave': [-1, 1],
-    'Wave Absolute Error': [None, 0.2]}
+    'Wave Absolute Error': [None, 0.25]}
 increment_bounds = {
     'Linear': [0.0001, None],
     'Random': [0.0001, None],
@@ -34,8 +34,6 @@ if not os.path.exists(results_subdirectory):
 metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
 test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
 report_file =  os.path.join(results_subdirectory, system_name + '.html')
-
-
 
 # Create an PerformanceMonitoring instance
 pm = pecos.monitoring.PerformanceMonitoring()

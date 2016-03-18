@@ -16,14 +16,16 @@ def test_sun_position_pvlib():
     # Subset on 12/10/2015 = 4:55, 242 degrees
     
     timeseries = pd.DatetimeIndex(pd.date_range('12/10/2015', periods=24*60, freq='Min'))
+    timeseries = timeseries.tz_localize('MST')
     
     # pvlib python
     Location = pvlib.location.Location
     Location.latitude = 35.04;
     Location.longitude = -106.62;
-    Location.altitude = 1619;
-    Location.tz = 'US/Mountain'
-    sun_position = pvlib.solarposition.ephemeris(timeseries, Location);
+    #Location.altitude = 1619;
+    #Location.tz = 'US/Mountain'
+    
+    sun_position = pvlib.solarposition.ephemeris(timeseries, Location.latitude, Location.longitude);
     sun_position.index = sun_position.index.tz_localize(tz=None)
     
     sun_position.plot()

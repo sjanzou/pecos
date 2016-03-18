@@ -58,7 +58,7 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     notes_df = pd.DataFrame(notes.splitlines())
     notes_df.index += 1
     
-    pm.test_results.sort(['System Name', 'Variable Name'], inplace=True)
+    pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     
     # Generate graphics

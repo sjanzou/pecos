@@ -173,7 +173,7 @@ class PerformanceMonitoring(object):
             length = block['Stop Row'][i] - block['Start Row'][i] + 1
             if length >= min_failures:
                 if variable_name:
-                    var_name = sub_df.icol(block['Start Col'][i]).name
+                    var_name = sub_df.iloc[:,block['Start Col'][i]].name #sub_df.icol(block['Start Col'][i]).name
                     system_name = ''
                     temp = var_name.split(':')
                     if len(temp) == 2:
@@ -222,29 +222,33 @@ class PerformanceMonitoring(object):
         rng = pd.date_range(start=expected_start_time, end=expected_end_time, freq=str(frequency) + 's')
         
         # Check to see if timestamp is monotonic   
-        mask = pd.TimeSeries(self.df.index).diff() < 0
+#        mask = pd.TimeSeries(self.df.index).diff() < 0
+        mask = pd.Series(self.df.index).diff() < pd.Timedelta('0 days 00:00:00')
         mask.index = self.df.index
         mask[mask.index[0]] = False
         mask = pd.DataFrame(mask)
+        mask.columns = [0]
         
         self.append_test_results(mask, 'Nonmonotonic timestamp', variable_name=False, min_failures=min_failures)    
-       
+      
         # If not monotonic, sort df by timestamp
         if not self.df.index.is_monotonic:
             self.df = self.df.sort_index()
-            #self.df.sort(columns='TEMP', ascending=True, axis=0, inplace=True)
             
         # Check for duplicate timestamps
-        mask = pd.TimeSeries(self.df.index).diff() == 0
+#        mask = pd.TimeSeries(self.df.index).diff() == 0
+        mask = pd.Series(self.df.index).diff() == pd.Timedelta('0 days 00:00:00')
         mask.index = self.df.index
         mask[mask.index[0]] = False
         mask = pd.DataFrame(mask)
+        mask.columns = [0]
 
         self.append_test_results(mask, 'Duplicate timestamp', variable_name=False, min_failures=min_failures)
         
         # Drop duplicate timestamps
         self.df['TEMP'] = self.df.index
-        self.df.drop_duplicates(subset='TEMP', take_last=False, inplace=True)
+        #self.df.drop_duplicates(subset='TEMP', take_last=False, inplace=True)
+        self.df.drop_duplicates(subset='TEMP', keep='first', inplace=True)
         
         # reindex timestamps
         missing = []
@@ -511,26 +515,26 @@ class PerformanceMonitoring(object):
             DataFrame or Series with results of the evaluated string
         """
 
-        match = re.findall(r"\[(.*?)\]", string_to_eval)
+        match = re.findall(r"\{(.*?)\}", string_to_eval)
         for m in set(match):
             m = m.replace('[','') # check for list
             
             if m == 'ELAPSED_TIME':
                 ELAPSED_TIME = self.get_elapsed_time()
-                string_to_eval = string_to_eval.replace("["+m+"]",m)
+                string_to_eval = string_to_eval.replace("{"+m+"}",m)
             elif m == 'CLOCK_TIME':
                 CLOCK_TIME = self.get_clock_time()
-                string_to_eval = string_to_eval.replace("["+m+"]",m)
+                string_to_eval = string_to_eval.replace("{"+m+"}",m)
             else:
                 try:
                     self.df[self.trans[m]]
                     datastr = "self.df[self.trans['" + m + "']]"
-                    string_to_eval = string_to_eval.replace("["+m+"]",datastr)
+                    string_to_eval = string_to_eval.replace("{"+m+"}",datastr)
                 except:
                     try:
                         specs[m]
                         datastr = "specs['" + m + "']"
-                        string_to_eval = string_to_eval.replace("["+m+"]",datastr)
+                        string_to_eval = string_to_eval.replace("{"+m+"}",datastr)
                     except:
                         pass
                     
@@ -615,6 +619,7 @@ class PerformanceMonitoring(object):
             
         test_results_mask = ~pd.isnull(df)
         for i in self.test_results.index:
+            system = self.test_results.loc[i, 'System Name']
             variable = self.test_results.loc[i, 'Variable Name']
             start_date = self.test_results.loc[i, 'Start Date']
             end_date = self.test_results.loc[i, 'End Date']
@@ -624,6 +629,10 @@ class PerformanceMonitoring(object):
             if variable == '':
                 test_results_mask.loc[start_date:end_date] = False
             else:
-                test_results_mask.loc[start_date:end_date,variable] = False
+                if system == '':
+                    column_name = variable
+                else:
+                    column_name = system + ':'+ variable
+                test_results_mask.loc[start_date:end_date,column_name] = False
             
         return test_results_mask
