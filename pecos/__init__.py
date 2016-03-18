@@ -3,6 +3,7 @@ import metrics
 import io
 import graphics
 import logger
+import utils
 
 __version__ = '0.1'
 
