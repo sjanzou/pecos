@@ -2,12 +2,11 @@ import pecos
 import datetime
 import yaml
 import pv_application
-from glob import glob
 import os
 
 # Input
 system_name = 'Baseline_System'
-analysis_dates = [datetime.date(2015, 11, 11)]
+analysis_date = datetime.date(2015, 11, 11)
 config_file = 'Baseline_config.yml'
 
 # Open config file and extract information
@@ -15,7 +14,8 @@ fid = open(config_file, 'r')
 config = yaml.load(fid)
 fid.close()
 general = config['General'] 
-trans = config['Translation']
+MET_trans = config['MET Translation'] # translation dictonary for weather file
+BASE_trans = config['Baseline6kW Translation'] # translation dictonary for pv file
 specs = config['Specifications']
 composite_signals = config['Composite Signals']
 corrupt_values = config['Corrupt Values']
@@ -26,29 +26,32 @@ increment_bounds = config['Increment Bounds']
 results_directory = 'Results'
 if not os.path.exists(results_directory):
     os.makedirs(results_directory)
-results_subdirectory = os.path.join(results_directory, system_name + str(analysis_dates[0]))
+results_subdirectory = os.path.join(results_directory, system_name + str(analysis_date))
 if not os.path.exists(results_subdirectory):
     os.makedirs(results_subdirectory)
 metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
 test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
 report_file =  os.path.join(results_subdirectory, system_name + '.html')
 
-
-
 # Create an PerformanceMonitoring instance
 pm = pecos.monitoring.PerformanceMonitoring()
 
-# Populate the PerformanceMonitoring instance
-for db_name in trans.keys():
-    for analysis_date in analysis_dates:
-        analysis_date = analysis_date.strftime(general['Date Format'])
-        db_files = glob(os.path.join(general['File Directory'], db_name + analysis_date + '*'))
-        for db_file in db_files:
-            df = pecos.io.read_campbell_scientific(db_file, general['Index Column'], encoding='utf-16')
-            df.index = df.index.tz_localize(specs['Timezone'])
-            pm.add_dataframe(df, db_name)
-    pm.add_translation_dictonary(trans[db_name], db_name)
+# Add pv system data
+database_name = 'Baseline6kW'
+database_file = database_name + analysis_date.strftime(general['Date Format']) + '.dat'
+df = pecos.io.read_campbell_scientific(database_file, general['Index Column'], encoding='utf-16')
+df.index = df.index.tz_localize(specs['Timezone'])
+pm.add_dataframe(df, database_name)
+pm.add_translation_dictonary(BASE_trans, database_name)
     
+# Add weather data
+database_name = 'MET'
+database_file = database_name + analysis_date.strftime(general['Date Format']) + '.dat'
+df = pecos.io.read_campbell_scientific(database_file, general['Index Column'], encoding='utf-16')
+df.index = df.index.tz_localize(specs['Timezone'])
+pm.add_dataframe(df, database_name)
+pm.add_translation_dictonary(MET_trans, database_name)
+
 # Check timestamp
 pm.check_timestamp(specs['Frequency']) 
     
