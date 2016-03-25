@@ -9,5 +9,6 @@ dependencies:
     - nose
     - pvlib
     - matplotlib
+    - yaml
     - pip:
         - coveralls

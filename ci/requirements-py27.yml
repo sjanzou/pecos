@@ -10,6 +10,7 @@ dependencies:
     - nose
     - pvlib
     - matplotlib
+    - yaml
     - ephem
     - numba
     - pip:
