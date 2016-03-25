@@ -28,7 +28,7 @@ def test_sun_position_pvlib():
     sun_position = pvlib.solarposition.ephemeris(timeseries, Location.latitude, Location.longitude);
     sun_position.index = sun_position.index.tz_localize(tz=None)
     
-    sun_position.plot()
+    #sun_position.plot()
     
     sunrise_el = sun_position.loc['2015-12-10 7:04:00', 'apparent_elevation']
     expected = 0
@@ -77,7 +77,7 @@ def test_sun_position_ephem():
     
     sun_position = sun_position.convert_objects(convert_numeric=True)
     
-    sun_position.plot()
+    #sun_position.plot()
     
     sunrise_el = sun_position.loc['2015-12-10 7:04:00', 'elevation']
     expected = 0
