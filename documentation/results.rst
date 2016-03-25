@@ -95,7 +95,7 @@ Dashboard
 To compare performance of several systems, key graphics and metrics
 can be gathered in a dashboard view.  This summary can be linked to the HTML report
 for more detailed information.
-Pecos includes a dashboard example, **dashboard_driver.py**, in the examples/dashboard directory.
+Pecos includes a dashboard example, **dashboard_example.py**, in the examples/dashboard directory.
 
 The following method can be used to write a monitoring report::
 

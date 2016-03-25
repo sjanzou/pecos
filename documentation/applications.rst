@@ -14,15 +14,13 @@ The data objects used in Pecos are compatible with pvlib, which can be used to m
 systems (https://github.com/pvlib/pvlib-python).
 Pecos also includes a function to read Campbell Scientific ascii file format.
 
-Pecos includes a PV system example, **pv_driver.py**, in the examples/pv directory.  
-The example combines application specific functions in **pv_application.py**, 
-which computes the sun position using pvlib, 
-generates custom graphics and performance metrics. 
+Pecos includes a PV system example, **pv_example.py**, in the examples/pv directory.  
+The example uses graphics functions in **pv_graphics.py**.
 
 Performance metrics
 ---------------------
 The performance metrics file, created by Pecos, can be used for additional 
 analysis.
 
-Pecos includes a performance metrics example (based on PV metrics), **metrics_driver.py**, in the examples/metrics directory.
+Pecos includes a performance metrics example (based on PV metrics), **metrics_example.py**, in the examples/metrics directory.
 

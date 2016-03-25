@@ -34,7 +34,7 @@ of expected range, data that doesn't change, and data that changes abruptly.
 
 * Column D is missing data from 17:45 until 18:15
 
-The driver script, **simple_driver.py**, is used to run the quality control analysis using Pecos.
+The script, **simple_example.py**, is used to run the quality control analysis using Pecos.
 The script performs the following steps:
 
 * Define input for quality control tests, including 
