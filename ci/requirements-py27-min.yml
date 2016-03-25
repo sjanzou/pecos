@@ -9,6 +9,7 @@ dependencies:
     - nose
     - pvlib
     - matplotlib
+    - ephem
     - pyyaml
     - pip:
         - coveralls
