@@ -1,0 +1,15 @@
+name: test_env
+channels:
+    - defaults
+    - http://conda.anaconda.org/pvlib
+dependencies:
+    - python=3.5
+    - numpy
+    - scipy
+    - pandas
+    - nose
+    - pvlib
+    - ephem
+    - numba
+    - pip:
+        - coveralls
