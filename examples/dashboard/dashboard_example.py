@@ -1,3 +1,8 @@
+"""
+In this example, a dashboard is generated to view quality control analysis 
+results using analysis from several systems and locations.  Each system and 
+location links to a detailed report which includes test failures.
+"""
 import pecos
 import yaml
 import numpy as np

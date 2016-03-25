@@ -1,8 +1,22 @@
+"""
+In this example, data from a 6KW PV system is used to demonstrate integration
+between pecos and pvlib.  
+* Time series data is loaded from two text files in campbell scientific format
+* The files contain electrical output from the pv system and associated 
+  weather data. 
+* Translation dictonaries are defined to map and group the raw data into 
+  common names for analysis
+* A time filter is established based on sun position
+* Electrical adn weather data are loaded into a pecos PerformanceMonitoring 
+  class and a series of quality control tests are run
+* The results are printed to csv and html reports
+"""
 import pecos
 import datetime
 import yaml
 import pv_application
 import os
+import pvlib
 
 # Input
 system_name = 'Baseline_System'
@@ -14,8 +28,8 @@ fid = open(config_file, 'r')
 config = yaml.load(fid)
 fid.close()
 general = config['General'] 
-MET_trans = config['MET Translation'] # translation dictonary for weather file
-BASE_trans = config['Baseline6kW Translation'] # translation dictonary for pv file
+MET_translation_dictonary = config['MET Translation'] # translation dictonary for weather file
+BASE_translation_dictonary = config['Baseline6kW Translation'] # translation dictonary for pv file
 specs = config['Specifications']
 composite_signals = config['Composite Signals']
 corrupt_values = config['Corrupt Values']
@@ -42,7 +56,7 @@ database_file = database_name + analysis_date.strftime(general['Date Format']) +
 df = pecos.io.read_campbell_scientific(database_file, general['Index Column'], encoding='utf-16')
 df.index = df.index.tz_localize(specs['Timezone'])
 pm.add_dataframe(df, database_name)
-pm.add_translation_dictonary(BASE_trans, database_name)
+pm.add_translation_dictonary(BASE_translation_dictonary, database_name)
     
 # Add weather data
 database_name = 'MET'
@@ -50,13 +64,14 @@ database_file = database_name + analysis_date.strftime(general['Date Format']) +
 df = pecos.io.read_campbell_scientific(database_file, general['Index Column'], encoding='utf-16')
 df.index = df.index.tz_localize(specs['Timezone'])
 pm.add_dataframe(df, database_name)
-pm.add_translation_dictonary(MET_trans, database_name)
+pm.add_translation_dictonary(MET_translation_dictonary, database_name)
 
 # Check timestamp
 pm.check_timestamp(specs['Frequency']) 
     
-# Generate time filter
-time_filter = pv_application.calculate_time_filter(pm.df.index, specs)  
+# Generate time filter based on sun position
+solarposition = pvlib.solarposition.ephemeris(pm.df.index, specs['Latitude'], specs['Longitude'])
+time_filter = solarposition['apparent_elevation'] > specs['Min Sun Elevation'] 
 pm.add_time_filter(time_filter)
 
 # Check missing
@@ -88,7 +103,7 @@ metrics = QCI.join(pv_metrics)
 filename = os.path.join(results_subdirectory, system_name)
 pv_application.graphics(filename, pm)
 
-# Generate report
+# Generate reports
 pecos.io.write_metrics(metrics_file, metrics)
 pecos.io.write_test_results(test_results_file, pm.test_results)
 pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, metrics, config)

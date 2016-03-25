@@ -4,24 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pvlib
 from pecos.graphics import plot_timeseries, plot_scatter
-import os
 
-
-def calculate_time_filter(index, specs): 
-
-    Location = pvlib.location.Location
-    Location.latitude = specs['Latitude']
-    Location.longitude = specs['Longitude']
-    Location.altitude = specs['Altitude']
-    Location.tz = specs['Timezone']
-    
-    solarposition = pvlib.solarposition.ephemeris(index, specs['Latitude'], specs['Longitude'])
-    #solarposition.index = solarposition.index.tz_localize(tz=None)
-
-    time_filter = solarposition['apparent_elevation'] > specs['Min Sun Elevation']
-
-    return time_filter
-    
 def graphics(filename, pm):
     
     data = pm.df

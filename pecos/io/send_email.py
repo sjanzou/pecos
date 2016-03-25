@@ -1,4 +1,7 @@
-import win32com.client
+try:
+    import win32com.client
+except:
+    pass
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,13 @@
+"""
+In this example, performace metrics from a pv system are analyzed to determine 
+long term system health
+* Daily performance metrics for 2016 are loaded from a csv file
+* The files contain performance ratio and system availability.
+* The metrics are loaded into a pecos PerformanceMonitoring 
+  class and a series of quality control tests are run
+* The results are printed to csv and html reports
+"""
 import pecos
-import yaml
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -7,18 +15,7 @@ import os
 # Input
 system_name = 'System1'
 analysis_date = '2016'
-config_file = 'System1_2016_config.yml'
 data_file = 'System1_2016_performance_metrics.xlsx'
-
-# Open config file and extract information
-fid = open(config_file, 'r')
-config = yaml.load(fid)
-fid.close()
-trans = config['Translation']
-specs = config['Specifications']
-corrupt_values = config['Corrupt Values']
-range_bounds = config['Range Bounds']
-increment_bounds = config['Increment Bounds']
 
  # Define output files and directories
 results_directory = 'Results'
@@ -31,31 +28,31 @@ metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
 test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
 report_file =  os.path.join(results_subdirectory, system_name + '.html')
 
-
 # Create an PerformanceMonitoring instance
 pm = pecos.monitoring.PerformanceMonitoring()
 
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-pm.add_translation_dictonary(trans, system_name)
+translation_dictonary = dict(zip(df.columns, df.columns)) # 1:1 translation
+pm.add_translation_dictonary(translation_dictonary, system_name)
 
 # Check timestamp
-pm.check_timestamp(specs['Frequency']) 
+pm.check_timestamp(24*3600) 
         
 # Check missing
 pm.check_missing()
         
 # Check corrupt
-pm.check_corrupt(corrupt_values) 
+pm.check_corrupt([-999]) 
 
-# Check range
-for key,value in range_bounds.items():
-    pm.check_range(value, key)
+# Check range for all columns
+for key in pm.trans.keys():
+    pm.check_range([0,1], key)
 
-# Check increment
-for key,value in increment_bounds.items():
-    pm.check_increment([value[0], value[1]], key, absolute_value=value[2]) 
+# Check increment for all columns
+for key in pm.trans.keys():
+    pm.check_increment([-0.5, None], key, absolute_value=False) 
     
 # Create a custom graphic
 df.plot(ylim=[-0.2,1.2])
@@ -63,4 +60,4 @@ plt.savefig(os.path.join(results_subdirectory, system_name+'_custom_1.jpg'))
 
 # Generate report
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, config=config)
+pecos.io.write_monitoring_report(report_file, results_subdirectory, pm)

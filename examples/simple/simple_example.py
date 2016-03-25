@@ -1,3 +1,15 @@
+"""
+In this example, simple time series data is used to demonstrate basic functions
+in pecos.  
+* Data is loaded from an excel file which contains four columns of values that 
+  follow linear, random, sine, and cosine models
+* A translation dictonary is defined to map and group the raw data into 
+  common names for analysis
+* A time filter is established to screen out data between 3 AM and9 PM
+* The data is loaded into a pecos PerformanceMonitoring class and a series of 
+  quality control tests are run, including range tests and increment tests 
+* The results are printed to csv and html reports
+"""
 import pecos
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,7 +19,7 @@ import numpy as np
 # Input
 system_name = 'Simple'
 data_file = 'simple.xlsx'
-trans = {
+translation_dictonary = {
     'Linear': ['A'],
     'Random': ['B'],
     'Wave': ['C','D']}
@@ -41,7 +53,7 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-pm.add_translation_dictonary(trans, system_name)
+pm.add_translation_dictonary(translation_dictonary, system_name)
 
 # Check timestamp
 pm.check_timestamp(expected_frequency)
