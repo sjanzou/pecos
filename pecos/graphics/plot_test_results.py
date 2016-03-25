@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 from pecos.graphics import plot_timeseries
 import logging
+from nose.plugins.skip import SkipTest
 
 logger = logging.getLogger(__name__)
 
+@SkipTest
 def plot_test_results(filename, pm):
     """
     Create test results graphics.  

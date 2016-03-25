@@ -1,8 +1,10 @@
 import numpy as np
 import logging
+from nose.plugins.skip import SkipTest
 
 logger = logging.getLogger(__name__)
 
+@SkipTest
 def write_test_results(filename, test_results):
     """
     Write test results file
