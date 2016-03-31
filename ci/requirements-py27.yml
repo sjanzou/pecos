@@ -5,13 +5,10 @@ channels:
 dependencies:
     - python=2.7 
     - numpy
-    - scipy
     - pandas
     - nose
     - pvlib
     - matplotlib
-    - pyyaml
     - ephem
-    - numba
     - pip:
         - coveralls

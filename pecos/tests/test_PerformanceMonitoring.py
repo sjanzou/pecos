@@ -1,24 +1,30 @@
 from nose.tools import *
 from os.path import abspath, dirname, join
-import yaml
 import pecos
 import datetime
 
 testdir = dirname(abspath(__file__))
 datadir = join(testdir,'data')
 
-config_file = join(datadir,'TEST_config.yml')
-fid = open(config_file, 'r')
-config = yaml.load(fid)
-fid.close()
-     
+trans = {
+'Range': ['Range1', 'Range2'],
+'Deviation': ['Deviation1'],
+'Corrupt': ['Corrupt1'],
+'Missing': ['Missing1', 'Missing2'],
+'All': ['Range1', 'Range2', 'Deviation1', 'Corrupt1', 'Missing1', 'Missing2'],
+'Composite': ['(R1-sum(M))/R1', '(R2-sum(M))/R2', 'M1*D^2', 'M2*D^2', 'mean(All)-10']}
+
+composite_signals = [
+{'Comp1 (R-sum(M))/R': 'np.divide(({Range} - {Missing}.sum(axis=1)),{Range})'},
+{'Comp2 M*D^2': '{Missing}*np.power({Deviation},2)'}, 
+{'Comp3 mean(ALL)-10': '({All}).mean(axis=1) - 10'}]
+
 file_date = [datetime.datetime(2014,01,01,0,0,0)]
 
 def test_check_timestamp():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
     df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
-    trans = config['Translation'][system_name]
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
@@ -54,7 +60,6 @@ def test_check_missing():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
     df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
-    trans = config['Translation'][system_name]
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
@@ -95,7 +100,6 @@ def test_check_corrupt():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
     df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
-    trans = config['Translation'][system_name]
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
@@ -117,7 +121,6 @@ def test_check_range():
     system_name = 'TEST_db1'
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
     df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
-    trans = config['Translation'][system_name]
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
     pm.add_translation_dictonary(trans, system_name)
@@ -132,14 +135,13 @@ def test_check_range():
 #    system_name = 'TEST_db1'
 #    file_name = join(datadir,'TEST_db1_2014_01_01.dat')
 #    df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
-#    trans = config['Translation'][system_name]
 #    pm = pecos.monitoring.PerformanceMonitoring()
 #    pm.add_dataframe(df, system_name)
 #    pm.add_translation_dictonary(trans, system_name)
 #    
 #    pm.check_corrupt([-999])
 #        
-#    for composite_signal in config['Composite Equations']:
+#    for composite_signal in composite_signals:
 #        for key,value in composite_signal.items():
 #            signal = pm.evaluate_string(key, value)
 #            pm.add_signal(key, signal)

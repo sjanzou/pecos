@@ -1,16 +1,10 @@
 from nose.tools import *
 from os.path import abspath, dirname, join
-import yaml
 import pecos
 
 testdir = dirname(abspath(__file__))
 datadir = join(testdir,'data')
-
-config_file = join(datadir,'TEST_config.yml')
-fid = open(config_file, 'r')
-config = yaml.load(fid)
-fid.close()
-    
+ 
 def test_read_campbell_scientific():
     file_name = join(datadir,'TEST_db1_2014_01_01.dat')
     df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
