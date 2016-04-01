@@ -4,7 +4,7 @@ channels:
     - http://conda.anaconda.org/pvlib
 dependencies:
     - python=2.7 
-    - numpy==1.8.2
+    - numpy==1.9
     - pandas==0.15.0
     - nose
     - pvlib
