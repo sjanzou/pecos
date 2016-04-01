@@ -2,6 +2,8 @@
 In this example, a dashboard is generated to view quality control analysis 
 results using analysis from several systems and locations.  Each system and 
 location links to a detailed report which includes test failures.
+For illustrative purposes, the data used in this example is generated within 
+the script, using a sine wave function.
 """
 import pecos
 import yaml
@@ -73,7 +75,8 @@ for location_name in locations:
             pm.check_range(value, key) 
         
         # Compute metrics
-        QCI = pecos.metrics.qci(pm)
+        mask = pm.get_test_results_mask()
+        QCI = pecos.metrics.qci(mask, pm.tfilter)
         
         # Create a custom graphic
         df.plot()

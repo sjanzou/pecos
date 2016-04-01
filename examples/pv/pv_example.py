@@ -1,21 +1,22 @@
 """
 In this example, data from a 6KW PV system is used to demonstrate integration
 between pecos and pvlib.  
-* Time series data is loaded from two text files in campbell scientific format
+* Time series data is loaded from two text files in Campbell Scientific format
 * The files contain electrical output from the pv system and associated 
   weather data. 
-* Translation dictonaries are defined to map and group the raw data into 
+* Translation dictionaries are defined to map and group the raw data into 
   common names for analysis
 * A time filter is established based on sun position
-* Electrical adn weather data are loaded into a pecos PerformanceMonitoring 
+* Electrical and weather data are loaded into a pecos PerformanceMonitoring 
   class and a series of quality control tests are run
 * The results are printed to csv and html reports
 """
 import pecos
 import datetime
 import yaml
-import pv_application
+import pv_graphics
 import os
+import pandas as pd
 import pvlib
 
 # Input
@@ -95,13 +96,17 @@ for key,value in increment_bounds.items():
     pm.check_increment([value[0], value[1]], key, specs, min_failures=value[2]) 
     
 # Compute metrics
-QCI = pecos.metrics.qci(pm)
-pv_metrics = pv_application.metrics(pm)
-metrics = QCI.join(pv_metrics)
+mask = pm.get_test_results_mask()
+QCI = pecos.metrics.qci(mask, pm.tfilter)
+PR_AC = pecos.metrics.pv.ac_performance_ratio(pm.df[pm.trans['AC Power']], 
+                                           pm.df[pm.trans['POA']], 
+                                           specs['DC power rating'], pm.tfilter)
+Kt = pecos.metrics.pv.clearness_index(pm.df[pm.trans['DNI']], pm.tfilter)
+metrics = pd.concat([QCI, PR_AC, Kt], axis=1)
 
 # Generate custom graphics
 filename = os.path.join(results_subdirectory, system_name)
-pv_application.graphics(filename, pm)
+pv_graphics.graphics(filename, pm)
 
 # Generate reports
 pecos.io.write_metrics(metrics_file, metrics)

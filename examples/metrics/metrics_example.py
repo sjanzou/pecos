@@ -1,5 +1,5 @@
 """
-In this example, performace metrics from a pv system are analyzed to determine 
+In this example, performance metrics from a pv system are analyzed to determine 
 long term system health
 * Daily performance metrics for 2016 are loaded from a csv file
 * The files contain performance ratio and system availability.
@@ -34,7 +34,7 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-translation_dictonary = dict(zip(df.columns, df.columns)) # 1:1 translation
+translation_dictonary = dict(zip(df.columns, [[col] for col in df.columns])) # 1:1 translation
 pm.add_translation_dictonary(translation_dictonary, system_name)
 
 # Check timestamp

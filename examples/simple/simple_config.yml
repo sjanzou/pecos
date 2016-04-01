@@ -8,10 +8,10 @@ Translation:
   Wave: [C,D]
 
 Composite Signals: 
-- Wave Model: "np.sin([Multiplier]*[ELAPSED_TIME]/86400)"
-- Wave Absolute Error: "np.abs(np.subtract([Wave], [Wave Model]))"
+- Wave Model: "np.sin({Multiplier}*{ELAPSED_TIME}/86400)"
+- Wave Absolute Error: "np.abs(np.subtract({Wave}, {Wave Model}))"
 
-Time Filter: "([CLOCK_TIME] > 3*3600) & ([CLOCK_TIME] < 21*3600)"
+Time Filter: "({CLOCK_TIME} > 3*3600) & ({CLOCK_TIME} < 21*3600)"
 
 Corrupt Values: [-999]
 

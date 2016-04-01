@@ -1,41 +1,31 @@
 """
-In this example, simple time series data is used to demonstrate basic functions
-in pecos.  
-* Data is loaded from an excel file which contains four columns of values that 
-  follow linear, random, and sine models.
-* A translation dictionary is defined to map and group the raw data into 
-  common names for analysis
-* A time filter is established to screen out data between 3 AM and9 PM
-* The data is loaded into a pecos PerformanceMonitoring class and a series of 
-  quality control tests are run, including range tests and increment tests 
-* The results are printed to csv and html reports
+This example is the same as simple_example.py, but it uses a configuration 
+file to define the quality control analysis input.
 """
 import pecos
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import numpy as np
+import yaml
 
 # Input
 system_name = 'Simple'
+analysis_date = '1_1_2015'
 data_file = 'simple.xlsx'
-translation_dictonary = {
-    'Linear': ['A'],
-    'Random': ['B'],
-    'Wave': ['C','D']}
-expected_frequency = 900
-time_filter_min = 3*3600
-time_filter_max = 21*3600
-corrupt_values = [-999]
-range_bounds = {
-    'Random': [0, 1],
-    'Wave': [-1, 1],
-    'Wave Absolute Error': [None, 0.25]}
-increment_bounds = {
-    'Linear': [0.0001, None],
-    'Random': [0.0001, None],
-    'Wave': [0.0001, 0.5]}
-    
+config_file = 'simple_config.yml'
+  
+# Open config file and extract information
+fid = open(config_file, 'r')
+config = yaml.load(fid)
+fid.close()
+specs = config['Specifications']
+trans = config['Translation']
+composite_signals = config['Composite Signals']
+time_filter = config['Time Filter']
+corrupt_values = config['Corrupt Values']
+range_bounds = config['Range Bounds']
+increment_bounds = config['Increment Bounds']
+   
  # Define output files and directories
 results_directory = 'Results'
 if not os.path.exists(results_directory):
@@ -53,14 +43,13 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-pm.add_translation_dictonary(translation_dictonary, system_name)
+pm.add_translation_dictonary(trans, system_name)
 
 # Check timestamp
-pm.check_timestamp(expected_frequency)
+pm.check_timestamp(specs['Frequency'])
  
 # Generate time filter
-clock_time = pm.get_clock_time()
-time_filter = (clock_time > time_filter_min) & (clock_time < time_filter_max)
+time_filter = pm.evaluate_string('Time Filter', time_filter)
 pm.add_time_filter(time_filter)
 
 # Check missing
@@ -70,13 +59,10 @@ pm.check_missing()
 pm.check_corrupt(corrupt_values) 
 
 # Add composite signals
-elapsed_time= pm.get_elapsed_time()
-wave_model = np.sin(10*(elapsed_time/86400))
-wave_model.columns=['Wave Model']
-pm.add_signal('Wave Model', wave_model)
-wave_mode_abs_error = np.abs(np.subtract(pm.df[pm.trans['Wave']], wave_model))
-wave_mode_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-pm.add_signal('Wave Absolute Error', wave_mode_abs_error)
+for composite_signal in composite_signals:
+    for key, value in composite_signal.iteritems():
+        signal = pm.evaluate_string(key, value, specs)
+        pm.add_signal(key, signal)
 
 # Check range
 for key,value in range_bounds.items():
@@ -93,7 +79,8 @@ QCI = pecos.metrics.qci(mask, pm.tfilter)
 # Create a custom graphic
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
-df.plot(ax=ax, ylim=[-1.5,1.5])
+df.plot(ax=ax)
+plt.ylim((-1.5, 1.5))
 plt.savefig(os.path.join(results_subdirectory, system_name+'_custom_1.jpg')) 
 
 # Write metrics, test results, and report files
