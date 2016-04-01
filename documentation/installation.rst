@@ -3,17 +3,17 @@ Installation
 
 Pecos can be installed as a python package using pip or from source using git.  
 
-To install using pip::
+To install Pecos using pip::
 
 	pip install pecos 
 	
-To build from source using git::
+To build Pecos from source using git::
 
-	git clone https://github.com/pecos
+	git clone https://github.com/kaklise/pecos
 	cd pecos
 	python setup.py install
 
-Pecos is a python package which requires Python 2.7 along with several python 
+Pecos requires Python 2.7 along with several python 
 package dependencies, including:
 
 * Pandas: analyze and store time series data, 

@@ -15,7 +15,7 @@ Test results includes the following information:
 
 * End Date: : End time of the failure
 
-* Timesteps: The number of consecutive timestemps involved in the failure
+* Timesteps: The number of consecutive timesteps involved in the failure
 
 * Error Flag: Error messages include:
 
@@ -52,10 +52,10 @@ used in the analysis.
   custom graphics section.  By default, no custom graphics are generated.
 
 * **Performance Metrics:**
-  Performance metrics added during analysis are displayed in a table.
+  Performance metrics are displayed in a table.
 
 * **Test Results**
-  Test results contain infomation stored in pm.test_results
+  Test results contain information stored in pm.test_results
   Graphics follow that display the data point(s) that caused the failure.  
 
 * **Notes:**
@@ -64,7 +64,7 @@ used in the analysis.
   * Empty/missing database
   * Formatting error in the translation dictionary
   * Insufficient data for a specific quality control test
-  * Insufficient data or error when evaluating a composite equation
+  * Insufficient data or error when evaluating string
 
 * **Configuration Options:**
   Optional.  Configuration options used in the analysis.
@@ -75,29 +75,40 @@ The following method can be used to write a monitoring report::
 
 Test results
 ----------------------
-The test results CSV file contains informantion stored in pm.test_results.
+The test results CSV file contains information stored in pm.test_results.
 
-The following method can be used to write a monitoring report::
+The following method can be used to write test results::
 
 	pecos.io.write_test_results()
 	
 Performance metrics
 -----------------------------
 The performance metrics CSV file contains metrics.  
-Values are appended each time an analysis is run.
+Values are appended each time an analysis is run.  
 
-The following method can be used to write a monitoring report::
+The following method can be used to write metrics to a file::
 
 	pecos.io.write_metrics()
 	
 Dashboard
 -----------
 To compare performance of several systems, key graphics and metrics
-can be gathered in a dashboard view.  This summary can be linked to the HTML report
-for more detailed information.
-Pecos includes a dashboard example, **dashboard_example.py**, in the examples/dashboard directory.
+can be gathered in a dashboard view.  
+For example, the dashboard can contain multiple rows (one for each system) and multiple columns (one for each location).  
+The dashboard can be linked to specific monitoring reports for more detailed information.
+
+For each row and column in the dashboard, the following information can be specified
+
+* Text (i.e. general information about the system/location)
+
+* Graphics (i.e. a list of custom graphics)
+
+* Table (i.e. a Pandas DataFrame with performance metrics)
+
+* Link (i.e. the path to monitoring report for detailed information)
 
 The following method can be used to write a monitoring report::
 
 	pecos.io.write_dashboard()
-	
+
+Pecos includes a dashboard example, **dashboard_example.py**, in the examples/dashboard directory.

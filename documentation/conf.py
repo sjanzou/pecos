@@ -241,7 +241,10 @@ latex_elements = {
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+'preamble': '''
+        \\pagestyle{plain}
+        \\pagenumbering{arabic}
+''',
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
@@ -251,7 +254,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index_latex', 'pecos.tex', u'Performance Monitoring using Pecos, Documentation and Use Cases',
+  ('index_latex', 'pecos.tex', u'Performance Monitoring using Pecos',
    u'', 'howto', 'True'),
 ]
 

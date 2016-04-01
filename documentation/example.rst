@@ -34,7 +34,7 @@ of expected range, data that doesn't change, and data that changes abruptly.
 
 * Column D is missing data from 17:45 until 18:15
 
-The script, **simple_example.py**, is used to run the quality control analysis using Pecos.
+The script, **simple_example.py** (shown below), is used to run quality control analysis using Pecos.
 The script performs the following steps:
 
 * Define input for quality control tests, including 
@@ -43,19 +43,19 @@ The script performs the following steps:
   
   * Time filter to exclude data points early and late in the day
   
-  * sine wave model to compute measurement error
+  * Corrupt data values
   
   * Upper and lower bounds for data range and data increments 
-
+  
+  * sine wave model to compute measurement error
+  
 * Load time series data from an excel file
 
 * Run quality control tests
 
 * Generate an HTML report, test results CSV file, and performance metrics CSV file
-
-These methods are included in the Pecos class, :doc:`PerformanceMonitoring</apidoc/pecos.PerformanceMonitoring>`.
  
-.. literalinclude:: ../examples/simple/simple_driver.py
+.. literalinclude:: ../examples/simple/simple_example.py
 
 Results are saved in examples/simple/Results.  Results include:
 

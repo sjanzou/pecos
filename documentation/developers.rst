@@ -1,14 +1,14 @@
 Developers
 ==========
 
-Pecos is hosted on github at https://github.com/pecos.  
+The current release is hosted on PyPI at https://pypi.python.org/pypi/pecos.
 
-Bug reports can be submitted to https://github.com/pecos/issues.
+The software repository is hosted on github at https://github.com/kaklise/pecos.  
 
-Online documentation is hosted at http://pecos.readthedocs.org.
+Automated testing is run using TravisCI at https://travis-ci.org/kaklise/pecos.
 
-Software test are run nightly using the Jenkins continuous build and test server 
-at Sandia National Laboratories. 
+Test coverage statistics are collected using Coveralls at https://coveralls.io/github/kaklise/pecos.
+
 Tests can be run locally using nosetests::
 
 	nosetests -v --with-coverage --cover-package=pecos pecos
@@ -17,8 +17,3 @@ The development team includes:
 
 * Katherine Klise, kaklise@sandia.gov
 * Joshua Stein, jsstein@sandia.gov
-
-To cite Pecos, use the following reference:
-
-* K.A. Klise and J.S. Stein (2016), Performance Monitoring using Pecos, Documentation and Use Cases. Technical Report SAND2016-XXXX, Sandia National Laboratories. (PDF version of online documentation).
-

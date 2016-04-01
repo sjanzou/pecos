@@ -1,7 +1,5 @@
 Performance Monitoring using Pecos
 ================================================================
-Documentation and Use Cases
---------------------------------
 Pecos was designed to monitor performance of time series data, 
 subject to a series of quality control tests.  
 The software includes methods to 
@@ -19,12 +17,12 @@ The software can be customized for specific applications.
 * Time filters can be used to eliminate data at specific times from quality 
   control tests (i.e. early evening and late afternoon).  
 
-* Application specific modeled data can be incorporated in performance monitoring.
+* Application specific models can be incorporated into performance monitoring tests.
 
 * General and custom performance metrics can be saved to keep a  
   running history of system health. 
 
-* Pecos can be setup to run on an automated schedule (i.e. the software can be 
+* Analysis can be setup to run on an automated schedule (i.e. Pecos can be 
   run each day to analyze data collected on the previous day). 
   
 * HTML formatted reports can be sent via email or hosted on a website.  
@@ -45,7 +43,6 @@ The software can be customized for specific applications.
    results
    applications
    license
-   developers
 
 Indices and tables
 ==================
