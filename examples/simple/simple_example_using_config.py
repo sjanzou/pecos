@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import os
 import yaml
 
+# Initialize logger
+pecos.logger.initialize()
+
 # Input
 system_name = 'Simple'
 analysis_date = '1_1_2015'

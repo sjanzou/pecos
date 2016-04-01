@@ -15,6 +15,9 @@ import datetime
 from os.path import join, abspath
 from glob import glob
 
+# Initialize logger
+pecos.logger.initialize()
+
 systems = ['system1', 'system2', 'system3']
 locations = ['location1', 'location2']
 analysis_date = datetime.date.today()-datetime.timedelta(days=1)

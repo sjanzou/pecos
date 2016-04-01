@@ -12,6 +12,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+# Initialize logger
+pecos.logger.initialize()
+
 # Input
 system_name = 'System1'
 analysis_date = '2016'

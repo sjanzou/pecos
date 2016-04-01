@@ -19,6 +19,9 @@ import os
 import pandas as pd
 import pvlib
 
+# Initialize logger
+pecos.logger.initialize()
+
 # Input
 system_name = 'Baseline_System'
 analysis_date = datetime.date(2015, 11, 11)

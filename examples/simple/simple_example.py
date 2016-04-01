@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
+# Initialize logger
+pecos.logger.initialize()
+
 # Input
 system_name = 'Simple'
 data_file = 'simple.xlsx'
