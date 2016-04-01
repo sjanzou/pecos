@@ -1,6 +1,3 @@
-import pandas as pd
-import numpy as np
-from pandas.tseries.frequencies import to_offset
 import logging
 import os
 
@@ -29,6 +26,6 @@ def convert_html_to_image(html_filename, image_filename, image_format='jpg', qua
         Zoom factor
     """
     os.system('wkhtmltoimage --format ' + image_format + 
-                           ' --quality ' + quality + 
-                           ' --zoom ' + zoom + ' ' + 
+                           ' --quality ' + str(quality) + 
+                           ' --zoom ' + str(zoom) + ' ' + 
                             html_filename + ' ' + image_filename)
