@@ -93,7 +93,7 @@ def test_check_missing():
 3  Missing data
     """
     expected = [10,5,10,5]
-    print temp['Timesteps']
+    print(temp['Timesteps'])
     assert_items_equal(temp['Timesteps'], expected)
 
 def test_check_corrupt():
