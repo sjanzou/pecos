@@ -1,6 +1,7 @@
 from nose.tools import *
 from os.path import abspath, dirname, join
 import pecos
+import inspect
 
 testdir = dirname(abspath(inspect.getfile(inspect.currentframe())))
 datadir = abspath(join(testdir, 'data'))    
