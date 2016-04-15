@@ -3,8 +3,7 @@ Performance Monitoring using Pecos
 
 Advances in sensor technology have rapidly increased our ability to monitor 
 natural and human-made physical systems.  
-The challenge is to turn the resulting large volumes of data into meaningful information. 
-In many cases, it is critical to process this data on a regular schedule
+In many cases, it is critical to process the resulting large volumes of data on a regular schedule
 and alert system operators when the system has changed.
 Automated quality control and performance monitoring can allow system 
 operators to quickly detect performance issues.  
