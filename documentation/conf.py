@@ -244,6 +244,7 @@ latex_elements = {
 'preamble': '''
         \\pagestyle{plain}
         \\pagenumbering{arabic}
+        \\renewcommand{\\refname}{References}
 ''',
 
 # Latex figure (float) alignment

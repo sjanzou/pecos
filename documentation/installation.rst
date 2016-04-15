@@ -1,7 +1,11 @@
 Installation
 ======================================
 
-Pecos can be installed as a python package using pip or from source using git.  
+Pecos requires Python 2.7 along with several python 
+package dependencies.  Information on installing and using python can be found at 
+https://www.python.org/.  Python distributions, such as Python(x,y) and Anaconda,
+can also be used to manage the Python interface.  
+These distributions include the Python packages needed for Pecos.
 
 To install Pecos using pip::
 
@@ -13,17 +17,16 @@ To build Pecos from source using git::
 	cd pecos
 	python setup.py install
 
-Pecos requires Python 2.7 along with several python 
-package dependencies, including:
+Python package dependencies include:
 
-* Pandas: analyze and store time series data, 
+* Pandas [McKinney2013]_: analyze and store time series data, 
   http://pandas.pydata.org/
-* Numpy: support large, multi-dimensional arrays and matrices, 
+* Numpy [vanderWalt2011]_: support large, multi-dimensional arrays and matrices, 
   http://www.numpy.org/
-* Matplotlib: produce figures, 
+* Matplotlib [Hunter2007]_: produce figures, 
   http://matplotlib.org/
 
-The following python packages are optional:
+Optional python packages include:
 
 * pyyaml: store configuration options in human readable data format,
   http://pyyaml.org/
