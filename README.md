@@ -14,12 +14,11 @@ operators to quickly detect performance issues.
 
 Pecos is an open source python package designed to address this need.
 Pecos includes built-in functionality to monitor performance of time series data, 
-subject to a series of quality control tests.  
+subject to a series of quality control tests.
 The python package includes methods to run quality control tests defined by the user
 and generate reports which include performance metrics, test results, and graphics.
-The software was developed specifically for 
-solar photovoltaic system monitoring, but it can be customized for other 
-applications.
+The software was developed specifically for solar photovoltaic system 
+monitoring, but it can be customized for other applications.
 
 License
 ------------
