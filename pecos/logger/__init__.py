@@ -1,1 +1,1 @@
-from .logger import initialize
+from pecos.logger.logger import initialize

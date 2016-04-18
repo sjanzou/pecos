@@ -1,9 +1,9 @@
-from . import monitoring
-from . import metrics
-from . import io
-from . import graphics
-from . import logger
-from . import utils
+from pecos import monitoring
+from pecos import metrics
+from pecos import io
+from pecos import graphics
+from pecos import logger
+from pecos import utils
 
 __version__ = '0.1'
 

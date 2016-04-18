@@ -1,1 +1,1 @@
-from .PerformanceMonitoring import PerformanceMonitoring
+from pecos.monitoring.PerformanceMonitoring import PerformanceMonitoring
