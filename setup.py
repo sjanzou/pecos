@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 from distutils.core import Extension
-import sys
 
 DISTNAME = 'pecos'
 VERSION = '0.1'
@@ -12,9 +11,6 @@ AUTHOR = 'Katherine Klise, Joshua Stein'
 MAINTAINER_EMAIL = 'kaklise@sandia.gov'
 LICENSE = 'Revised BSD'
 URL = 'https://github.com/kaklise/pecos'
-
-if not sys.version_info[:2] in ((2,7)):
-   sys.exit('%s requires Python 2.7' % DISTNAME)
 
 setuptools_kwargs = {
     'zip_safe': False,
