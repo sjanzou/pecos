@@ -12,6 +12,19 @@ MAINTAINER_EMAIL = 'kaklise@sandia.gov'
 LICENSE = 'Revised BSD'
 URL = 'https://github.com/kaklise/pecos'
 
+if not sys.version_info[:2] in ((2,7)):
+   sys.exit('%s requires Python 2.7' % DISTNAME)
+
+setuptools_kwargs = {
+    'zip_safe': False,
+    'install_requires': ['numpy >= 1.10.4',
+                         'pandas >= 0.18.0',
+                         'matplotlib',
+                         ],
+    'scripts': [],
+    'include_package_data': True
+}
+
 setup(name=DISTNAME,
       version=VERSION,
       packages=PACKAGES,
@@ -22,4 +35,4 @@ setup(name=DISTNAME,
       maintainer_email=MAINTAINER_EMAIL,
       license=LICENSE,
       url=URL,
-      zip_safe=False)
+      **setuptools_kwargs)
