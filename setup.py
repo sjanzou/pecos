@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 from distutils.core import Extension
+import sys
 
 DISTNAME = 'pecos'
 VERSION = '0.1'
