@@ -16,7 +16,7 @@ from string import Template
 try:
     from nose.tools import nottest
 except ImportError:
-    def nottest(afunction):
+    def _nottest(afunction):
         return afunction
         
 logger = logging.getLogger(__name__)
