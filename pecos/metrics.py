@@ -1,3 +1,6 @@
+"""
+The metrics module contains performance metrics to track system health.
+"""
 import logging
 import pandas as pd
 import numpy as np

@@ -1,15 +1,7 @@
-pecos.metrics package
-=====================
+pecos.metrics module
+====================
 
 .. automodule:: pecos.metrics
     :members:
     :undoc-members:
     :show-inheritance:
-
-Submodules
-----------
-
-.. toctree::
-
-   pecos.metrics.qci
-

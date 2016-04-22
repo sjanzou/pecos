@@ -1,3 +1,7 @@
+"""
+The monitoring module contains the PerformanceMonitoring class used to run
+quality control tests and store results.
+"""
 import pandas as pd
 import numpy as np
 import re

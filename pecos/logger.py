@@ -1,3 +1,7 @@
+"""
+The logger module contains a function to initialize the logger.  Logger
+warnings and errors are printed to the monitoring report.
+"""
 import logging
 from os.path import abspath, dirname, join
 logging.getLogger('pecos').addHandler(logging.NullHandler())
