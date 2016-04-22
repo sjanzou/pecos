@@ -41,6 +41,7 @@ Contents
    results
    applications
    license
+   whatsnew
    developers
    API documentation <apidoc/pecos>
    reference

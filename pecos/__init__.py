@@ -4,6 +4,7 @@ from pecos import io
 from pecos import graphics
 from pecos import logger
 from pecos import utils
+from pecos import pv
 
 __version__ = '0.1'
 

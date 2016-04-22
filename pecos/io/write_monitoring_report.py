@@ -51,7 +51,7 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     pd.set_option('display.width', 40)
     
     # Collect notes (from the logger file)
-    logfiledir = logfiledir = os.path.join(dirname(abspath(__file__)),'..', 'logger')
+    logfiledir = logfiledir = os.path.join(dirname(abspath(__file__)),'..')
     f = open(join(logfiledir,'logfile'), 'r')
     notes = f.read()
     f.close()

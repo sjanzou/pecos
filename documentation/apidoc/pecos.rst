@@ -13,8 +13,15 @@ Subpackages
 
     pecos.graphics
     pecos.io
-    pecos.logger
     pecos.metrics
-    pecos.monitoring
-    pecos.utils
+
+Submodules
+----------
+
+.. toctree::
+
+   pecos.logger
+   pecos.monitoring
+   pecos.pv
+   pecos.utils
 

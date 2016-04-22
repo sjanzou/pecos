@@ -101,10 +101,10 @@ for key,value in increment_bounds.items():
 # Compute metrics
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
-PR_AC = pecos.metrics.pv.ac_performance_ratio(pm.df[pm.trans['AC Power']], 
+PR_AC = pecos.pv.ac_performance_ratio(pm.df[pm.trans['AC Power']], 
                                            pm.df[pm.trans['POA']], 
                                            specs['DC power rating'], pm.tfilter)
-Kt = pecos.metrics.pv.clearness_index(pm.df[pm.trans['DNI']], pm.tfilter)
+Kt = pecos.pv.clearness_index(pm.df[pm.trans['DNI']], pm.tfilter)
 metrics = pd.concat([QCI, PR_AC, Kt], axis=1)
 
 # Generate custom graphics

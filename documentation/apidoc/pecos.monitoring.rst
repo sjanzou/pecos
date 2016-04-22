@@ -1,15 +1,7 @@
-pecos.monitoring package
-========================
+pecos.monitoring module
+=======================
 
 .. automodule:: pecos.monitoring
     :members:
     :undoc-members:
     :show-inheritance:
-
-Submodules
-----------
-
-.. toctree::
-
-   pecos.monitoring.PerformanceMonitoring
-

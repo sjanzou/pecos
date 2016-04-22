@@ -11,6 +11,5 @@ Submodules
 
 .. toctree::
 
-   pecos.metrics.pv
    pecos.metrics.qci
 

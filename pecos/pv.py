@@ -1,10 +1,15 @@
 import pandas as pd
 import numpy as np
-import datetime
+import datetime 
 import logging
 
 logger = logging.getLogger(__name__)
 
+try:
+    import pvlib
+except:
+    logger.info('Could not import pvlib')
+    
 def ac_performance_ratio(acpower, poa, DC_power_rating, tfilter=None, per_day=True):
     """
     The daily AC performance ratio (:math:`PR_{AC}`) is defined in IEC 61724 as:
@@ -113,8 +118,6 @@ def clearness_index(dni, tfilter=None, per_day=True):
         Clearness index, if per_day = True, then a dataframe indexed by day is 
         returned, otherwise a single vlaue is returned for the entire dataset.
     """
-    import pvlib
-    
     logger.info("Compute Clearness Index")
     
     df = dni
