@@ -65,5 +65,10 @@ Results are saved in examples/simple/Results.  Results include:
 
 * Performance metric CSV file, **Simple_metrics.csv**, includes a quality control index based on the analysis.  
 
-.. raw:: html
-   :file: ..\examples\simple\Results\Simple_2015_01_01\Simple.html
+..
+	.. raw:: html
+	   :file: ..\examples\simple\Results\Simple_2015_01_01\Simple.html
+
+.. figure:: figures/Simple.jpg
+	:scale: 100 %
+	:alt: Simple.html
