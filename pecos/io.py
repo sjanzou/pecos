@@ -14,7 +14,7 @@ import pprint
 from string import Template
 
 try:
-    from nose.tools import nottest
+    from nose.tools import nottest as _nottest
 except ImportError:
     def _nottest(afunction):
         return afunction
@@ -119,7 +119,7 @@ def write_metrics(filename, metrics):
     metrics.to_csv(fout, index_label='TIMESTEP', na_rep = 'NaN')
     fout.close()
 
-@nottest
+@_nottest
 def write_test_results(filename, test_results):
     """
     Write test results file

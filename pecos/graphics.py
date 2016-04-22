@@ -9,7 +9,7 @@ import textwrap
 import logging
 
 try:
-    from nose.tools import nottest
+    from nose.tools import nottest as _nottest
 except ImportError:
     def _nottest(afunction):
         return afunction
@@ -201,7 +201,7 @@ def plot_timeseries(data, tfilter, test_results_group=None, xaxis_min=None, xaxi
     box = ax.get_position()
     ax.set_position([box.x0, box.y0+0.2, box.width, box.height*0.64])
 
-@nottest
+@_nottest
 def plot_test_results(filename, pm):
     """
     Create test results graphics.
