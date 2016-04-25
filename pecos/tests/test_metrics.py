@@ -111,6 +111,3 @@ def test_qci_perday():
     QCI = pecos.metrics.qci(mask, per_day = True)
     assert_equal(QCI['Quality Control Index'][0], (72-5)/72.0)
     assert_equal(QCI['Quality Control Index'][1], 1.0)
-
-if __name__ == '__main__':
-    test_qci_with_test_results()
