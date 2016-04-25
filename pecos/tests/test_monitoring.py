@@ -138,3 +138,4 @@ class Test_db1_file(unittest.TestCase):
         
         expected = [75600, 79200, 82800, 0, 3600, 7200, 10800, 14400, 18000, 21600]
         assert_equal(clock_time.iloc[24:34][0].values.tolist(), expected)
+
