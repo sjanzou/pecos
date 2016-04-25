@@ -1,4 +1,3 @@
-import unittest
 from nose.tools import *
 from os.path import abspath, dirname, join
 import pecos
@@ -53,8 +52,8 @@ def test_qci_with_test_results():
     test_result = {
     'System Name': 'Test',
     'Variable Name': 'B', 
-    'Start Date': '2016-01-01 00:00:00', 
-    'End Date': '2016-01-01 00:00:00', 
+    'Start Date': '2016-01-01 01:00:00', 
+    'End Date': '2016-01-01 01:00:00', 
     'Timesteps': 1, 
     'Error Flag': 'Error Flag'}
     pm.test_results = pm.test_results.append(pd.DataFrame(test_result, index=[2]))
@@ -62,13 +61,18 @@ def test_qci_with_test_results():
     mask = pm.get_test_results_mask()
     QCI = pecos.metrics.qci(mask, per_day = False)
     
-    expected_mask = pd.DataFrame(data=[[True, False, True],[False, True, True],[False, True, True],[False, True, True],[False, True, True]], 
+    expected_mask = pd.DataFrame(data=[[False, False, True],[False, True, True],[False, True, True],[False, True, True],[False, True, True]], 
                                  index=pm.df.index, 
                                  columns=pm.df.columns)
     
     assert_equal((mask == expected_mask).any().any(), True)
     assert_equal(QCI, (15-5)/15.0)
 
+    tfilter = pd.Series(data = [True, False, True, True, True], index=pm.df.index)
+    QCI_with_tfilter = pecos.metrics.qci(mask, tfilter = tfilter, per_day=False)
+    
+    assert_equal(QCI_with_tfilter, (12-3)/12.0)
+    
 def test_qci_perday():
     periods = 48
     np.random.seed(100)
@@ -108,3 +112,5 @@ def test_qci_perday():
     assert_equal(QCI['Quality Control Index'][0], (72-5)/72.0)
     assert_equal(QCI['Quality Control Index'][1], 1.0)
 
+if __name__ == '__main__':
+    test_qci_with_test_results()
