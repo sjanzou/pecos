@@ -32,8 +32,8 @@ fid = open(config_file, 'r')
 config = yaml.load(fid)
 fid.close()
 general = config['General'] 
-MET_translation_dictonary = config['MET Translation'] # translation dictonary for weather file
-BASE_translation_dictonary = config['Baseline6kW Translation'] # translation dictonary for pv file
+MET_translation_dictionary = config['MET Translation'] # translation dictionary for weather file
+BASE_translation_dictionary = config['Baseline6kW Translation'] # translation dictionary for pv file
 specs = config['Specifications']
 composite_signals = config['Composite Signals']
 corrupt_values = config['Corrupt Values']
@@ -60,7 +60,7 @@ database_file = database_name + analysis_date.strftime(general['Date Format']) +
 df = pecos.io.read_campbell_scientific(database_file, general['Index Column'], encoding='utf-16')
 df.index = df.index.tz_localize(specs['Timezone'])
 pm.add_dataframe(df, database_name)
-pm.add_translation_dictonary(BASE_translation_dictonary, database_name)
+pm.add_translation_dictionary(BASE_translation_dictionary, database_name)
     
 # Add weather data
 database_name = 'MET'
@@ -68,7 +68,7 @@ database_file = database_name + analysis_date.strftime(general['Date Format']) +
 df = pecos.io.read_campbell_scientific(database_file, general['Index Column'], encoding='utf-16')
 df.index = df.index.tz_localize(specs['Timezone'])
 pm.add_dataframe(df, database_name)
-pm.add_translation_dictonary(MET_translation_dictonary, database_name)
+pm.add_translation_dictionary(MET_translation_dictionary, database_name)
 
 # Check timestamp
 pm.check_timestamp(specs['Frequency']) 

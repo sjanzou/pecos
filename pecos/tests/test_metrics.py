@@ -30,7 +30,7 @@ def test_qci_no_test_results():
     
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
-    pm.add_translation_dictonary(trans, system_name)
+    pm.add_translation_dictionary(trans, system_name)
     
     mask = pm.get_test_results_mask()
     QCI = pecos.metrics.qci(mask, per_day=False)
@@ -49,7 +49,7 @@ def test_qci_with_test_results():
     
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
-    pm.add_translation_dictonary(trans, system_name)
+    pm.add_translation_dictionary(trans, system_name)
     
     test_result = {
     'System Name': 'Test',
@@ -95,7 +95,7 @@ def test_qci_perday():
     
     pm = pecos.monitoring.PerformanceMonitoring()
     pm.add_dataframe(df, system_name)
-    pm.add_translation_dictonary(trans, system_name)
+    pm.add_translation_dictionary(trans, system_name)
     
     test_result = {
     'System Name': 'Test',

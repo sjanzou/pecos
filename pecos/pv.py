@@ -26,7 +26,7 @@ def insolation(irradiance, time_unit=1, tfilter=None, per_day=True):
         Time filter containing boolean values for each time index
         
     per_day : Boolean (default = True)
-        Flag indicating if the results shoudl be computed per day
+        Flag indicating if the results should be computed per day
     
     Returns
     -------
@@ -54,7 +54,7 @@ def energy(power, time_unit=1, tfilter=None, per_day=True):
         Time filter containing boolean values for each time index
         
     per_day : Boolean (default = True)
-        Flag indicating if the results shoudl be computed per day
+        Flag indicating if the results should be computed per day
     
     Returns
     -------
@@ -67,7 +67,7 @@ def energy(power, time_unit=1, tfilter=None, per_day=True):
     
 def performance_ratio(energy, insolation, dc_power_rating, reference_irradiance=1000):
     """
-    Performance ratio (:math:`PR`) is defined as:
+    Compute performance ratio defined as:
 
     :math:`PR=\dfrac{Y_{f}}{Yr}`
     
@@ -121,7 +121,7 @@ def performance_ratio(energy, insolation, dc_power_rating, reference_irradiance=
     
 def performance_index(energy, predicted_energy):
     """
-    Performance index is the the ratio of measured energy from a PV system 
+    Compute performance index defined as the ratio of measured energy from a PV system 
     to the predicted energy using a PV performance model.  Unlike with the 
     performance ratio, the performance index very close to 1 for a well 
     functioning PV system and should not vary by season due to temperature 
@@ -160,9 +160,9 @@ def performance_index(energy, predicted_energy):
     
     return PI
 
-def energy_yeild(energy, dc_power_rating):
+def energy_yield(energy, dc_power_rating):
     """
-    Energy yield is the energy produced over a given timeframe (generally a year) 
+    Compute energy yield defined as the energy produced over a given timeframe 
     divided by the DC power rating of the system.
     
     Parameters
@@ -170,15 +170,15 @@ def energy_yeild(energy, dc_power_rating):
     energy : pd.DataFrame with a single column or pd.Series
         Measured energy
     
-     dc_power_rating : float
+    dc_power_rating : float
         DC power rating at STC conditions
         
     Returns
     ---------
     EY : pd.DataFrame
-        Energy yeild  
+        Energy yield  
     """
-    logger.info("Compute Energy Yeild")
+    logger.info("Compute Energy Yield")
     
     try:
         energy = pd.Series(energy, index=energy.index)
@@ -188,20 +188,20 @@ def energy_yeild(energy, dc_power_rating):
 
     EY = energy/dc_power_rating
     
-    EY = EY.to_frame('Energy Yeild')
+    EY = EY.to_frame('Energy Yield')
     
     return EY
     
 def clearness_index(dni_insolation, ea_insolation):
     """
-    Clearness index (:math:`Kt`) is defined as:
+    Compute clearness index defined as:
     
     :math:`Kt=\dfrac{DN\_insolation}{Ex\_insolation}`
     
     where 
     :math:`DN\_insolation` is the direct-normal insolation in one day 
     (kWh/m2/d)
-    :math:`Ex\_insolation` is the the extraterestrial insolation in one 
+    :math:`Ex\_insolation` is the extraterrestrial insolation in one 
     day (kWh/m2/d).  Computed using pvlib.irradiance.extraradiation.
     
     Parameters

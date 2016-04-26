@@ -34,7 +34,7 @@ def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
         Index column name
 
     encoding : string
-        character encoding (i.e. utf-16)
+        Character encoding (i.e. utf-16)
     """
     logger.info("Reading Campbell Scientific CSV file " + file_name)
 

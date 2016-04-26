@@ -24,7 +24,7 @@ class PerformanceMonitoring(object):
                                                 'Start Date', 'End Date', 
                                                 'Timesteps', 'Error Flag']) 
     
-    def add_dataframe(self, df, system_name, add_identity_translation_dictonary = False):
+    def add_dataframe(self, df, system_name, add_identity_translation_dictionary = False):
         """
         Add dataframe to the PerformanceMonitoring class
         
@@ -36,8 +36,8 @@ class PerformanceMonitoring(object):
         system_name : string
             System name
             
-        add_identity_translation_dictonary : bool (default = False)
-            Add a 1:1 translation dictonary to the Performance Monitoring class
+        add_identity_translation_dictionary : bool (default = False)
+            Add a 1:1 translation dictionary to the Performance Monitoring class
             using all column names in df
         """
         temp = df.copy()
@@ -51,21 +51,21 @@ class PerformanceMonitoring(object):
             self.df = temp.copy()     
 
         # define identifty translation
-        if add_identity_translation_dictonary:
+        if add_identity_translation_dictionary:
             trans = {}
             for col in df.columns:
                 trans[col] = [col]
             
-            self.add_translation_dictonary(trans, system_name)
+            self.add_translation_dictionary(trans, system_name)
             
-    def add_translation_dictonary(self, trans, system_name):
+    def add_translation_dictionary(self, trans, system_name):
         """
-        Add translation dictonary to the PerformanceMonitoring class
+        Add translation dictionary to the PerformanceMonitoring class
         
         Parameters
         -----------
-        trans : dictonary
-            Translation dictonary
+        trans : dictionary
+            Translation dictionary
         
         system_name : string
             System name
@@ -97,7 +97,7 @@ class PerformanceMonitoring(object):
         Parameters
         -----------
         col_name : string
-            Column name to add to translation dictonary
+            Column name to add to translation dictionary
         
         df : pd.DataFarame
             DataFrame to add to df
@@ -202,10 +202,10 @@ class PerformanceMonitoring(object):
         Parameters
         ----------
         frequency : int
-            Expected timeseries frequency, in seconds
+            Expected time series frequency, in seconds
         
         expected_start_time : Timestamp (default = None)
-            Expected start time. If not specified, the minimimum timestamp is used.
+            Expected start time. If not specified, the minimum timestamp is used.
         
         expected_end_time : Timestamp (default = None)
             Expected end time. If not specified, the maximum timestamp is used.
@@ -277,13 +277,13 @@ class PerformanceMonitoring(object):
             [lower bound, upper bound], None can be used in place of a lower or upper bound
             
         key : string (default = None)
-            Translation dictonary key.  If not specified, all columns are used in the test.
+            Translation dictionary key.  If not specified, all columns are used in the test.
         
         specs : dict (default = {})
             Constants used in bound
         
         rolling_mean : int (default = 1)
-            Rolling mean window in number of timesteps
+            Rolling mean window in number of time steps
         
         min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
@@ -343,19 +343,19 @@ class PerformanceMonitoring(object):
             [lower bound, upper bound], None can be used in place of a lower or upper bound
         
         key : string (default = None)
-            Translation dictonary key. If not specified, all columns are used in the test.
+            Translation dictionary key. If not specified, all columns are used in the test.
             
         specs : dict (default = {})
             Constants used in bound
         
         increment : int (default = 1)
-            Timestep shift used to compute difference
+            Time step shift used to compute difference
             
         absolute_value : bool (default = True)
             Take the absolute value of the increment data
             
         rolling_mean : int (default = 1)
-            Rolling mean window in number of timesteps
+            Rolling mean window in number of time steps
         
         min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
@@ -418,7 +418,7 @@ class PerformanceMonitoring(object):
         Parameters
         ----------
         key : string (default = None)
-            Translation dictonary key. If not specified, all columns are used in the test.
+            Translation dictionary key. If not specified, all columns are used in the test.
         
         min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
@@ -462,7 +462,7 @@ class PerformanceMonitoring(object):
             List of corrupt data values
             
         key : string (default = None)
-            Translation dictonary key. If not specified, all columns are used in the test.
+            Translation dictionary key. If not specified, all columns are used in the test.
         
         min_failures : int (default = 1)
             Minimum number of consecutive failures required for reporting
@@ -600,7 +600,7 @@ class PerformanceMonitoring(object):
         Parameters
         -----------
         key : string (default = None)
-            Translation dictonary key. If not specified, all columns are used
+            Translation dictionary key. If not specified, all columns are used
             
         Returns
         --------

@@ -16,7 +16,7 @@ def qci(mask, tfilter=None, per_day=True):
     
     where 
     :math:`D` is the set of data columns and 
-    :math:`T` is the set of timestamps in the analysis.  
+    :math:`T` is the set of time stamps in the analysis.  
     :math:`X_{dt}` is a data point for column :math:`d` time t` that passed all quality control test.  
     :math:`|DT|` is the number of data points in the analysis.
     
@@ -29,7 +29,7 @@ def qci(mask, tfilter=None, per_day=True):
         Time filter containing boolean values for each time index
         
     per_day : Boolean (default = True)
-        Flag indicating if the results shoudl be computed per day
+        Flag indicating if the results should be computed per day
     
     Returns
     -------
@@ -70,16 +70,16 @@ def time_integral(df, time_unit=1, tfilter=None, per_day=True):
     Parameters
     -----------
     df : pd.DataFrame
-        data
+        Data
         
     time_unit : float (default = 1)
-         Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
+        Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
          
     tfilter : pd.Series (default = None)
         Time filter containing boolean values for each time index
         
     per_day : Boolean (default = True)
-        Flag indicating if the results shoudl be computed per day
+        Flag indicating if the results should be computed per day
     
     Returns
     -------

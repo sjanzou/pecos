@@ -37,8 +37,8 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-translation_dictonary = dict(zip(df.columns, [[col] for col in df.columns])) # 1:1 translation
-pm.add_translation_dictonary(translation_dictonary, system_name)
+translation_dictionary = dict(zip(df.columns, [[col] for col in df.columns])) # 1:1 translation
+pm.add_translation_dictionary(translation_dictionary, system_name)
 
 # Check timestamp
 pm.check_timestamp(24*3600) 

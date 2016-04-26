@@ -60,7 +60,7 @@ for location_name in locations:
         data=np.sin(np.random.rand(3,1)*np.arange(0,24,1))
         df = pd.DataFrame(data=data.transpose(), index=index, columns=['A', 'B', 'C'])
         pm.add_dataframe(df, system_name)
-        pm.add_translation_dictonary(trans, system_name)
+        pm.add_translation_dictionary(trans, system_name)
 
         # Check timestamp
         pm.check_timestamp(specs['Frequency']) 

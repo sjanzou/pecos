@@ -19,7 +19,7 @@ def round_index(dt, frequency, how='nearest'):
         Time series index
     
     frequency : int
-        Expected timeseries frequency, in seconds
+        Expected time series frequency, in seconds
     
     how : string (default = 'nearest')
         Method for rounding.  Options include:
@@ -50,7 +50,7 @@ def round_index(dt, frequency, how='nearest'):
 
 def convert_html_to_image(html_filename, image_filename, image_format='jpg', quality=100, zoom=1):
     """
-    Convert html file to impage file using wkhtmltoimage
+    Convert html file to image file using wkhtmltoimage
     See http://wkhtmltopdf.org/ for more information
     
     Parameters

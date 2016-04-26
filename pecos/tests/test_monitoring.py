@@ -31,7 +31,7 @@ class Test_db1_file(unittest.TestCase):
         df = pecos.io.read_campbell_scientific(file_name, 'TIMESTAMP')
         self.pm = pecos.monitoring.PerformanceMonitoring()
         self.pm.add_dataframe(df, system_name)
-        self.pm.add_translation_dictonary(trans, system_name)
+        self.pm.add_translation_dictionary(trans, system_name)
 
     @classmethod
     def tearDown(self):

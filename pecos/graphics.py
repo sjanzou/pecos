@@ -82,7 +82,7 @@ def plot_scatter(x,y,xaxis_min=None, xaxis_max=None, yaxis_min=None, yaxis_max=N
     
 def plot_timeseries(data, tfilter, test_results_group=None, xaxis_min=None, xaxis_max=None, yaxis_min=None, yaxis_max=None):
     """
-    Create a timeseries plot
+    Create a time series plot
     
     Parameters
     ----------

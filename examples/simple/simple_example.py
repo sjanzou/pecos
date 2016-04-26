@@ -22,7 +22,7 @@ pecos.logger.initialize()
 # Input
 system_name = 'Simple'
 data_file = 'simple.xlsx'
-translation_dictonary = {
+translation_dictionary = {
     'Linear': ['A'],
     'Random': ['B'],
     'Wave': ['C','D']}
@@ -56,7 +56,7 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-pm.add_translation_dictonary(translation_dictonary, system_name)
+pm.add_translation_dictionary(translation_dictionary, system_name)
 
 # Check timestamp
 pm.check_timestamp(expected_frequency)

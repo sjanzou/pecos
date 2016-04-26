@@ -24,7 +24,7 @@ The DataFrame can then be added to the PerformanceMonitoring object as follows::
 	pm.add_dataframe(df, system_name)
 
 Multiple DataFrames can be added to the PerformanceMonitoring object.  
-The 'system_name' is used to distinquish DataFrames.
+The 'system_name' is used to distinguish DataFrames.
 
 DataFrames are accessed using::
 

@@ -1,22 +1,22 @@
 General:
-  Date Format: _%Y_%m_%d        # Date format (i.e. _2014_03_25), string
+  Date Format: _%Y_%m_%d        # Date format (i.e. _2014_03_25)
   Index Column: TIMESTAMP       # Column name to use for database index
   
 Specifications:
-  Latitude: 35.054           # Latitude in decimal degrees (+N), string
-  Longitude: -106.539         # Longitude in decimal degrees (+E), string
-  Altitude: 1663                 # Elevation in meters, float
-  Timezone: 'MST'
-  Isc: 10000                    # Short-circuit current (A), float
-  Imp: 10000                    # Current at max power point (A), float
-  Voc: 10000                    # Open-circuit voltage (V), float
-  Vmp: 10000                    # Voltage at max power point (V), float
-  Pmp: 10000                    # Power at max power point (W), float
-  Ns: 100                       # Number of cells in series, float
-  Np: 100                       # Number of cell-strings in parallel, float
+  Latitude: 35.054              # Latitude in decimal degrees (+N)
+  Longitude: -106.539           # Longitude in decimal degrees (+E)
+  Altitude: 1663                # Elevation in meters
+  Timezone: 'MST'               # Timezone
+  Isc: 10000                    # Short-circuit current (A)
+  Imp: 10000                    # Current at max power point (A)
+  Voc: 10000                    # Open-circuit voltage (V)
+  Vmp: 10000                    # Voltage at max power point (V)
+  Pmp: 10000                    # Power at max power point (W)
+  Ns: 100                       # Number of cells in series
+  Np: 100                       # Number of cell-strings in parallel
   DC power rating: 6000         # REMOVE WHEN SPECS ARE CORRECT
-  Frequency: 60                 # Expected timestamp frequency (s), float 
-  Min Sun Elevation: 5          # used in time filter
+  Frequency: 60                 # Expected timestamp frequency (s)
+  Min Sun Elevation: 5          # Used to setup time filter
   
 MET Translation: 
   DHI: [Diffuse_Wm2_Avg]
@@ -101,8 +101,6 @@ Increment Bounds:
   Wind Direction: [0.000000001, None, 60]
   Wind Direction Stdev: [0.000000001, None, 60]
   Relative Humidity: [0.000000001, None, 60]
-  #Datalog Temperature: [0.000000001, None, 60]
-  #Datalog Voltage: [0.000000001, None, 60]
   Time Per Scan: [0.000000001, None, 60]
   GHI Raw: [0.000000001, None, 60]
   GHI Temperature: [0.000000001, None, 60]

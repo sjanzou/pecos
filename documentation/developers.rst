@@ -3,7 +3,7 @@ Developers
 
 The current release is hosted on PyPI at https://pypi.python.org/pypi/pecos.
 
-The software repository is hosted on github at https://github.com/kaklise/pecos.  
+The software repository is hosted on GitHub at https://github.com/kaklise/pecos.  
 
 Automated testing is run using TravisCI at https://travis-ci.org/kaklise/pecos.
 

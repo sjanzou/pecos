@@ -18,12 +18,12 @@ In the simple example, the following translation dictionary is used to rename co
 
 The translation dictionary can then be added to the PerformanceMonitoring object as follows::
 
-	pm.add_translation_dictonary(trans, system_name)
+	pm.add_translation_dictionary(trans, system_name)
 
 If no translation is desired (i.e. raw column names are used), a 1:1 map can be generated using the following code::
 
 	trans = dict(zip(df.columns, [[col] for col in df.columns]))
-	pm.add_translation_dictonary(trans, system_name)
+	pm.add_translation_dictionary(trans, system_name)
 
 As with DataFrames, multiple translation dictionaries can be added to the 
 PerformanceMonitoring object, distinguished by the 'system_name'.
