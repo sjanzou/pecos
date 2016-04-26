@@ -7,7 +7,18 @@ import pandas as pd
 testdir = dirname(abspath(__file__))
 datadir = join(testdir,'data')
 
-        
+def test_time_integral():
+    periods = 5
+    index = pd.date_range('1/1/2016', periods=periods, freq='H')
+    data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
+    df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
+    
+    df_integral = pecos.pv.time_integral(df)
+    
+    assert_equal(df_integral['Time integral of A'].values[0], 100800)
+    assert_equal(df_integral['Time integral of B'].values[0], 115200)
+    assert_equal(df_integral['Time integral of C'].values[0], 129600)
+    
 def test_qci_no_test_results():
     periods = 5
     np.random.seed(100)

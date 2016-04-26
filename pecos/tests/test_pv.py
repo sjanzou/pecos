@@ -5,32 +5,11 @@ import ephem
 import pvlib
 import numpy as np
 import datetime
+import pecos
 
 testdir = dirname(abspath(__file__))
 datadir = join(testdir,'data')
 
-#def test_ac_performance_ratio():
-#    periods = 24
-#    index = pd.date_range('1/1/2016', periods=periods, freq='H')
-#    data=[[], []]
-#    df = pd.DataFrame(data=data.transpose(), index=index, columns=['AC Power', 'POA'])
-#    DC_PowerRating = 1000
-#    
-#    acPR = pecos.pv.ac_performance_ratio(df['AC Power'], df['POA'], DC_PowerRating, per_day = False)
-#
-#    assert_equal(acPR, 1)
-#    
-#def test_clearness_index():
-#    periods = 24
-#    index = pd.date_range('1/1/2016', periods=periods, freq='H')
-#    data=[]
-#    df = pd.DataFrame(data=data.transpose(), index=index, columns=['DNI'])
-#
-#    CI = pecos.pv.clearness_index(df['DNI'], per_day = False)
-#    
-#    assert_equal(CI, (15-5)/15.0)
-
-    
 def test_sun_position_pvlib():
 
     # Albuquerque
@@ -118,3 +97,4 @@ def test_sun_position_ephem():
     assert_less(abs(sunset_az-expected), 0.5) # 0.5 degree
 
     return sun_position
+    

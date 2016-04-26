@@ -98,14 +98,23 @@ for key,value in range_bounds.items():
 for key,value in increment_bounds.items():
     pm.check_increment([value[0], value[1]], key, specs, min_failures=value[2]) 
     
-# Compute metrics
+# Compute QCI
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
-PR_AC = pecos.pv.ac_performance_ratio(pm.df[pm.trans['AC Power']], 
-                                           pm.df[pm.trans['POA']], 
-                                           specs['DC power rating'], pm.tfilter)
-Kt = pecos.pv.clearness_index(pm.df[pm.trans['DNI']], pm.tfilter)
-metrics = pd.concat([QCI, PR_AC, Kt], axis=1)
+
+# Compute performance ratio
+poa_insolation = pecos.pv.insolation(pm.df[pm.trans['POA']], time_unit=3600, tfilter=pm.tfilter)
+energy = pecos.pv.energy(pm.df[pm.trans['AC Power']], time_unit=3600, tfilter=pm.tfilter)
+PR = pecos.pv.performance_ratio(energy.sum(axis=1), poa_insolation, specs['DC power rating'])
+
+# Compute clearness index
+dni_insolation = pecos.pv.time_integral(pm.df[pm.trans['POA']], time_unit=3600, tfilter=pm.tfilter)
+ea = pvlib.irradiance.extraradiation(pm.df.index.dayofyear)
+ea = pd.DataFrame(index=pm.df.index, data=ea, columns=['ea'])
+ea_insolation = pecos.pv.time_integral(ea, time_unit=3600, tfilter=pm.tfilter)
+Kt = pecos.pv.clearness_index(dni_insolation, ea_insolation)
+
+metrics = pd.concat([QCI, PR, Kt], axis=1)
 
 # Generate custom graphics
 filename = os.path.join(results_subdirectory, system_name)

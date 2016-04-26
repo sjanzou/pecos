@@ -4,90 +4,195 @@ The pv module contains custom methods for PV applications.
 import pandas as pd
 import numpy as np
 import datetime 
+from pecos.metrics import time_integral
 import logging
 
 logger = logging.getLogger(__name__)
 
-def ac_performance_ratio(acpower, poa, DC_power_rating, tfilter=None, per_day=True):
+def insolation(irradiance, time_unit=1, tfilter=None, per_day=True):
     """
-    The daily AC performance ratio (:math:`PR_{AC}`) is defined in IEC 61724 as:
+    Convert irradiance to insolation by taking the time integral.
+    Results are given in [irradiance units]*seconds.
+    
+     Parameters
+    -----------
+    irradiance : pd.DataFrame
+        Irradiance
+        
+    time_unit : float (default = 1)
+         Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
+         
+    tfilter : pd.Series (default = None)
+        Time filter containing boolean values for each time index
+        
+    per_day : Boolean (default = True)
+        Flag indicating if the results shoudl be computed per day
+    
+    Returns
+    -------
+    insolation : pd.DataFrame
+        Insolation
+    """
+    insolation = time_integral(irradiance, time_unit=time_unit, tfilter=tfilter, per_day=per_day)
+    
+    return insolation
+    
+def energy(power, time_unit=1, tfilter=None, per_day=True):
+    """
+    Convert power to energy by taking the time integral.
+    Results are given in [power units]*seconds.
+    
+    Parameters
+    -----------
+    power : pd.DataFrame
+        Power
+        
+    time_unit : float (default = 1)
+         Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
+         
+    tfilter : pd.Series (default = None)
+        Time filter containing boolean values for each time index
+        
+    per_day : Boolean (default = True)
+        Flag indicating if the results shoudl be computed per day
+    
+    Returns
+    -------
+    energy : pd.DataFrame
+        Energy
+    """
+    energy = time_integral(power, time_unit=time_unit, tfilter=tfilter, per_day=per_day)
+    
+    return energy
+    
+def performance_ratio(energy, insolation, dc_power_rating, reference_irradiance=1000):
+    """
+    Performance ratio (:math:`PR`) is defined as:
 
-    :math:`PR_{AC}=\dfrac{Y_{fAC}}{Yr}`
+    :math:`PR=\dfrac{Y_{f}}{Yr}`
     
     where 
-    :math:`Y_fAC` is ths the AC system yield defined as the measured AC energy 
-    produced by the PV system in the day (kWh/d) divided by 
-    the rated power of the PV system.  The definition of this rating is not 
-    specified in IEC 61724, but is defined here as DC power rating at 
-    STC conditions (1000 W/m2, cell temperature of 25 C, and AM1.5 spectrum).
+    :math:`Y_f` is the the measured energy (AC or DC) produced by the PV system (kWh) 
+    divided by the rated power of the PV system.  The rated power is the DC power rating 
+    at STC conditions (1000 W/m2, cell temperature of 25 C, and AM1.5 spectrum).
     :math:`Y_r` is the plane-of-array insolation (kWh/m2) divided 
     by the reference irradiance (1000 W/m2).  :math:`Y_r` is in units of time.
     
     Parameters
     -----------
-    acpower : Pandas DataFrame
-        AC power
+    energy : pd.DataFrame with a single column or pd.Series
+        Energy (AC or DC)
         
-    poa : Pandas DataFrame
-         Plane of array irradiance
+    insolation : pd.DataFrame with a single column or pd.Series
+         Plane of array insolation
          
-    DC_power_rating : float
+    dc_power_rating : float
         DC power rating at STC conditions
         
-    tfilter : Pandas Series (default = None)
-        Time filter containing boolean values for each time index
-        
-    per_day : Boolean (default = True)
-        Flag indicating if the results shoudl be computed per day
+    reference_irradiance : float (default = 1000)
+        Reference irradiance
         
     Returns
     -------
-    PR_AC : Pandas DataFrame or float
-        AC performance ratio, if per_day = True, then a dataframe indexed by day 
-        is returned, otherwise a single vlaue is returned for the entire dataset.
+    PR : pd.DataFrame
+        Performance ratio
     """
-    logger.info("Compute AC Performance Ratio")
+    logger.info("Compute Performance Ratio")
     
-    # Combine ac power and poa into a single dataframe
-    df = acpower.join(poa)
-    df = df[~df.isnull().any(axis=1)] # remove any data where is null
-    trans = {'acpower': acpower.columns, 'poa': poa.columns}
-    
-    # Remove time filter
-    if tfilter is not None:
-        df = df[tfilter]
-    
-    if per_day:
-        dates = [df.index[0].date() + datetime.timedelta(days=x) for x in range(0, (df.index[-1].date()-df.index[0].date()).days+1)]
-      
-        PR_AC = pd.DataFrame(index=pd.to_datetime(dates))
+    try:
+        energy = pd.Series(energy, index=energy.index)
+    except:
+        logger.info('Cannot convert energy to pd.Series')
+        return
+
+    try:
+        insolation = pd.Series(insolation, index=insolation.index)
+    except:
+        logger.info('Cannot convert insolation to pd.Series')
+        return
         
-        for date in dates:
-            df_date = df.loc[date.strftime('%m/%d/%Y')] 
-            try:
-                acpower = df_date[trans['acpower']] # W
-                poa = df_date[trans['poa']] # W/m2
-                ACEnergy = np.sum(np.sum(acpower, axis=1), axis=0) # W[T]/d
-                POAInsolation = np.sum(poa, axis=0) #W[T]/m2/d
-                ReferenceIrradiance = 1000 # W/m2
-                YfAC = np.divide(ACEnergy,DC_power_rating)
-                Yr = np.divide(POAInsolation,ReferenceIrradiance)
-                PR_AC.loc[date, 'Performance Ratio'] = float(np.divide(YfAC,Yr))
-            except:
-                PR_AC.loc[date, 'Performance Ratio'] = 'NaN'
-    else:
-        acpower = df[trans['acpowerr']] # W
-        poa = df[trans['poa']] # W/m2
-        ACEnergy = np.sum(np.sum(acpower, axis=1), axis=0) # W[T]/d
-        POAInsolation = np.sum(poa, axis=0) #W[T]/m2/d
-        ReferenceIrradiance = 1000 # W/m2
-        YfAC = np.divide(ACEnergy,DC_power_rating)
-        Yr = np.divide(POAInsolation,ReferenceIrradiance)
-        PR_AC = np.divide(YfAC,Yr)
-        
-    return PR_AC
+    Yf = energy/dc_power_rating
+    Yr = insolation/reference_irradiance
+    PR = Yf/Yr
     
-def clearness_index(dni, tfilter=None, per_day=True):
+    PR = PR.to_frame('Performance Ratio')
+    
+    return PR
+    
+def performance_index(energy, predicted_energy):
+    """
+    Performance index is the the ratio of measured energy from a PV system 
+    to the predicted energy using a PV performance model.  Unlike with the 
+    performance ratio, the performance index very close to 1 for a well 
+    functioning PV system and should not vary by season due to temperature 
+    variations.
+    
+    Parameters
+    -----------
+    energy : pd.DataFrame with a single column or pd.Series
+        Measured energy
+    
+    predicted_energy: pd.DataFrame with a single column or pd.Series
+        Predicted energy
+        
+    Returns
+    ---------
+    PI : pd.DataFrame
+        Performance index 
+    """
+    logger.info("Compute Performance Index")
+    
+    try:
+        energy = pd.Series(energy, index=energy.index)
+    except:
+        logger.info('Cannot convert energy to pd.Series')
+        return
+
+    try:
+        predicted_energy = pd.Series(predicted_energy, index=predicted_energy.index)
+    except:
+        logger.info('Cannot convert predicted_energy to pd.Series')
+        return
+        
+    PI = energy/predicted_energy
+    
+    PI = PI.to_frame('Performance Index')
+    
+    return PI
+
+def energy_yeild(energy, dc_power_rating):
+    """
+    Energy yield is the energy produced over a given timeframe (generally a year) 
+    divided by the DC power rating of the system.
+    
+    Parameters
+    -----------
+    energy : pd.DataFrame with a single column or pd.Series
+        Measured energy
+    
+     dc_power_rating : float
+        DC power rating at STC conditions
+        
+    Returns
+    ---------
+    EY : pd.DataFrame
+        Energy yeild  
+    """
+    logger.info("Compute Energy Yeild")
+    
+    try:
+        energy = pd.Series(energy, index=energy.index)
+    except:
+        logger.info('Cannot convert energy to pd.Series')
+        return
+
+    EY = energy/dc_power_rating
+    
+    EY = EY.to_frame('Energy Yeild')
+    
+    return EY
+    
+def clearness_index(dni_insolation, ea_insolation):
     """
     Clearness index (:math:`Kt`) is defined as:
     
@@ -101,64 +206,28 @@ def clearness_index(dni, tfilter=None, per_day=True):
     
     Parameters
     -----------
-    dni : Pandas DataFrame
-        Direct normal irradiance
-        
-    tfilter : Pandas Series (default = None)
-        Time filter containing boolean values for each time index
-        
-    per_day : Boolean (default = True)
-        Flag indicating if the results shoudl be computed per day
+    insolation : pd.DataFrame with a single column or pd.Series
+        Direct normal insolation
         
     Returns
     -------
     Kt : Pandas DataFrame or float
-        Clearness index, if per_day = True, then a dataframe indexed by day is 
-        returned, otherwise a single vlaue is returned for the entire dataset.
+        Clearness index
     """
     try:
-        import pvlib
+        dni_insolation = pd.Series(dni_insolation, index=dni_insolation.index)
     except:
-        logger.info('Could not import pvlib')
+        logger.info('Cannot convert dni_insolation to pd.Series')
+        return
+
+    try:
+        ea_insolation = pd.Series(ea_insolation, index=ea_insolation.index)
+    except:
+        logger.info('Cannot convert ea_insolation to pd.Series')
         return
         
-    logger.info("Compute Clearness Index")
-    
-    df = dni
-    
-    trans = {'dni': dni.columns}
-    
-    # Remove time filter
-    if tfilter is not None:
-        df = df[tfilter]
-    
-    if per_day:
-        dates = [df.index[0].date() + datetime.timedelta(days=x) for x in range(0, (df.index[-1].date()-df.index[0].date()).days+1)]
-
-        Kt = pd.DataFrame(index=pd.to_datetime(dates))
+    Kt = dni_insolation/ea_insolation
         
-        for date in dates:
-            df_date = df.loc[date.strftime('%m/%d/%Y')]
-            try:
-                Ea = pvlib.irradiance.extraradiation(df_date.index.dayofyear)
-                Ea = pd.DataFrame(index=df_date.index, data=Ea)
-                dni = df_date[trans['dni']] # W/m2
-                Ea = Ea[~dni.isnull().any(axis=1)]
-                dni = dni[~dni.isnull().any(axis=1)]
-                dnInsolation = np.sum(dni, axis=0)
-                EaInsolation = np.sum(Ea, axis=0)
-                Kt.loc[date, 'Clearness Index'] = float(np.divide(dnInsolation, EaInsolation))
-            except:
-                Kt.loc[date, 'Clearness Index'] = 'NaN'
-    else:
-        Ea = pvlib.irradiance.extraradiation(df.index.dayofyear)
-        Ea = pd.DataFrame(index=df.index, data=Ea)
-        dni = df[trans['dni']] # W/m2
-        Ea = Ea[~dni.isnull().any(axis=1)]
-        dni = dni[~dni.isnull().any(axis=1)]
-        dnInsolation = np.sum(dni, axis=0)
-        EaInsolation = np.sum(Ea, axis=0)
-        Kt = np.divide(dnInsolation, EaInsolation)
-        
+    Kt = Kt.to_frame('Clearness Index')
+    
     return Kt
-    

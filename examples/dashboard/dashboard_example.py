@@ -88,7 +88,7 @@ for location_name in locations:
         # Generate report
         pecos.io.write_test_results(test_results_file, pm.test_results)
         pecos.io.write_metrics(metrics_file, QCI)
-        pecos.io.write_monitoring_report(report_file, results_subdirectory, pm)
+        pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, metrics=QCI)
             
         graphics = glob(abspath(join(results_subdirectory, '*custom*.jpg')))
         metrics_table = QCI.transpose().to_html(bold_rows=False, header=False)
