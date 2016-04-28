@@ -1,23 +1,50 @@
-General:
-  Date Format: _%Y_%m_%d        # Date format (i.e. _2014_03_25)
-  Index Column: TIMESTAMP       # Column name to use for database index
-  
-Specifications:
-  Latitude: 35.054              # Latitude in decimal degrees (+N)
-  Longitude: -106.539           # Longitude in decimal degrees (+E)
-  Altitude: 1663                # Elevation in meters
-  Timezone: 'MST'               # Timezone
-  Isc: 10000                    # Short-circuit current (A)
-  Imp: 10000                    # Current at max power point (A)
-  Voc: 10000                    # Open-circuit voltage (V)
-  Vmp: 10000                    # Voltage at max power point (V)
-  Pmp: 10000                    # Power at max power point (W)
-  Ns: 100                       # Number of cells in series
-  Np: 100                       # Number of cell-strings in parallel
-  DC power rating: 6000         # REMOVE WHEN SPECS ARE CORRECT
-  Frequency: 60                 # Expected timestamp frequency (s)
-  Min Sun Elevation: 5          # Used to setup time filter
-  
+Location:
+  Latitude: 35.054
+  Longitude: -106.539
+  Altitude: 1663
+  Timezone: 'MST'
+
+SAPM Parameters:
+  Ns: 12                        
+  Np: 2
+  A0: 0.934425158
+  A1: 0.061300718
+  A2: -0.013966234
+  A3: 0.001212089
+  A4: -4.50E-05
+  B0: 1
+  B1: -0.002438
+  B2: 0.0003103
+  B3: -1.25E-05
+  B4: 2.11E-07
+  B5: -1.36E-09
+  C0: 1.02426
+  C1: -0.024262
+  C2: -0.451614
+  C3: -11.2165
+  C4: 1.00021
+  C5: -0.000206352
+  C6: 1.18877
+  C7: -0.188767
+  Isco: 8.71363
+  Impo: 7.98597
+  Voco: 38.2807
+  Vmpo: 29.9784
+  Aisc: 0.00047 
+  Aimp: 0.000484
+  Bvoco: -0.12864
+  Mbvoc: 0
+  Bvmpo: -0.12
+  Mbvmp: 0
+  N: 1.2321
+  Cells_in_Series: 60
+  IXO: 8.6503
+  IXXO: 5.52369
+  FD: 1
+  deltaT: 3
+  a: -3.469158041
+  b: -0.092100608
+
 MET Translation: 
   DHI: [Diffuse_Wm2_Avg]
   DNI: [Direct_Wm2_Avg]
@@ -80,9 +107,9 @@ Range Bounds:
   Box Temperature: [-20,90]
   Module Temperature 1: [-20,90]
   Module Temperature 2: [-20,90]
-  DC Voltage: [0, "{Vmp}*{Ns}*1.2"]
-  DC Current: [0, "{Imp}*{Np}*1.4"]
-  DC Power: [0, "{Pmp}*1.4"]
+  DC Voltage: [0, "{Vmpo}*{Ns}*1.2"]
+  DC Current: [0, "{Impo}*{Np}*1.4"]
+  DC Power: [0, "{Vmpo}*{Ns}*{Impo}*{Np}*1.4"]
   AC Voltage: [0, None]
   AC Current: [0, None]
   AC Power: [0, None]

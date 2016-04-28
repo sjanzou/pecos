@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def qci(mask, tfilter=None, per_day=True):
     """
-    Quality control index (:math:`QCI`) is defined as:
+    Compute the quality control index defined as:
     
     :math:`QCI=\dfrac{\sum_{d\in D}\sum_{t\in T}X_{dt}}{|DT|}`
     
@@ -61,19 +61,24 @@ def qci(mask, tfilter=None, per_day=True):
         
     return QCI   
 
-def time_integral(df, time_unit=1, tfilter=None, per_day=True):
+def rmse(x1, x2, tfilter=None, per_day=True):
     """
-    Compute the time integral of each column in the dataframe.
-    The time integral is computed using the trapezoidal rule from numpy.trapz.
-    Results are given in [original data units]*seconds.
+    Compute the root mean squared error defined as:
+    
+    :math:`RMSE=\sqrt{\dfrac{\sum{(x_1-x_2)^2}}{n}}`
+    
+    where
+    :math:`x_1` is a time series,
+    :math:`x_2` is a time series, and 
+    :math:`n` is a number of data points.
     
     Parameters
     -----------
-    df : pd.DataFrame
+    x1 : pd.DataFrame with a single column or pd.Series
         Data
         
-    time_unit : float (default = 1)
-        Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
+    x2 : pd.DataFrame with a single column or pd.Series
+        Data
          
     tfilter : pd.Series (default = None)
         Time filter containing boolean values for each time index
@@ -83,31 +88,88 @@ def time_integral(df, time_unit=1, tfilter=None, per_day=True):
     
     Returns
     -------
-    df_integral : pd.DataFrame or float
+    RMSE : pd.DataFrame
         Time integral of the dataframe, each column is named 'Time integral of ' + original column name.
     """
-    if tfilter is not None:
-        df = df[tfilter]
+    logger.info("Compute RMSE")
+    
+    if type(x1) is pd.core.frame.DataFrame:
+        x1 = pd.Series(x1.values[:,0], index=x1.index)
+    if type(x2) is pd.core.frame.DataFrame:
+        x2 = pd.Series(x2.values[:,0], index=x2.index)
         
-    def compute_integral(data):
-        val = {}
-        tdelta = ((data.index - data.index[0]).values)/1000000000 # convert ns to seconds
-        for col in data.columns:
-            val['Time integral of ' + col] = float(np.trapz(data.loc[:,col], tdelta))
+    if tfilter is not None:
+        x1 = x1[tfilter]
+        x2 = x2[tfilter]
+        
+    def compute_rmse(data1, data2):
+        val = np.sqrt(np.mean(np.power(data1 - data2,2)))
         return val
         
     if per_day:
-        dates = [df.index[0].date() + datetime.timedelta(days=x) for x in range(0, (df.index[-1].date()-df.index[0].date()).days+1)]
-        df_integral = pd.DataFrame(index=pd.to_datetime(dates))
+        dates = [x1.index[0].date() + datetime.timedelta(days=x) for x in range(0, (x1.index[-1].date()-x1.index[0].date()).days+1)]
+        rmse = pd.DataFrame(index=pd.to_datetime(dates))
         for date in dates:
-            df_date = df.loc[date.strftime('%m/%d/%Y')] 
+            x1_date1 = x1.loc[date.strftime('%m/%d/%Y')] 
+            x2_date2 = x2.loc[date.strftime('%m/%d/%Y')] 
+            val = compute_rmse(x1_date1, x2_date2)
+            rmse.loc[date, 'RMSE'] = val
+    else:
+        val = compute_rmse(x1, x2)
+        rmse = pd.DataFrame(val, index=[0], columns=['RMSE'])
+
+    return rmse
+    
+def time_integral(data, tfilter=None, per_day=True):
+    """
+    Compute the time integral of each column in the dataframe defined as:
+    
+    :math:`F=\int{fdt}`
+    
+    where 
+    :math:`f` is a column of data 
+    :math:`dt` is the time step between observations.
+    The time integral is computed using the trapezoidal rule from numpy.trapz.
+    Results are given in [original data units]*seconds.
+    
+    Parameters
+    -----------
+    data : pd.DataFrame
+        Data
+         
+    tfilter : pd.Series (default = None)
+        Time filter containing boolean values for each time index
+        
+    per_day : Boolean (default = True)
+        Flag indicating if the results should be computed per day
+    
+    Returns
+    -------
+    F : pd.DataFrame
+        Time integral of the data, each column is named 'Time integral of ' + original column name.
+    """
+    logger.info("Compute time integral")
+    
+    if tfilter is not None:
+        data = data[tfilter]
+        
+    def compute_integral(d):
+        val = {}
+        tdelta = ((d.index - d.index[0]).values)/1000000000 # convert ns to seconds
+        for col in d.columns:
+            val['Time integral of ' + col] = float(np.trapz(d.loc[:,col], tdelta))
+        return val
+        
+    if per_day:
+        dates = [data.index[0].date() + datetime.timedelta(days=x) for x in range(0, (data.index[-1].date()-data.index[0].date()).days+1)]
+        F = pd.DataFrame(index=pd.to_datetime(dates))
+        for date in dates:
+            df_date = data.loc[date.strftime('%m/%d/%Y')] 
             df_int = compute_integral(df_date)
             for col in df_int:
-                df_integral.loc[date, col] = df_int[col]
+                F.loc[date, col] = df_int[col]
     else:
-        df_integral = compute_integral(df)
-        df_integral = pd.DataFrame(df_integral, index=[0])
+        F = compute_integral(data)
+        F = pd.DataFrame(F, index=[0])
     
-    df_integral = df_integral/time_unit
-    
-    return df_integral
+    return F

@@ -2,26 +2,28 @@
 The pv module contains custom methods for PV applications.
 """
 import pandas as pd
-import numpy as np
-import datetime 
 from pecos.metrics import time_integral
 import logging
 
 logger = logging.getLogger(__name__)
 
-def insolation(irradiance, time_unit=1, tfilter=None, per_day=True):
+def insolation(G, tfilter=None, per_day=True):
     """
-    Convert irradiance to insolation by taking the time integral.
+    Compute insolation defined as:
+    
+    :math:`H=\int{Gdt}`
+    
+    where 
+    :math:`G` is irradiance and 
+    :math:`dt` is the time step between observations.
+    The time integral is computed using the trapezoidal rule.
     Results are given in [irradiance units]*seconds.
     
      Parameters
     -----------
-    irradiance : pd.DataFrame
-        Irradiance
+    G : pd.DataFrame
+        Irradiance time series
         
-    time_unit : float (default = 1)
-         Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
-         
     tfilter : pd.Series (default = None)
         Time filter containing boolean values for each time index
         
@@ -30,25 +32,32 @@ def insolation(irradiance, time_unit=1, tfilter=None, per_day=True):
     
     Returns
     -------
-    insolation : pd.DataFrame
+    H : pd.DataFrame
         Insolation
     """
-    insolation = time_integral(irradiance, time_unit=time_unit, tfilter=tfilter, per_day=per_day)
+    if type(G) is pd.core.series.Series:
+        G = G.to_frame('Irradiance')
+        
+    H = time_integral(G,  tfilter=tfilter, per_day=per_day)
     
-    return insolation
+    return H
     
-def energy(power, time_unit=1, tfilter=None, per_day=True):
+def energy(P, tfilter=None, per_day=True):
     """
-    Convert power to energy by taking the time integral.
+    Convert energy defined as:
+    
+    :math:`E=\int{Pdt}`
+    
+    where 
+    :math:`P` is power and 
+    :math:`dt` is the time step between observations.
+    The time integral is computed using the trapezoidal rule.
     Results are given in [power units]*seconds.
     
     Parameters
     -----------
-    power : pd.DataFrame
-        Power
-        
-    time_unit : float (default = 1)
-         Convert time unit of integration.  time_unit = 3600 returns integral in units of hours.
+    P : pd.DataFrame
+        Power time series
          
     tfilter : pd.Series (default = None)
         Time filter containing boolean values for each time index
@@ -58,38 +67,40 @@ def energy(power, time_unit=1, tfilter=None, per_day=True):
     
     Returns
     -------
-    energy : pd.DataFrame
+    E : pd.DataFrame
         Energy
     """
-    energy = time_integral(power, time_unit=time_unit, tfilter=tfilter, per_day=per_day)
+    if type(P) is pd.core.series.Series:
+        P = P.to_frame('Power')
+        
+    E = time_integral(P, tfilter=tfilter, per_day=per_day)
     
-    return energy
-    
-def performance_ratio(energy, insolation, dc_power_rating, reference_irradiance=1000):
+    return E
+
+def performance_ratio(E, H_poa, P_ref, G_ref=1000):
     """
     Compute performance ratio defined as:
 
-    :math:`PR=\dfrac{Y_{f}}{Yr}`
+    :math:`PR=\dfrac{Y_{f}}{Yr} = \dfrac{\dfrac{E}{P_{ref}}}{\dfrac{H_{poa}}{G_{ref}}}`
     
     where 
-    :math:`Y_f` is the the measured energy (AC or DC) produced by the PV system (kWh) 
-    divided by the rated power of the PV system.  The rated power is the DC power rating 
-    at STC conditions (1000 W/m2, cell temperature of 25 C, and AM1.5 spectrum).
+    :math:`Y_f` is the observed energy (AC or DC) produced by the PV system (kWh) 
+    divided by the DC power rating at STC conditions.
     :math:`Y_r` is the plane-of-array insolation (kWh/m2) divided 
-    by the reference irradiance (1000 W/m2).  :math:`Y_r` is in units of time.
+    by the reference irradiance (1000 W/m2).
     
     Parameters
     -----------
-    energy : pd.DataFrame with a single column or pd.Series
-        Energy (AC or DC)
+    E : pd.DataFrame with a single column or pd.Series
+        Energy (AC or DC) 
         
-    insolation : pd.DataFrame with a single column or pd.Series
+    H_poa : pd.DataFrame with a single column or pd.Series
          Plane of array insolation
          
-    dc_power_rating : float
+    P_ref : float
         DC power rating at STC conditions
         
-    reference_irradiance : float (default = 1000)
+    G_ref : float (default = 1000)
         Reference irradiance
         
     Returns
@@ -99,40 +110,88 @@ def performance_ratio(energy, insolation, dc_power_rating, reference_irradiance=
     """
     logger.info("Compute Performance Ratio")
     
-    try:
-        energy = pd.Series(energy, index=energy.index)
-    except:
-        logger.info('Cannot convert energy to pd.Series')
-        return
-
-    try:
-        insolation = pd.Series(insolation, index=insolation.index)
-    except:
-        logger.info('Cannot convert insolation to pd.Series')
-        return
+    if type(E) is pd.core.frame.DataFrame:
+        E = pd.Series(E.values[:,0], index=E.index)
+    if type(H_poa) is pd.core.frame.DataFrame:
+        H_poa = pd.Series(H_poa.values[:,0], index=H_poa.index)
         
-    Yf = energy/dc_power_rating
-    Yr = insolation/reference_irradiance
+    Yf = E/P_ref
+    Yr = H_poa/G_ref
     PR = Yf/Yr
     
     PR = PR.to_frame('Performance Ratio')
     
     return PR
-    
-def performance_index(energy, predicted_energy):
+
+def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
     """
-    Compute performance index defined as the ratio of measured energy from a PV system 
-    to the predicted energy using a PV performance model.  Unlike with the 
-    performance ratio, the performance index very close to 1 for a well 
-    functioning PV system and should not vary by season due to temperature 
-    variations.
+    Compute normalized efficiency defined as:
+
+    :math:`NE = \dfrac{\dfrac{P}{P_{ref}}}{\dfrac{G_{poa}}{G_{ref}}}`
+    
+    where 
+    :math:`P` is the observed power (AC or DC), 
+    :math:`P_{ref}` is the DC power rating at STC conditions, 
+    :math:`G_{poa}` is the plane-of-array irradiance, and 
+    :math:`G_{ref}` is the reference irradiance.
     
     Parameters
     -----------
-    energy : pd.DataFrame with a single column or pd.Series
-        Measured energy
+    P : pd.DataFrame with a single column or pd.Series
+        Power (AC or DC) 
+        
+    G_poa : pd.DataFrame with a single column or pd.Series
+         Plane of array irradiance
+         
+    P_ref : float
+        DC power rating at STC conditions
+        
+    G_ref : float (default = 1000)
+        Reference irradiance
+        
+    Returns
+    -------
+    PR : pd.DataFrame
+        Performance ratio
+    """
+    logger.info("Compute Performance Ratio")
     
-    predicted_energy: pd.DataFrame with a single column or pd.Series
+    if type(P) is pd.core.frame.DataFrame:
+        P = pd.Series(P.values.values[:,0], index=P.index)
+    if type(G_poa) is pd.core.frame.DataFrame:
+        G_poa = pd.Series(G_poa.values[:,0], index=G_poa.index)
+        
+    Yf = P/P_ref
+    Yr = G_poa/G_ref
+    NE = Yf/Yr
+    
+    NE = NE.to_frame('Normalized Efficiency')
+    
+    return NE
+    
+def performance_index(E, E_predicted):
+    """
+    Compute performance index defined as:
+    
+    :math:`PI=\dfrac{E}{\hat{E}}`
+    
+    where 
+    :math:`E` is the observed energy from a PV system and  
+    :math:`\hat{E}` is the predicted energy over the same time frame.
+    :math:`\hat{E}` can be computed using by first predicting power using 
+    ``pecos.pv.basic_pvlib_performance_model`` or methods in ``pvlib.pvsystem`` 
+    and then convert power to enery using ``pecos.pv.enery``.
+    
+    Unlike with the performance ratio, the performance index should be very 
+    close to 1 for a well functioning PV system and should not vary by 
+    season due to temperature variations.
+    
+    Parameters
+    -----------
+    E : pd.DataFrame with a single column or pd.Series
+        Observed energy
+    
+    E_predicted : pd.DataFrame with a single column or pd.Series
         Predicted energy
         
     Returns
@@ -142,35 +201,33 @@ def performance_index(energy, predicted_energy):
     """
     logger.info("Compute Performance Index")
     
-    try:
-        energy = pd.Series(energy, index=energy.index)
-    except:
-        logger.info('Cannot convert energy to pd.Series')
-        return
-
-    try:
-        predicted_energy = pd.Series(predicted_energy, index=predicted_energy.index)
-    except:
-        logger.info('Cannot convert predicted_energy to pd.Series')
-        return
+    if type(E) is pd.core.frame.DataFrame:
+        E = pd.Series(E.values[:,0], index=E.index)
+    if type(E_predicted) is pd.core.frame.DataFrame:
+        E_predicted = pd.Series(E_predicted.values[:,0], index=E_predicted.index)
         
-    PI = energy/predicted_energy
+    PI = E/E_predicted
     
     PI = PI.to_frame('Performance Index')
     
     return PI
 
-def energy_yield(energy, dc_power_rating):
+def energy_yield(E, P_ref):
     """
-    Compute energy yield defined as the energy produced over a given timeframe 
-    divided by the DC power rating of the system.
+    Compute energy yield is defined as:
+    
+    :math:`EY=\dfrac{E}{P_{ref}}`
+    
+    where 
+    :math:`E` is the observed energy from a PV system and  
+    :math:`P_{ref}` is the DC power rating of the system at STC conditions.
     
     Parameters
     -----------
-    energy : pd.DataFrame with a single column or pd.Series
-        Measured energy
+    E : pd.DataFrame with a single column or pd.Series
+        Observed energy
     
-    dc_power_rating : float
+    P_ref : float
         DC power rating at STC conditions
         
     Returns
@@ -180,54 +237,126 @@ def energy_yield(energy, dc_power_rating):
     """
     logger.info("Compute Energy Yield")
     
-    try:
-        energy = pd.Series(energy, index=energy.index)
-    except:
-        logger.info('Cannot convert energy to pd.Series')
-        return
+    if type(E) is pd.core.frame.DataFrame:
+        E = pd.Series(E.values[:,0], index=E.index)
 
-    EY = energy/dc_power_rating
+    EY = E/P_ref
     
     EY = EY.to_frame('Energy Yield')
     
     return EY
     
-def clearness_index(dni_insolation, ea_insolation):
+def clearness_index(H_dn, H_ea):
     """
     Compute clearness index defined as:
     
-    :math:`Kt=\dfrac{DN\_insolation}{Ex\_insolation}`
+    :math:`Kt=\dfrac{H_{dn}}{H_{ea}}`
     
     where 
-    :math:`DN\_insolation` is the direct-normal insolation in one day 
-    (kWh/m2/d)
-    :math:`Ex\_insolation` is the extraterrestrial insolation in one 
-    day (kWh/m2/d).  Computed using pvlib.irradiance.extraradiation.
+    :math:`H_{dn}` is the direct-normal insolation (kWh/m2)
+    :math:`H_{ea}` is the extraterrestrial insolation (kWh/m2)
+    over the same time frame.
+    Extraterrestiral irradiation can be computed using ``pvlib.irradiance.extraradiation``.  
+    Irradiation can be converted to insolation using ``pecos.pv.insolation``.
     
     Parameters
     -----------
-    insolation : pd.DataFrame with a single column or pd.Series
+    H_dn : pd.DataFrame with a single column or pd.Series
         Direct normal insolation
+    
+    H_ea : pd.DataFrame with a single column or pd.Series
+        Extraterrestrial insolation
         
     Returns
     -------
     Kt : Pandas DataFrame or float
         Clearness index
     """
-    try:
-        dni_insolation = pd.Series(dni_insolation, index=dni_insolation.index)
-    except:
-        logger.info('Cannot convert dni_insolation to pd.Series')
-        return
-
-    try:
-        ea_insolation = pd.Series(ea_insolation, index=ea_insolation.index)
-    except:
-        logger.info('Cannot convert ea_insolation to pd.Series')
-        return
+    logger.info("Compute Clearness Index")
+    
+    if type(H_dn) is pd.core.frame.DataFrame:
+        H_dn = pd.Series(H_dn.values[:,0], index=H_dn.index)
+    if type(H_ea) is pd.core.frame.DataFrame:
+        H_ea = pd.Series(H_ea.values[:,0], index=H_ea.index)
         
-    Kt = dni_insolation/ea_insolation
+    Kt = H_dn/H_ea
         
     Kt = Kt.to_frame('Clearness Index')
     
     return Kt
+
+def basic_pvlib_performance_model(parameters, latitude, longitude, wind_speed, 
+                                  air_temp, poa_global, poa_diffuse=None, 
+                                  model='SAPM'):
+    """
+    Compute a very basic pv performance model using the SAPM or single diode model from pvlib.
+    Input includes observed wind speed, air temperature, and POA irradiance.
+    Default model options, defined in pvlib, are used to compute the performance model.
+    Use pvlib directly to customize the model.
+    
+    Parameters
+    -----------
+    parameters : dict
+        Model parameters, see ``pvlib.pvsystem`` module for more details
+        
+    latitude : float
+        Latitude
+        
+    longitude : float
+        Lolngitude
+    
+    wind speed : pd.DataFrame with a single column or pd.Series
+        Wind speed time series
+        
+    air_temp : pd.DataFrame with a single column or pd.Series
+        Air temperature time series
+    
+    poa_global : pd.DataFrame with a single column or pd.Series
+        Global POA irradiance time series
+    
+    poa_diffuse : pd.DataFrame with a single column or pd.Series (default = None)
+        Diffuse POA irradiance time series, set to 0 by default
+        
+    model : string
+        'SAPM' or 'singlediode'
+    
+    Returns
+    ---------
+    model : pd.DataFrame
+        Predicted Isc, Imp, Voc, Vmp
+    """
+    import pvlib
+
+    if type(wind_speed) is pd.core.frame.DataFrame:
+        wind_speed = pd.Series(wind_speed.values[:,0], index=wind_speed.index)
+    if type(air_temp) is pd.core.frame.DataFrame:
+        air_temp = pd.Series(air_temp.values[:,0], index=air_temp.index)
+    if type(poa_global) is pd.core.frame.DataFrame:
+        poa_global = pd.Series(poa_global.values[:,0], index=poa_global.index)
+    if type(poa_diffuse) is pd.core.frame.DataFrame:
+        poa_diffuse = pd.Series(poa_diffuse.values[:,0], index=poa_diffuse.index)
+    if poa_diffuse is None:
+        poa_diffuse = pd.Series(data=0, index=poa_global.index)
+         
+    index = poa_global.index  
+        
+    # Copute sun position
+    solarposition = pvlib.solarposition.ephemeris(index, latitude, longitude)
+    
+    # Compute cell temperature
+    celltemp = pvlib.pvsystem.sapm_celltemp(poa_global, wind_speed, air_temp)
+
+    # Compute alsolute airmass
+    airmass_relative  = pvlib.atmosphere.relativeairmass(solarposition['zenith'])
+    airmass_absolute = pvlib.atmosphere.absoluteairmass(airmass_relative)
+    
+    # Compute aoi
+    aoi = pvlib.irradiance.aoi(latitude, 180, solarposition['zenith'], solarposition['azimuth'])
+           
+    if model == 'SAPM':
+        model = pvlib.pvsystem.sapm(parameters, poa_global, poa_diffuse, celltemp['temp_cell'], airmass_absolute, aoi)
+    elif model == 'singlediode':
+        (photocurrent, saturation_current, resistance_series, resistance_shunt, nNsVth) = pvlib.pvsystem.calcparams_desoto(poa_global, celltemp['temp_cell'], parameters['Aisc'], parameters, 0, 0)
+        model = pvlib.pvsystem.singlediode(parameters, photocurrent, saturation_current, resistance_series, resistance_shunt, nNsVth)
+
+    return model

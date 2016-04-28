@@ -182,12 +182,15 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     pd.set_option('display.width', 40)
     
     # Collect notes (from the logger file)
-    logfiledir = logfiledir = os.path.join(dirname(abspath(__file__)))
-    f = open(join(logfiledir,'logfile'), 'r')
-    notes = f.read()
-    f.close()
-    notes_df = pd.DataFrame(notes.splitlines())
-    notes_df.index += 1
+    try:
+        logfiledir = logfiledir = os.path.join(dirname(abspath(__file__)))
+        f = open(join(logfiledir,'logfile'), 'r')
+        notes = f.read()
+        f.close()
+        notes_df = pd.DataFrame(notes.splitlines())
+        notes_df.index += 1
+    except:
+        notes_df = pd.DataFrame()
     
     pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
