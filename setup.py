@@ -10,7 +10,7 @@ LONG_DESCRIPTION = open('README.md').read()
 AUTHOR = 'Katherine Klise, Joshua Stein'
 MAINTAINER_EMAIL = 'kaklise@sandia.gov'
 LICENSE = 'Revised BSD'
-URL = 'https://github.com/kaklise/pecos'
+URL = 'https://github.com/sandialabs/pecos'
 
 setuptools_kwargs = {
     'zip_safe': False,
