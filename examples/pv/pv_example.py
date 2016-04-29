@@ -172,4 +172,4 @@ pv_graphics.graphics(filename, pm)
 # Generate reports
 pecos.io.write_metrics(metrics_file, metrics)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, metrics.transpose()), config)
+pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, metrics.transpose(), config)
