@@ -42,7 +42,7 @@ or other constants needed in composite equations, for example::
 	  'Latitude': 35.054,  
 	  'Longitude': -106.539}
 
-Strings are evaluated and added to the dataframe using the following code::
+Strings are evaluated and added to the DataFrame using the following code::
 
 	signal = pm.evaluate_string(raw_column_name, string, specs)
 	pm.add_signal(trans_column_name, signal)

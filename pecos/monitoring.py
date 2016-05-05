@@ -15,7 +15,7 @@ class PerformanceMonitoring(object):
 
     def __init__(self):
         """
-        Performance Monitoring class
+        PerformanceMonitoring class
         """
         self.df = pd.DataFrame()
         self.trans = {}
@@ -26,19 +26,19 @@ class PerformanceMonitoring(object):
     
     def add_dataframe(self, df, system_name, add_identity_translation_dictionary = False):
         """
-        Add dataframe to the PerformanceMonitoring class
+        Add DataFrame to the PerformanceMonitoring object.
         
         Parameters
         -----------
         df : pd.Dataframe
-            Dataframe to add to the Performance Monitoring class
+            Dataframe to add to the PerformanceMonitoring object
         
         system_name : string
             System name
             
-        add_identity_translation_dictionary : bool (default = False)
-            Add a 1:1 translation dictionary to the Performance Monitoring class
-            using all column names in df
+        add_identity_translation_dictionary : boolean (optional)
+            Add a 1:1 translation dictionary to the PerformanceMonitoring object
+            using all column names in df, default = False
         """
         temp = df.copy()
         
@@ -50,7 +50,7 @@ class PerformanceMonitoring(object):
         else:
             self.df = temp.copy()     
 
-        # define identifty translation
+        # define identity translation
         if add_identity_translation_dictionary:
             trans = {}
             for col in df.columns:
@@ -60,7 +60,7 @@ class PerformanceMonitoring(object):
             
     def add_translation_dictionary(self, trans, system_name):
         """
-        Add translation dictionary to the PerformanceMonitoring class
+        Add translation dictionary to the PerformanceMonitoring object.
         
         Parameters
         -----------
@@ -78,11 +78,11 @@ class PerformanceMonitoring(object):
         
     def add_time_filter(self, time_filter):
         """
-        Add a time filter to the PerformanceMonitoring class
+        Add a time filter to the PerformanceMonitoring object.
         
         Parameters
         ----------
-        time_filter : pd.Series 
+        time_filter : pd.DataFrame with a single column or pd.Series
             Time filter containing boolean values for each time index
         """
         if isinstance(time_filter, pd.DataFrame):
@@ -92,7 +92,7 @@ class PerformanceMonitoring(object):
 
     def add_signal(self, col_name, df):
         """
-        Add signal to the PerformanceMonitoring dataframe
+        Add signal to the PerformanceMonitoring DataFrame.
         
         Parameters
         -----------
@@ -100,7 +100,7 @@ class PerformanceMonitoring(object):
             Column name to add to translation dictionary
         
         df : pd.DataFarame
-            DataFrame to add to df
+            Data to add to df
         """
         df = pd.DataFrame(df)
         
@@ -122,21 +122,21 @@ class PerformanceMonitoring(object):
             
     def append_test_results(self, mask, error_msg, min_failures=1, variable_name=True): #, sub_df=None):
         """
-        Append QC results to the PerformanceMonitoring class
+        Append QC results to the PerformanceMonitoring object.
         
         Parameters
         ----------
         mask : pd.Dataframe
-            Result from QC test, boolean values.
+            Result from quality control test, boolean values
         
         error_msg : string
             Error message to store with the QC results
         
-        min_failures : int
-            Minimum number of consecutive failures required for reporting
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, default = 1
         
-        variable_name : bool  (default = True)
-            Add variable name to QC results, set to False for timestamp tests
+        variable_name : boolean  (optional)
+            Add variable name to QC results, set to False for timestamp tests, default = True
         """
         if len(mask.columns) == 1 and mask.columns[0] == 0:
             sub_df = self.df
@@ -204,14 +204,14 @@ class PerformanceMonitoring(object):
         frequency : int
             Expected time series frequency, in seconds
         
-        expected_start_time : Timestamp (default = None)
-            Expected start time. If not specified, the minimum timestamp is used.
+        expected_start_time : Timestamp (optional)
+            Expected start time. If not specified, the minimum timestamp is used
         
-        expected_end_time : Timestamp (default = None)
-            Expected end time. If not specified, the maximum timestamp is used.
+        expected_end_time : Timestamp (optional)
+            Expected end time. If not specified, the maximum timestamp is used
         
-        min_failures : int (default = 1)
-            Minimum number of consecutive failures required for reporting
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, default = 1
         """
         logger.info("Check timestamp")
         
@@ -269,24 +269,24 @@ class PerformanceMonitoring(object):
         
     def check_range(self, bound, key=None, specs={}, rolling_mean=1, min_failures=1):
         """
-        Check data range
+        Check data range.
         
         Parameters
         ----------
-        bound : list
+        bound : list of floats
             [lower bound, upper bound], None can be used in place of a lower or upper bound
             
-        key : string (default = None)
+        key : string (optional)
             Translation dictionary key.  If not specified, all columns are used in the test.
         
-        specs : dict (default = {})
+        specs : dictionary (optional)
             Constants used in bound
         
-        rolling_mean : int (default = 1)
-            Rolling mean window in number of time steps
+        rolling_mean : int (optional)
+            Rolling mean window in number of time steps, default = 1
         
-        min_failures : int (default = 1)
-            Minimum number of consecutive failures required for reporting
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, default = 1
         """
         logger.info("Check variable ranges")
         
@@ -335,30 +335,30 @@ class PerformanceMonitoring(object):
         
     def check_increment(self, bound, key=None, specs={}, increment=1, absolute_value=True, rolling_mean=1, min_failures=1):
         """
-        Check range on data increments
+        Check range on data increments.
         
         Parameters
         ----------
-        bound : list
+        bound : list of floats
             [lower bound, upper bound], None can be used in place of a lower or upper bound
         
-        key : string (default = None)
+        key : string (optional)
             Translation dictionary key. If not specified, all columns are used in the test.
             
-        specs : dict (default = {})
+        specs : dictionary (optional)
             Constants used in bound
         
-        increment : int (default = 1)
-            Time step shift used to compute difference
+        increment : int (optional)
+            Time step shift used to compute difference, default = 1
             
-        absolute_value : bool (default = True)
-            Take the absolute value of the increment data
+        absolute_value : boolean (optional)
+            Take the absolute value of the increment data, default = True
             
-        rolling_mean : int (default = 1)
-            Rolling mean window in number of time steps
+        rolling_mean : int (optional)
+            Rolling mean window in number of time steps, default = 1
         
-        min_failures : int (default = 1)
-            Minimum number of consecutive failures required for reporting
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, default = 1
         """
         logger.info("Check increment range")
         
@@ -417,11 +417,11 @@ class PerformanceMonitoring(object):
         
         Parameters
         ----------
-        key : string (default = None)
+        key : string (optional)
             Translation dictionary key. If not specified, all columns are used in the test.
         
-        min_failures : int (default = 1)
-            Minimum number of consecutive failures required for reporting
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, default = 1
         """
         logger.info("Check for missing data")
         
@@ -454,18 +454,18 @@ class PerformanceMonitoring(object):
         
     def check_corrupt(self, corrupt_values, key=None, min_failures=1):
         """
-        Check for corrupt data
+        Check for corrupt data.
         
         Parameters
         ----------
-        corrupt_values : list
+        corrupt_values : list of floats
             List of corrupt data values
             
-        key : string (default = None)
+        key : string (optional)
             Translation dictionary key. If not specified, all columns are used in the test.
         
-        min_failures : int (default = 1)
-            Minimum number of consecutive failures required for reporting
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, default = 1
         """
         logger.info("Check for corrupt data")
         
@@ -498,9 +498,9 @@ class PerformanceMonitoring(object):
     def evaluate_string(self, col_name, string_to_eval, specs={}):
         """
         Returns the evaluated python equation written as a string (BETA).  
-        For each [keyword] in string_to_eval, 
-        [keyword] is first expanded to self.df[self.trans[keyword]], 
-        if that fails, then [keyword] is expanded to specs[keyword].
+        For each {keyword} in string_to_eval, 
+        {keyword} is first expanded to self.df[self.trans[keyword]], 
+        if that fails, then {keyword} is expanded to specs[keyword].
 
         Parameters
         ----------
@@ -510,7 +510,7 @@ class PerformanceMonitoring(object):
         string_to_eval : string
             String to evaluate
         
-        specs : dict (default = {})
+        specs : dictionary (optional)
             Constants used as keywords
             
         Returns
@@ -566,12 +566,12 @@ class PerformanceMonitoring(object):
 
     def get_elapsed_time(self):
         """
-        Returns elapsed time in seconds from the dataframe index
+        Returns elapsed time in seconds from the DataFrame index.
         
         Returns
         --------
         elapsed_time : pd.DataFrame
-            Elapsed time of the dataframe index 
+            Elapsed time of the DataFrame index 
         """
         elapsed_time = ((self.df.index - self.df.index[0]).values)/1000000000 # convert ns to s
         elapsed_time = pd.DataFrame(data=elapsed_time, index=self.df.index, dtype=int)
@@ -580,12 +580,12 @@ class PerformanceMonitoring(object):
     
     def get_clock_time(self):
         """
-        Returns clock time in seconds from the dataframe index
+        Returns clock time in seconds from the DataFrame index.
         
         Returns
         --------
         clock_time : pd.DataFrame
-            Clock time of the dataframe index
+            Clock time of the DataFrame index
         """
         clock_time = ((self.df.index - self.df.index[0]).values)/1000000000 # convert ns to s
         clock_time = pd.DataFrame(data=clock_time, index=self.df.index, dtype=int)
@@ -595,11 +595,11 @@ class PerformanceMonitoring(object):
     
     def get_test_results_mask(self, key=None):
         """
-        Return a mask of data-times that failed a quality control test
+        Return a mask of data-times that failed a quality control test.
         
         Parameters
         -----------
-        key : string (default = None)
+        key : string (optional)
             Translation dictionary key. If not specified, all columns are used
             
         Returns
@@ -616,7 +616,7 @@ class PerformanceMonitoring(object):
             try:
                 df = self.df[self.trans[key]]
             except:
-                logger.warning("Key not in dataframe")
+                logger.warning("Key not in DataFrame")
                 return
         else:
             df = self.df 

@@ -26,7 +26,7 @@ To compute QCI::
 
 	QCI = pecos.metrics.qci(pm)
 
-Additional metrics can be added to the QCI dataframe and saved to a file::
+Additional metrics can be added to the QCI DataFrame and saved to a file::
 
 	pecos.io.write_metrics(metrics_filename, QCI)
 

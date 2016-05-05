@@ -23,18 +23,23 @@ logger = logging.getLogger(__name__)
 
 def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
     """
-    Read Campbell Scientific CSV file
+    Read Campbell Scientific CSV file.
 
     Parameters
     ----------
     file_name : string
-        File name with full path
+        File name, with full path
 
-    index_col : string
-        Index column name
+    index_col : string (optional)
+        Index column name, default = 'TIMESTAMP'
 
-    encoding : string
+    encoding : string (optional)
         Character encoding (i.e. utf-16)
+    
+    Returns
+    ---------
+    df : pd.DataFrame
+        Data
     """
     logger.info("Reading Campbell Scientific CSV file " + file_name)
 
@@ -58,9 +63,9 @@ def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
 
     return df
     
-def send_email(subject, html_body, recipeint, attachment=None):
+def send_email(subject, html_body, recipient, attachment=None):
     """
-    Send email via Outlook
+    Send email via Outlook.
     
     Parameters
     ----------
@@ -70,11 +75,11 @@ def send_email(subject, html_body, recipeint, attachment=None):
     html_body : string
         HTML body text
     
-    recipeint : string
+    recipient : string
         Email address or addresses, separated by semicolon
     
-    attachment : string
-        Name of file to attached (with full path)
+    attachment : string (optional)
+        Name of file to attached, with full path
     """
     try:
         import win32com.client
@@ -89,22 +94,22 @@ def send_email(subject, html_body, recipeint, attachment=None):
     newMail = obj.CreateItem(olMailItem)
     newMail.Subject = subject
     newMail.HTMLBody = html_body
-    newMail.To = recipeint
+    newMail.To = recipient
     if attachment:
         newMail.Attachments.Add(attachment)
     newMail.Send()
 
 def write_metrics(filename, metrics):
     """
-    Write metrics file
+    Write metrics file.
     
     Parameters
     -----------
     filename : string
-        Filename with full path
+        File name, with full path
     
-    metrics : pd.Series
-        Data to add to the stats file
+    metrics : pd.DataFrame
+        Data to add to the metrics file
     """
     logger.info("Write metrics file")
 
@@ -122,12 +127,12 @@ def write_metrics(filename, metrics):
 @_nottest
 def write_test_results(filename, test_results):
     """
-    Write test results file
+    Write test results file.
 
     Parameters
     -----------
     filename : string
-        Filename with full path
+        File name, with full path
 
     test_results : pd.DataFrame
         Test results stored in pm.test_results
@@ -142,24 +147,25 @@ def write_test_results(filename, test_results):
     test_results.to_csv(fout, na_rep = 'NaN')
     fout.close()
 
-def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={}, logo=False):
+def write_monitoring_report(filename, directory, pm, metrics=None, config={}, logo=False):
     """
-    Generate a performance monitoring report
+    Generate a performance monitoring report.
     
     Parameters
     ----------
     filename : string
-        Filename with full path
+        File name, with full path
     
-    subdirectory : string
-        Full path to directory containing results
+    directory : string
+        Directory containing results, with full path
     
     pm : PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)
         
     metrics : pd.DataFrame (optional)
+        Performance metrics to add as a table to the monitoring report
     
-    config : dict (optional)
+    config : dictionary (optional)
         Configuration options, to be printed at the end of the report
     
     logo : string (optional)
@@ -196,13 +202,13 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     
     # Generate graphics
-    pecos.graphics.plot_test_results(join(subdirectory, 'test'), pm)
+    pecos.graphics.plot_test_results(join(directory, 'test'), pm)
     
     # Gather custom graphic
-    custom_graphic_files = sorted(glob(abspath(join(subdirectory, '*custom*.jpg'))))
+    custom_graphic_files = sorted(glob(abspath(join(directory, '*custom*.jpg'))))
 
     # Gather test results graphics
-    qc_graphic_files = sorted(glob(abspath(join(subdirectory, '*pecos*.jpg'))))
+    qc_graphic_files = sorted(glob(abspath(join(directory, '*pecos*.jpg'))))
     
     # Convert to html format
     if metrics is None:
@@ -211,7 +217,7 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
     metrics_html = metrics.to_html(justify='left')
     notes_html = notes_df.to_html(justify='left', header=False)
     
-    sub_dict = {'database': os.path.basename(subdirectory),
+    sub_dict = {'database': os.path.basename(directory),
                 'start_time': str(start_time), #data.df.index[0]),
                 'end_time': str(end_time), #data.df.index[-1]),
                 'num_notes': str(notes_df.shape[0]),
@@ -220,7 +226,7 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
                 #'missing_data': missing_html,
                 'num_warnings': str(pm.test_results.shape[0]),
                 'warnings': warnings_html,
-                'graphics_path': os.path.abspath(subdirectory),
+                'graphics_path': os.path.abspath(directory),
                 'qc_graphics': qc_graphic_files,
                 'general_graphics': custom_graphic_files,
                 #'num_data': data.df.shape[0],
@@ -238,19 +244,49 @@ def write_monitoring_report(filename, subdirectory, pm, metrics=None, config={},
 
 def write_dashboard(filename, column_names, row_names, content, title='Pecos Dashboard', footnote='', logo=False):
     """
-    Generate a Pecos report
+    Generate a dashboard.
     
     Parameters
     ----------
     filename : string
+        File name, with full path
     
-    content : pd.DataFrame
+    column_names : list of strings
+        Column names listed in the order they should appear in the dashboard, i.e. ['location1', 'location2']
+        
+    row_names : list of strings
+        Row names listed in the order they should appear in the dashboard, i.e. ['system1', 'system2']
+        
+    content : dictionary
+        Dashboard content for each cell. 
+        
+        Dictionary keys are tuples indicating the row name and column name, i.e. ('row name', 'column name'), where 'row name' is in the list row_names and 'column name' is in the list column_names. 
+        
+        For each key, another dictionary is defined that contains the content to be included in each cell of the dashboard.
+        Each cell can contain text, graphics, a table, and an html link.  These are defined using the following keys:
+        
+        - text (string) =  text at the top of each cell
+        - graphics (list of strings) =  a list of graphics file names.  Each file name includes the full path
+        - table (string) = a table in html format, for example a table of performance metrics.  DataFrames can be converted to an html string using df.to_html() or df.transpose().to_html().
+        - link = (string) = html link, with full path
+        - link text (string) = the name of the link, i.e. 'Link to monitoring report'
+        
+        For example::
+        
+            content = {('row name', 'column name'): {
+                'text': 'text at the top', 
+                'graphic': ['C:\\\\pecos\\\\results\\\\custom_graphic.jpg'], 
+                'table': df.to_html(), 
+                'link': 'C:\\\\pecos\\\\results\\\\monitoring_report.html', 
+                'link text': 'Link to monitoring report'}}
+        
+    title : string (optional)
+        Dashboard title, default = 'Pecos Dashboard'
     
-    title : string (optional, default = 'Pecos Dashboard')
+    footnote : string (optional)
+        Text to be added to the end of the report
     
-    footnote : string (optional, default = no footer)
-    
-    logo : string (optional, default = no logo)
+    logo : string (optional)
         Graphic to be added to the report header
     """
     

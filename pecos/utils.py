@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
         
 def round_index(dt, frequency, how='nearest'):
     """
-    Round datetime index
+    Round datetime index.
     
     Parameters
     ----------
@@ -21,8 +21,8 @@ def round_index(dt, frequency, how='nearest'):
     frequency : int
         Expected time series frequency, in seconds
     
-    how : string (default = 'nearest')
-        Method for rounding.  Options include:
+    how : string (optional)
+        Method for rounding, default = 'nearest'.  Options include:
         
         - nearest = round the index to the nearest expected integer
         - floor= round the index to the largest expected integer such that the integer <= index
@@ -50,25 +50,25 @@ def round_index(dt, frequency, how='nearest'):
 
 def convert_html_to_image(html_filename, image_filename, image_format='jpg', quality=100, zoom=1):
     """
-    Convert html file to image file using wkhtmltoimage
-    See http://wkhtmltopdf.org/ for more information
+    Convert html file to image file using wkhtmltoimage.
+    See http://wkhtmltopdf.org/ for more information.
     
     Parameters
     ----------
     html_filename : string
-        HTML filename with full path
+        HTML file name, with full path
     
     image_filename : string
-        Image filename with full path
+        Image file name, with full path
     
-    image_format : string  (default = 'jpg')
-        Image format
+    image_format : string  (optional)
+        Image format, default = 'jpg'
     
-    quality : int (default = 100)
-        Image quality 
+    quality : int (optional)
+        Image quality, default = 100
     
-    zoom : int (default = 1)
-        Zoom factor
+    zoom : int (optional)
+        Zoom factor, default = 1
     """
     os.system('wkhtmltoimage --format ' + image_format + 
                            ' --quality ' + str(quality) + 

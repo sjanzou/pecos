@@ -24,11 +24,11 @@ def insolation(G, tfilter=None, per_day=True):
     G : pd.DataFrame
         Irradiance time series
         
-    tfilter : pd.Series (default = None)
+    tfilter : pd.Series (optional)
         Time filter containing boolean values for each time index
         
-    per_day : Boolean (default = True)
-        Flag indicating if the results should be computed per day
+    per_day : boolean (optional)
+        Flag indicating if the results should be computed per day, default = True
     
     Returns
     -------
@@ -59,11 +59,11 @@ def energy(P, tfilter=None, per_day=True):
     P : pd.DataFrame
         Power time series
          
-    tfilter : pd.Series (default = None)
+    tfilter : pd.Series (optional)
         Time filter containing boolean values for each time index
         
-    per_day : Boolean (default = True)
-        Flag indicating if the results should be computed per day
+    per_day : boolean (optional)
+        Flag indicating if the results should be computed per day, default = True
     
     Returns
     -------
@@ -100,8 +100,8 @@ def performance_ratio(E, H_poa, P_ref, G_ref=1000):
     P_ref : float
         DC power rating at STC conditions
         
-    G_ref : float (default = 1000)
-        Reference irradiance
+    G_ref : float (optional)
+        Reference irradiance, default = 1000
         
     Returns
     -------
@@ -146,8 +146,8 @@ def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
     P_ref : float
         DC power rating at STC conditions
         
-    G_ref : float (default = 1000)
-        Reference irradiance
+    G_ref : float (optional)
+        Reference irradiance, default = 1000
         
     Returns
     -------
@@ -180,7 +180,7 @@ def performance_index(E, E_predicted):
     :math:`\hat{E}` is the predicted energy over the same time frame.
     :math:`\hat{E}` can be computed using by first predicting power using 
     ``pecos.pv.basic_pvlib_performance_model`` or methods in ``pvlib.pvsystem`` 
-    and then convert power to enery using ``pecos.pv.enery``.
+    and then convert power to energy using ``pecos.pv.enery``.
     
     Unlike with the performance ratio, the performance index should be very 
     close to 1 for a well functioning PV system and should not vary by 
@@ -256,7 +256,7 @@ def clearness_index(H_dn, H_ea):
     :math:`H_{dn}` is the direct-normal insolation (kWh/m2)
     :math:`H_{ea}` is the extraterrestrial insolation (kWh/m2)
     over the same time frame.
-    Extraterrestiral irradiation can be computed using ``pvlib.irradiance.extraradiation``.  
+    Extraterrestrial irradiation can be computed using ``pvlib.irradiance.extraradiation``.  
     Irradiation can be converted to insolation using ``pecos.pv.insolation``.
     
     Parameters
@@ -269,7 +269,7 @@ def clearness_index(H_dn, H_ea):
         
     Returns
     -------
-    Kt : Pandas DataFrame or float
+    Kt : pd.DataFrame
         Clearness index
     """
     logger.info("Compute Clearness Index")
@@ -303,7 +303,7 @@ def basic_pvlib_performance_model(parameters, latitude, longitude, wind_speed,
         Latitude
         
     longitude : float
-        Lolngitude
+        Longitude
     
     wind speed : pd.DataFrame with a single column or pd.Series
         Wind speed time series
@@ -314,11 +314,11 @@ def basic_pvlib_performance_model(parameters, latitude, longitude, wind_speed,
     poa_global : pd.DataFrame with a single column or pd.Series
         Global POA irradiance time series
     
-    poa_diffuse : pd.DataFrame with a single column or pd.Series (default = None)
-        Diffuse POA irradiance time series, set to 0 by default
+    poa_diffuse : pd.DataFrame with a single column or pd.Series (optional)
+        Diffuse POA irradiance time series, default = 0
         
-    model : string
-        'SAPM' or 'singlediode'
+    model : string (optional)
+        'SAPM' or 'singlediode', default = 'SAPM'
     
     Returns
     ---------

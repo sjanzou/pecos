@@ -8,7 +8,7 @@ between pecos and pvlib.
   common names for analysis
 * A time filter is established based on sun position
 * Electrical and weather data are loaded into a pecos PerformanceMonitoring 
-  class and a series of quality control tests are run
+  object and a series of quality control tests are run
 * A performance model is computed using pvlib, additional quality control test
   is run to compare observed to predicted power output
 * PV performance metrics are computed
@@ -61,7 +61,7 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Add pv system data
 database_name = 'Baseline6kW'
 database_file = database_name + analysis_date.strftime('_%Y_%m_%d') + '.dat'
-df = pecos.io.read_campbell_scientific(database_file, 'TIMESTAMP', encoding='utf-16')
+df = pecos.io.read_campbell_scientific(database_file)
 df.index = df.index.tz_localize(location['Timezone'])
 pm.add_dataframe(df, database_name)
 pm.add_translation_dictionary(BASE_translation_dictionary, database_name)
@@ -69,7 +69,7 @@ pm.add_translation_dictionary(BASE_translation_dictionary, database_name)
 # Add weather data
 database_name = 'MET'
 database_file = database_name + analysis_date.strftime('_%Y_%m_%d') + '.dat'
-df = pecos.io.read_campbell_scientific(database_file, 'TIMESTAMP', encoding='utf-16')
+df = pecos.io.read_campbell_scientific(database_file)
 df.index = df.index.tz_localize(location['Timezone'])
 pm.add_dataframe(df, database_name)
 pm.add_translation_dictionary(MET_translation_dictionary, database_name)
@@ -102,9 +102,10 @@ for key,value in range_bounds.items():
 for key,value in increment_bounds.items():
     pm.check_increment([value[0], value[1]], key, min_failures=value[2]) 
     
-# Compute QCI
+# Compute QCI only using columns defined in the translation dictionaries
 mask = pm.get_test_results_mask()
-QCI = pecos.metrics.qci(mask, pm.tfilter)
+col = [item for sublist in pm.trans.values() for item in sublist]
+QCI = pecos.metrics.qci(mask[col], pm.tfilter)
 
 # Generate a performance model using observed POA, wind speed, and air temp
 # Remove data points that failed a previous qualtiy control test before

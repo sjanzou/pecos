@@ -25,15 +25,15 @@ def qci(mask, tfilter=None, per_day=True):
     mask : pd.Dataframe
         Test results mask, returned from pm.get_test_results_mask()
     
-    tfilter : Pandas Series (default = None)
+    tfilter : pd.Series (optional)
         Time filter containing boolean values for each time index
         
-    per_day : Boolean (default = True)
-        Flag indicating if the results should be computed per day
+    per_day : boolean (optional)
+        Flag indicating if the results should be computed per day, default = True
     
     Returns
     -------
-    QCI : pd.Series
+    QCI : pd.DataFrame
         Quality control index
     """
     logger.info("Compute QCI")
@@ -80,16 +80,16 @@ def rmse(x1, x2, tfilter=None, per_day=True):
     x2 : pd.DataFrame with a single column or pd.Series
         Data
          
-    tfilter : pd.Series (default = None)
+    tfilter : pd.Series (optional)
         Time filter containing boolean values for each time index
         
-    per_day : Boolean (default = True)
-        Flag indicating if the results should be computed per day
+    per_day : boolean (optional)
+        Flag indicating if the results should be computed per day, default = True
     
     Returns
     -------
     RMSE : pd.DataFrame
-        Time integral of the dataframe, each column is named 'Time integral of ' + original column name.
+        Root mean squared error of the data
     """
     logger.info("Compute RMSE")
     
@@ -122,7 +122,7 @@ def rmse(x1, x2, tfilter=None, per_day=True):
     
 def time_integral(data, tfilter=None, per_day=True):
     """
-    Compute the time integral of each column in the dataframe defined as:
+    Compute the time integral of each column in the DataFrame defined as:
     
     :math:`F=\int{fdt}`
     
@@ -137,11 +137,11 @@ def time_integral(data, tfilter=None, per_day=True):
     data : pd.DataFrame
         Data
          
-    tfilter : pd.Series (default = None)
+    tfilter : pd.Series (optional)
         Time filter containing boolean values for each time index
         
-    per_day : Boolean (default = True)
-        Flag indicating if the results should be computed per day
+    per_day : boolean (doptional)
+        Flag indicating if the results should be computed per day, default = True
     
     Returns
     -------

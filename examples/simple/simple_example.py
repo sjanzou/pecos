@@ -6,7 +6,7 @@ in pecos.
 * A translation dictionary is defined to map and group the raw data into 
   common names for analysis
 * A time filter is established to screen out data between 3 AM and9 PM
-* The data is loaded into a pecos PerformanceMonitoring class and a series of 
+* The data is loaded into a pecos PerformanceMonitoring object and a series of 
   quality control tests are run, including range tests and increment tests 
 * The results are printed to csv and html reports
 """

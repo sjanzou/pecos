@@ -4,7 +4,7 @@ long term system health
 * Daily performance metrics for 2016 are loaded from a csv file
 * The files contain performance ratio and system availability.
 * The metrics are loaded into a pecos PerformanceMonitoring 
-  class and a series of quality control tests are run
+  object and a series of quality control tests are run
 * The results are printed to csv and html reports
 """
 import pecos
