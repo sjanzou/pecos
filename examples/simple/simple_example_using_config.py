@@ -22,7 +22,7 @@ fid = open(config_file, 'r')
 config = yaml.load(fid)
 fid.close()
 specs = config['Specifications']
-trans = config['Translation']
+translation_dictionary = config['Translation']
 composite_signals = config['Composite Signals']
 time_filter = config['Time Filter']
 corrupt_values = config['Corrupt Values']
@@ -46,7 +46,7 @@ pm = pecos.monitoring.PerformanceMonitoring()
 # Populate the PerformanceMonitoring instance
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
-pm.add_translation_dictionary(trans, system_name)
+pm.add_translation_dictionary(translation_dictionary, system_name)
 
 # Check timestamp
 pm.check_timestamp(specs['Frequency'])
@@ -79,14 +79,17 @@ for key,value in increment_bounds.items():
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
  
-# Create a custom graphic
+# Generate graphics
+test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
+test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
-df.plot(ax=ax)
-plt.ylim((-1.5, 1.5))
-plt.savefig(os.path.join(results_subdirectory, system_name+'_custom_1.jpg')) 
+df.plot(ax=ax, ylim=[-1.5,1.5])
+custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.jpg'))
+plt.savefig(custom_graphic, format='jpg', dpi=500)
 
 # Write metrics, test results, and report files
 pecos.io.write_metrics(metrics_file, QCI)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, QCI)
+pecos.io.write_monitoring_report(report_file, os.path.basename(results_subdirectory), pm, 
+                                  test_results_graphics, [custom_graphic], QCI)

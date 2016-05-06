@@ -2,10 +2,10 @@
 In this example, simple time series data is used to demonstrate basic functions
 in pecos.  
 * Data is loaded from an excel file which contains four columns of values that 
-  follow linear, random, and sine models.
+  are expected to follow linear, random, and sine models.
 * A translation dictionary is defined to map and group the raw data into 
   common names for analysis
-* A time filter is established to screen out data between 3 AM and9 PM
+* A time filter is established to screen out data between 3 AM and 9 PM
 * The data is loaded into a pecos PerformanceMonitoring object and a series of 
   quality control tests are run, including range tests and increment tests 
 * The results are printed to csv and html reports
@@ -26,9 +26,7 @@ translation_dictionary = {
     'Linear': ['A'],
     'Random': ['B'],
     'Wave': ['C','D']}
-expected_frequency = 900
-time_filter_min = 3*3600
-time_filter_max = 21*3600
+expected_frequency = 900 # s
 corrupt_values = [-999]
 range_bounds = {
     'Random': [0, 1],
@@ -37,7 +35,7 @@ range_bounds = {
 increment_bounds = {
     'Linear': [0.0001, None],
     'Random': [0.0001, None],
-    'Wave': [0.0001, 0.5]}
+    'Wave': [0.0001, 0.6]}
     
  # Define output files and directories
 results_directory = 'Results'
@@ -63,7 +61,7 @@ pm.check_timestamp(expected_frequency)
  
 # Generate time filter
 clock_time = pm.get_clock_time()
-time_filter = (clock_time > time_filter_min) & (clock_time < time_filter_max)
+time_filter = (clock_time > 3*3600) & (clock_time < 21*3600)
 pm.add_time_filter(time_filter)
 
 # Check missing
@@ -77,9 +75,9 @@ elapsed_time= pm.get_elapsed_time()
 wave_model = np.sin(10*(elapsed_time/86400))
 wave_model.columns=['Wave Model']
 pm.add_signal('Wave Model', wave_model)
-wave_mode_abs_error = np.abs(np.subtract(pm.df[pm.trans['Wave']], wave_model))
-wave_mode_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-pm.add_signal('Wave Absolute Error', wave_mode_abs_error)
+wave_model_abs_error = np.abs(np.subtract(pm.df[pm.trans['Wave']], wave_model))
+wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
+pm.add_signal('Wave Absolute Error', wave_model_abs_error)
 
 # Check range
 for key,value in range_bounds.items():
@@ -93,13 +91,18 @@ for key,value in increment_bounds.items():
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
  
-# Create a custom graphic
+# Generate graphics
+test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
+test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
 df.plot(ax=ax, ylim=[-1.5,1.5])
-plt.savefig(os.path.join(results_subdirectory, system_name+'_custom_1.jpg')) 
-
+custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.jpg'))
+plt.savefig(custom_graphic, format='jpg', dpi=500)
+    
 # Write metrics, test results, and report files
 pecos.io.write_metrics(metrics_file, QCI)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, QCI)
+pecos.io.write_monitoring_report(report_file, os.path.basename(results_subdirectory), pm, 
+                                  test_results_graphics, [custom_graphic], QCI)
+                                 

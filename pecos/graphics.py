@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import textwrap
+import os
 import logging
 
 try:
@@ -209,7 +210,7 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
     ax.set_position([box.x0, box.y0+0.2, box.width, box.height*0.64])
 
 @_nottest
-def plot_test_results(filename, pm):
+def plot_test_results(filename_root, pm):
     """
     Create test results graphics which highlight data points that
     failed a quality control test.
@@ -218,14 +219,20 @@ def plot_test_results(filename, pm):
     ----------
     filename : string
         Filename root, with full path.  
-        Each graphic is appended with '_pecos_*.jpg' where * is an integer.
-        For example, filename = 'C:\\\\pecos\\\\results\\\\test' will generate files named 
-        'C:\\\\pecos\\\\results\\\\test_pecos_*.jpg'.
+        Each grpahics filename is appended with an integer.
+        For example, filename_root = 'C:\\\\pecos\\\\results\\\\test' will generate a file named 
+        'C:\\\\pecos\\\\results\\\\test1.jpg'.
         The directory ''C:\\\\pecos\\\\results' must exist.
 
     pm : PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)
     """
+    
+    filename_root = os.path.abspath(filename_root)
+    
+    # Colect file names
+    test_results_graphics = []
+    
     if pm.test_results.empty:
         return
 
@@ -255,7 +262,12 @@ def plot_test_results(filename, pm):
         ax.set_position([box.x0, box.y0, box.width*0.65, box.height])
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=8)
         plt.title(col_name, fontsize=8)
-
-        plt.savefig(filename +'_pecos_'+str(graphic)+'.jpg', format='jpg', dpi=500)
+        
+        filename = filename_root + str(graphic) + '.jpg'
+        test_results_graphics.append(filename)
+        plt.savefig(filename, format='jpg', dpi=500)
+        
         graphic = graphic + 1
         plt.close()
+
+    return test_results_graphics

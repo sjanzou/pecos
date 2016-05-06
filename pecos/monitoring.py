@@ -90,7 +90,7 @@ class PerformanceMonitoring(object):
         else:
             self.tfilter = time_filter
 
-    def add_signal(self, col_name, df):
+    def add_signal(self, col_name, data):
         """
         Add signal to the PerformanceMonitoring DataFrame.
         
@@ -99,23 +99,24 @@ class PerformanceMonitoring(object):
         col_name : string
             Column name to add to translation dictionary
         
-        df : pd.DataFarame
+        data : pd.DataFarame or pd.Series
             Data to add to df
         """
-        df = pd.DataFrame(df)
+        if type(data) is pd.core.series.Series:
+            data = data.to_frame(col_name)
         
         if col_name in self.trans.keys():
             logger.info(col_name + ' already exists in trans')
             return
-        for col in df.columns.values.tolist():
+        for col in data.columns.values.tolist():
             if col in self.df.columns.values.tolist():
                 logger.info(col + ' already exists in df')
                 return
         try:
-            self.trans[col_name] = df.columns.values.tolist()
+            self.trans[col_name] = data.columns.values.tolist()
             #self.df[df.columns] = df
-            for col in df.columns:
-                self.df[col] = df[col]
+            for col in data.columns:
+                self.df[col] = data[col]
         except:
             logger.warning("Add signal failed: " + col_name)
             return

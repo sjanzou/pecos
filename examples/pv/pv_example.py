@@ -102,13 +102,13 @@ for key,value in range_bounds.items():
 for key,value in increment_bounds.items():
     pm.check_increment([value[0], value[1]], key, min_failures=value[2]) 
     
-# Compute QCI only using columns defined in the translation dictionaries
+# Compute QCI only using columns defined in the translation dictionary
 mask = pm.get_test_results_mask()
 col = [item for sublist in pm.trans.values() for item in sublist]
 QCI = pecos.metrics.qci(mask[col], pm.tfilter)
 
 # Generate a performance model using observed POA, wind speed, and air temp
-# Remove data points that failed a previous qualtiy control test before
+# Remove data points that failed a previous quality control test before
 # running the model (using 'mask')
 poa = pm.df[pm.trans['POA']][mask[pm.trans['POA']]]
 wind = pm.df[pm.trans['Wind Speed']][mask[pm.trans['Wind Speed']]]
@@ -121,9 +121,9 @@ sapm = pecos.pv.basic_pvlib_performance_model(sapm_parameters,
 # Compute the relative error between observed and predicted DC Power.  
 # Add the composite signal and run a range test
 modeled_dcpower = sapm['p_mp']*sapm_parameters['Ns']*sapm_parameters['Np']
+pm.add_signal('Expected DC Power', modeled_dcpower)
 observed_dcpower = pm.df[pm.trans['DC Power']].sum(axis=1)
 dc_power_relative_error = (np.abs(observed_dcpower - modeled_dcpower))/observed_dcpower
-dc_power_relative_error = dc_power_relative_error.to_frame('DC Power Relative Error')
 pm.add_signal('DC Power Relative Error', dc_power_relative_error)
 pm.check_range([0,0.1], 'DC Power Relative Error') 
 
@@ -135,7 +135,7 @@ pm.check_range([0.8, 1.2], 'Normalized Efficiency')
 
 # Compute energy
 energy = pecos.pv.energy(pm.df[pm.trans['AC Power']], tfilter=pm.tfilter)
-total_energy = energy.sum(axis=1).to_frame('Total Energy')
+total_energy = energy.sum(axis=1)
 
 # Compute insolation
 poa_insolation = pecos.pv.insolation(pm.df[pm.trans['POA']], tfilter=pm.tfilter)
@@ -161,16 +161,19 @@ energy_yield = pecos.pv.energy_yield(total_energy, P_ref)
 total_energy = total_energy/3600/1000 # convert Ws to kWh
 poa_insolation = poa_insolation/3600/1000 # convert Ws to kWh
 energy_yield = energy_yield/3600 # convert s to h
-total_energy.columns = ['Total Energy (kWh)']
+total_energy = total_energy.to_frame('Total Energy (kWh)')
 poa_insolation.columns = ['POA Insolation (kWh/m2)']
 energy_yield.columns = ['Energy Yield (kWh/kWp)']
 metrics = pd.concat([QCI, PR, PI, Kt, total_energy, poa_insolation, energy_yield], axis=1)
 
-# Generate custom graphics
-filename = os.path.join(results_subdirectory, system_name)
-pv_graphics.graphics(filename, pm)
+# Generate graphics
+test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
+test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
+custom_graphics_filename_root = os.path.join(results_subdirectory, 'custom')
+custom_graphics = pv_graphics.graphics(custom_graphics_filename_root, pm)
 
 # Generate reports
 pecos.io.write_metrics(metrics_file, metrics)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, results_subdirectory, pm, metrics.transpose(), config)
+pecos.io.write_monitoring_report(report_file, os.path.basename(results_subdirectory), pm, 
+                                  test_results_graphics, custom_graphics, metrics.transpose(), config)

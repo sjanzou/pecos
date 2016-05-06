@@ -18,9 +18,9 @@ Corrupt Values: [-999]
 Range Bounds:
   Random: [0, 1]
   Wave: [-1, 1]
-  Wave Absolute Error: [None, 0.2]
+  Wave Absolute Error: [None, 0.25]
  
 Increment Bounds:
   Linear: [0.0001, None]
   Random: [0.0001, None]
-  Wave: [0.0001, 0.5] 
+  Wave: [0.0001, 0.6] 

@@ -34,6 +34,8 @@ of expected range, data that doesn't change, and data that changes abruptly.
 
 * Column D is missing data from 17:45 until 18:15
 
+* Column D is occasionally below the expected lower bound of -1 around midday (2 timesteps) and above the expected upper bound of 1 in the early morning and late evening (10 timesteps).
+
 The script, **simple_example.py** (shown below), is used to run quality control analysis using Pecos.
 The script performs the following steps:
 
@@ -65,10 +67,5 @@ Results are saved in examples/simple/Results.  Results include:
 
 * Performance metric CSV file, **Simple_metrics.csv**, includes a quality control index based on the analysis.  
 
-..
-	.. raw:: html
-	   :file: ..\examples\simple\Results\Simple_2015_01_01\Simple.html
-
-.. figure:: figures/Simple.jpg
-	:scale: 100 %
-	:alt: Simple.html
+.. raw:: html
+	:file: figures/Simple.html

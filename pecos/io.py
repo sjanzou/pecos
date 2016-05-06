@@ -147,20 +147,31 @@ def write_test_results(filename, test_results):
     test_results.to_csv(fout, na_rep = 'NaN')
     fout.close()
 
-def write_monitoring_report(filename, directory, pm, metrics=None, config={}, logo=False):
+def write_monitoring_report(filename, report_title, pm, 
+                             test_results_graphics=[], custom_graphics=[], 
+                             metrics=None, config={}, logo=False, encode=False):
     """
-    Generate a performance monitoring report.
+    Generate a monitoring report.  
+    The monitoring report is used to report quality control test results for a single system.
+    The report includes custom graphics, performance metrics, and test results.
     
     Parameters
     ----------
     filename : string
         File name, with full path
     
-    directory : string
-        Directory containing results, with full path
+    report_title : string
+        Report title
     
     pm : PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)
+        
+    test_results_graphics : list of strings (optional)
+        Graphics files, with full path.  These graphics highlight data points 
+        that failed a quality control test, created using pecos.graphics.plot_test_results()
+        
+    custom_graphics : list of strings (optional)
+        Custom files, with full path.  Created by the user.
         
     metrics : pd.DataFrame (optional)
         Performance metrics to add as a table to the monitoring report
@@ -170,6 +181,9 @@ def write_monitoring_report(filename, directory, pm, metrics=None, config={}, lo
     
     logo : string (optional)
         Graphic to be added to the report header
+    
+    encode : boolean (optional)
+        Encode graphics in the html, default = False
     """
     
     logger.info("Writing HTML report")
@@ -201,39 +215,26 @@ def write_monitoring_report(filename, directory, pm, metrics=None, config={}, lo
     pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     
-    # Generate graphics
-    pecos.graphics.plot_test_results(join(directory, 'test'), pm)
-    
-    # Gather custom graphic
-    custom_graphic_files = sorted(glob(abspath(join(directory, '*custom*.jpg'))))
-
-    # Gather test results graphics
-    qc_graphic_files = sorted(glob(abspath(join(directory, '*pecos*.jpg'))))
-    
     # Convert to html format
     if metrics is None:
         metrics = pd.DataFrame()
-    warnings_html = pm.test_results.to_html(justify='left')
+    test_results_html = pm.test_results.to_html(justify='left')
     metrics_html = metrics.to_html(justify='left')
     notes_html = notes_df.to_html(justify='left', header=False)
     
-    sub_dict = {'database': os.path.basename(directory),
-                'start_time': str(start_time), #data.df.index[0]),
-                'end_time': str(end_time), #data.df.index[-1]),
+    sub_dict = {'title': os.path.basename(report_title),
+                'start_time': str(start_time), 
+                'end_time': str(end_time), 
                 'num_notes': str(notes_df.shape[0]),
-                'notes': notes_html, #.replace('\n', '<br>'),
-                'num_missing_data': str(0),
-                #'missing_data': missing_html,
-                'num_warnings': str(pm.test_results.shape[0]),
-                'warnings': warnings_html,
-                'graphics_path': os.path.abspath(directory),
-                'qc_graphics': qc_graphic_files,
-                'general_graphics': custom_graphic_files,
-                #'num_data': data.df.shape[0],
+                'notes': notes_html, 
+                'num_test_results': str(pm.test_results.shape[0]),
+                'test_results': test_results_html,
+                'test_results_graphics': test_results_graphics,
+                'custom_graphics': custom_graphics,
                 'num_metrics': str(metrics.shape[0]),
                 'metrics': metrics_html,
                 'config': config}
-    html_string = _html_template_monitoring_report(sub_dict, logo)
+    html_string = _html_template_monitoring_report(sub_dict, logo, encode=encode)
     
     # Write html file
     html_file = open(filename,"w")
@@ -241,10 +242,12 @@ def write_monitoring_report(filename, directory, pm, metrics=None, config={}, lo
     html_file.close()
     
     logger.info("")
-
-def write_dashboard(filename, column_names, row_names, content, title='Pecos Dashboard', footnote='', logo=False):
+    
+def write_dashboard(filename, column_names, row_names, content, title='Pecos Dashboard', footnote='', logo=False, encode=False):
     """
-    Generate a dashboard.
+    Generate a dashboard.  
+    The dashboard is used to compare multiple systems.
+    Each cell in the dashboard includes custom system graphics and metrics.
     
     Parameters
     ----------
@@ -268,7 +271,7 @@ def write_dashboard(filename, column_names, row_names, content, title='Pecos Das
         - text (string) =  text at the top of each cell
         - graphics (list of strings) =  a list of graphics file names.  Each file name includes the full path
         - table (string) = a table in html format, for example a table of performance metrics.  DataFrames can be converted to an html string using df.to_html() or df.transpose().to_html().
-        - link = (string) = html link, with full path
+        - link (string) = html link, with full path
         - link text (string) = the name of the link, i.e. 'Link to monitoring report'
         
         For example::
@@ -288,6 +291,9 @@ def write_dashboard(filename, column_names, row_names, content, title='Pecos Das
     
     logo : string (optional)
         Graphic to be added to the report header
+    
+    encode : boolean (optional)
+        Encode graphics in the html, default = False
     """
     
     logger.info("Writing dashboard")
@@ -296,23 +302,23 @@ def write_dashboard(filename, column_names, row_names, content, title='Pecos Das
     pd.set_option('display.max_colwidth', -1)
     pd.set_option('display.width', 40)
     
-    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo)
+    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo, encode)
     
     # Write html file
-#    filename = join('Results', 'dashboard_' + title + ".html")
     html_file = open(filename,"w")
     html_file.write(html_string)
     html_file.close()
     
     logger.info("")
     
-def _html_template_monitoring_report(sub_dict, logo, encode_flag=False):
+def _html_template_monitoring_report(sub_dict, logo, encode):
     
     template = """
     <!DOCTYPE html>
     <html lang="en-US">
+    <body style="background-color:white;">
     <head>
-    <title>$database</title>
+    <title>$title</title>
     <meta charset="UTF-8" />
     </head>
     <table border="0" width="100%">
@@ -332,21 +338,21 @@ def _html_template_monitoring_report(sub_dict, logo, encode_flag=False):
     </tr>
     </table>
     <hr>
-    <H2>$database Report</H2>
+    <H2>$title Report</H2>
     """
     #if sub_dict['num_data'] > 0:
     template = template + """
     Start time: $start_time <br>
     End time:  $end_time <br>
-    Test Failures: $num_warnings <br>        
+    Test Failures: $num_test_results <br>        
     Notes: $num_notes <br>
     <br>"""
-    for im in sub_dict['general_graphics']:
-        if encode_flag:
+    for im in sub_dict['custom_graphics']:
+        if encode:
             with open(im, "rb") as f:
                 data = f.read()
                 img_encode = data.encode("base64")
-            template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"500\"><br>"""
+            template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"700\"><br>"""
         else:
             template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"700\"><br>"""
     
@@ -356,23 +362,17 @@ def _html_template_monitoring_report(sub_dict, logo, encode_flag=False):
         $metrics
         <br>"""
         
-    #if sub_dict['num_data'] > 0:
-    if int(sub_dict['num_missing_data']) > 0:
-        template = template + """
-        <H3>Missing/Corrupt Data:</H3>
-        $missing_data
-        <br>"""
-    if int(sub_dict['num_warnings']) > 0:
+    if int(sub_dict['num_test_results']) > 0:
         template = template + """
         <H3>Test Results:</H3>
-        $warnings
+        $test_results
         <br>"""
-        for im in sub_dict['qc_graphics']:
-            if encode_flag:
+        for im in sub_dict['test_results_graphics']:
+            if encode:
                 with open(im, "rb") as f:
                     data = f.read()
                     img_encode = data.encode("base64")
-                template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"500\"><br>"""
+                template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"700\"><br>"""
             else:
                 template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"700\"><br>"""
     
@@ -392,7 +392,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode_flag=False):
         <pre>""" + config + """</pre><br><br>"""
     
     template = template + """<hr>
-    This report was generated by <A href="https://pypi.python.org/pypi/pecos">Pecos</A> """
+    This report was generated by <A href="https://github.com/sandialabs/pecos">Pecos</A> """
     date = datetime.datetime.now()
     datestr = date.strftime('%m/%d/%Y')
     template = template + pecos.__version__ + ", " + datestr
@@ -405,7 +405,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode_flag=False):
     
     return html_string
 
-def _html_template_dashboard(column_names, row_names, content, title, footnote, logo):
+def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, encode):
     
     template = """
     <!DOCTYPE html>
@@ -465,7 +465,14 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
                 # Add graphics
                 if len(content[row, column]['graphics']) > 0:
                     for im in content[row, column]['graphics']:
-                        template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"250"><br>"""
+                        if encode:
+                            with open(im, "rb") as f:
+                                data = f.read()
+                                img_encode = data.encode("base64")
+                            template = template + """<img src="data:image/png;base64,"""+img_encode+"""\" alt="Image not loaded" width=\"250"><br>"""
+                        else:
+                            template = template + """<img src=\"""" + im + """\" alt="Image not loaded" width=\"250"><br>"""
+                
                 # Add table
                 if content[row, column]['table']:
                     template = template + content[row, column]['table'] + """<br>"""
@@ -485,7 +492,7 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     <br>"""
     template = template + footnote + """<br><br>"""
     template = template + """<hr>
-    This report was generated by <A href="https://pypi.python.org/pypi/pecos">Pecos</A> """
+    This report was generated by <A href="https://github.com/sandialabs/pecos">Pecos</A> """
     date = datetime.datetime.now()
     datestr = date.strftime('%m/%d/%Y')
     template = template + pecos.__version__ + ", " + datestr
