@@ -8,6 +8,7 @@ This is a minor release, changes include:
 * Added a pv module, includes basic methods to compute energy, insolation,  
   performance ratio, performance index, energy yield, clearness index, 
   and a basic pv performance model.
-* Added method to compute time integral and rmse to metrics module  
+* Added method to compute time integral and RMSE to metrics module  
+* Cleaned up examples, API, and documentation
 * Software test harness run through TravisCI and analyzed using Coveralls
 * Documentation hosted on readthedocs

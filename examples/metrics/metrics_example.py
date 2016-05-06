@@ -66,5 +66,5 @@ plt.savefig(custom_graphic, format='jpg', dpi=500)
 
 # Generate report
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, os.path.basename(results_subdirectory), pm, 
-                                  test_results_graphics, [custom_graphic])
+pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphic], 
+                                 title='System1 2015 Performance Metrics')

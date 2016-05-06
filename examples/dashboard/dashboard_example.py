@@ -12,8 +12,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import datetime
-from os.path import join, abspath
-from glob import glob
 
 # Initialize logger
 pecos.logger.initialize()
@@ -93,15 +91,13 @@ for location_name in locations:
         # Generate reports
         pecos.io.write_test_results(test_results_file, pm.test_results)
         pecos.io.write_metrics(metrics_file, QCI)
-        pecos.io.write_monitoring_report(report_file, os.path.basename(results_subdirectory), pm, 
-                                  test_results_graphics, [custom_graphic], QCI)
+        pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphic], QCI)
             
-        graphics = glob(abspath(join(results_subdirectory, '*custom*.jpg')))
         metrics_table = QCI.transpose().to_html(bold_rows=False, header=False)
         content = {'text': "Example text for " + location_system, 
-                   'graphics': graphics, 
+                   'graphics': [custom_graphic], 
                    'table':  metrics_table, 
-                   'link': abspath(report_file),
+                   'link': os.path.abspath(report_file),
                    'link text': 'Link to Report'}
         dashboard_content[(system_name, location_name)] = content
         

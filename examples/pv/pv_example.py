@@ -175,5 +175,6 @@ custom_graphics = pv_graphics.graphics(custom_graphics_filename_root, pm)
 # Generate reports
 pecos.io.write_metrics(metrics_file, metrics)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, os.path.basename(results_subdirectory), pm, 
-                                  test_results_graphics, custom_graphics, metrics.transpose(), config)
+pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, 
+                                 custom_graphics, metrics.transpose(), 
+                                 'Baseline System, Performance Monitoring Report', config)

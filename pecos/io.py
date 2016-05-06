@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 import logging
 import os
-from glob import glob
 from os.path import abspath, dirname, join
 import pecos.graphics
 import datetime
@@ -147,9 +146,8 @@ def write_test_results(filename, test_results):
     test_results.to_csv(fout, na_rep = 'NaN')
     fout.close()
 
-def write_monitoring_report(filename, report_title, pm, 
-                             test_results_graphics=[], custom_graphics=[], 
-                             metrics=None, config={}, logo=False, encode=False):
+def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graphics=[], metrics=None, 
+                             title='Pecos Monitoring Report', config={}, logo=False, encode=False):
     """
     Generate a monitoring report.  
     The monitoring report is used to report quality control test results for a single system.
@@ -159,23 +157,23 @@ def write_monitoring_report(filename, report_title, pm,
     ----------
     filename : string
         File name, with full path
-    
-    report_title : string
-        Report title
-    
+
     pm : PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)
-        
+    
     test_results_graphics : list of strings (optional)
         Graphics files, with full path.  These graphics highlight data points 
         that failed a quality control test, created using pecos.graphics.plot_test_results()
         
     custom_graphics : list of strings (optional)
         Custom files, with full path.  Created by the user.
-        
+    
     metrics : pd.DataFrame (optional)
         Performance metrics to add as a table to the monitoring report
     
+    title : string (optional)
+        Monitoring report title, default = 'Pecos Monitoring Report'
+        
     config : dictionary (optional)
         Configuration options, to be printed at the end of the report
     
@@ -222,7 +220,7 @@ def write_monitoring_report(filename, report_title, pm,
     metrics_html = metrics.to_html(justify='left')
     notes_html = notes_df.to_html(justify='left', header=False)
     
-    sub_dict = {'title': os.path.basename(report_title),
+    sub_dict = {'title': os.path.basename(title),
                 'start_time': str(start_time), 
                 'end_time': str(end_time), 
                 'num_notes': str(notes_df.shape[0]),
@@ -243,7 +241,8 @@ def write_monitoring_report(filename, report_title, pm,
     
     logger.info("")
     
-def write_dashboard(filename, column_names, row_names, content, title='Pecos Dashboard', footnote='', logo=False, encode=False):
+def write_dashboard(filename, column_names, row_names, content, 
+                    title='Pecos Dashboard', footnote='', logo=False, encode=False):
     """
     Generate a dashboard.  
     The dashboard is used to compare multiple systems.
@@ -338,7 +337,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
     </tr>
     </table>
     <hr>
-    <H2>$title Report</H2>
+    <H2>$title</H2>
     """
     #if sub_dict['num_data'] > 0:
     template = template + """
