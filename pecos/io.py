@@ -320,6 +320,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
     <title>$title</title>
     <meta charset="UTF-8" />
     </head>
+    <body>
     <table border="0" width="100%">
     <col style="width:70%">
     <col style="width:30%">
@@ -396,6 +397,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
     datestr = date.strftime('%m/%d/%Y')
     template = template + pecos.__version__ + ", " + datestr
     template = template + """
+    </body>
     </html>"""
     
     template = Template(template)
@@ -415,7 +417,10 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     template = template + """
     </title>
     <meta charset="UTF-8" />
+    <!-- datatables.net -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.css">
     </head>
+    <body>
     <table border="0" width="100%">
     <col style="width:70%">
     <col style="width:30%">
@@ -437,7 +442,7 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     template = template + title
     template = template + """
     </H2>
-    <table border="1" class="dataframe">
+    <table id="myTable" border="1" class="dataframe display">
     <thead>
     <tr>
     <th></th>"""
@@ -496,9 +501,15 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     datestr = date.strftime('%m/%d/%Y')
     template = template + pecos.__version__ + ", " + datestr
     template = template + """
-    </html>"""
-    
-    template = template + """
+    <!-- jQuery (necessary for datatables.net) -->
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>  
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function(){
+        $('#myTable').DataTable();
+    });
+    </script>
+    </body>
     </html>"""
     
     return template
