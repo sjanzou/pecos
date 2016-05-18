@@ -277,7 +277,7 @@ def write_dashboard(filename, column_names, row_names, content,
         
             content = {('row name', 'column name'): {
                 'text': 'text at the top', 
-                'graphic': ['C:\\\\pecos\\\\results\\\\custom_graphic.jpg'], 
+                'graphic': ['C:\\\\pecos\\\\results\\\\custom_graphic.png'], 
                 'table': df.to_html(), 
                 'link': 'C:\\\\pecos\\\\results\\\\monitoring_report.html', 
                 'link text': 'Link to monitoring report'}}

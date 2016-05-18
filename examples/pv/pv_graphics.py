@@ -18,9 +18,9 @@ def graphics(filename_root, pm):
     plot_timeseries(plotdata, pm.tfilter, yaxis_min=-200)
     plt.legend(['String 1', 'String 2'], fontsize=8) 
     plt.ylabel('DC Power', fontsize=8)
-    filename = filename_root + '1.jpg'
+    filename = filename_root + '1.png'
     custom_graphics.append(filename)
-    plt.savefig(filename, format='jpg', dpi=1000)
+    plt.savefig(filename, format='png', dpi=1000)
     plt.close()  
     
     # Plot Irradiance over time
@@ -35,9 +35,9 @@ def graphics(filename_root, pm):
     plot_timeseries(plotdata, pm.tfilter, yaxis_min=-200, yaxis_max=1200)
     plt.legend(['GHI', 'DHI', 'DNI'], fontsize=8) 
     plt.ylabel('Irradiance', fontsize=8) 
-    filename = filename_root + '2.jpg'
+    filename = filename_root + '2.png'
     custom_graphics.append(filename)
-    plt.savefig(filename, format='jpg', dpi=1000)
+    plt.savefig(filename, format='png', dpi=1000)
     plt.close()  
     
     # Plot DC Power vs POA
@@ -55,9 +55,9 @@ def graphics(filename_root, pm):
     plt.legend(['String 1', 'String 2'], fontsize=8, loc='lower right')
     plt.xlabel('POA', fontsize=8)
     plt.ylabel('DC Power', fontsize=8)
-    filename = filename_root + '3.jpg'
+    filename = filename_root + '3.png'
     custom_graphics.append(filename)
-    plt.savefig(filename, format='jpg', dpi=1000)
+    plt.savefig(filename, format='png', dpi=1000)
     plt.close()  
     
     # Plot normalized efficiency
@@ -68,9 +68,9 @@ def graphics(filename_root, pm):
         plotdata = None
     plot_timeseries(plotdata, pm.tfilter) 
     plt.ylabel('Normalized Efficiency', fontsize=8) 
-    filename = filename_root + '4.jpg'
+    filename = filename_root + '4.png'
     custom_graphics.append(filename)
-    plt.savefig(filename, format='jpg', dpi=1000)
+    plt.savefig(filename, format='png', dpi=1000)
     plt.close()  
     
     # Plot DC Power actual vs. expected
@@ -88,9 +88,9 @@ def graphics(filename_root, pm):
     plt.legend(['String 1', 'String 2'], fontsize=8, loc='lower right')
     plt.xlabel('Expected DC Power', fontsize=8)
     plt.ylabel('DC Power', fontsize=8)
-    filename = filename_root + '5.jpg'
+    filename = filename_root + '5.png'
     custom_graphics.append(filename)
-    plt.savefig(filename, format='jpg', dpi=1000)
+    plt.savefig(filename, format='png', dpi=1000)
     plt.close()  
     
     return custom_graphics

@@ -97,8 +97,8 @@ test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_r
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
 df.plot(ax=ax, ylim=[-1.5,1.5])
-custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.jpg'))
-plt.savefig(custom_graphic, format='jpg', dpi=500)
+custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
+plt.savefig(custom_graphic, format='png', dpi=500)
     
 # Write metrics, test results, and report files
 pecos.io.write_metrics(metrics_file, QCI)

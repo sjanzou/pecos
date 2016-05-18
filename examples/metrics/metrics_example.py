@@ -61,8 +61,8 @@ for key in pm.trans.keys():
 test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
 test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
 df.plot(ylim=[-0.2,1.2])
-custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.jpg'))
-plt.savefig(custom_graphic, format='jpg', dpi=500)
+custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
+plt.savefig(custom_graphic, format='png', dpi=500)
 
 # Generate report
 pecos.io.write_test_results(test_results_file, pm.test_results)
