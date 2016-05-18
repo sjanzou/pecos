@@ -48,7 +48,7 @@ def round_index(dt, frequency, how='nearest'):
 
     return rounded_dt
 
-def convert_html_to_image(html_filename, image_filename, image_format='jpg', quality=100, zoom=1):
+def convert_html_to_image(html_filename, image_filename, image_format='png', quality=100, zoom=1):
     """
     Convert html file to image file using wkhtmltoimage.
     See http://wkhtmltopdf.org/ for more information.
@@ -62,7 +62,7 @@ def convert_html_to_image(html_filename, image_filename, image_format='jpg', qua
         Image file name, with full path
     
     image_format : string  (optional)
-        Image format, default = 'jpg'
+        Image format, default = 'png'
     
     quality : int (optional)
         Image quality, default = 100

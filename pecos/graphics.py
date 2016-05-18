@@ -210,7 +210,7 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
     ax.set_position([box.x0, box.y0+0.2, box.width, box.height*0.64])
 
 @_nottest
-def plot_test_results(filename_root, pm):
+def plot_test_results(filename_root, pm, image_format='png'):
     """
     Create test results graphics which highlight data points that
     failed a quality control test.
@@ -221,11 +221,15 @@ def plot_test_results(filename_root, pm):
         Filename root, with full path.  
         Each grpahics filename is appended with an integer.
         For example, filename_root = 'C:\\\\pecos\\\\results\\\\test' will generate a file named 
-        'C:\\\\pecos\\\\results\\\\test1.jpg'.
+        'C:\\\\pecos\\\\results\\\\test1.png'.
         The directory ''C:\\\\pecos\\\\results' must exist.
 
     pm : PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)
+        
+    image_format : string  (optional)
+        Image format, default = 'png'
+    
     """
     
     filename_root = os.path.abspath(filename_root)
@@ -263,9 +267,9 @@ def plot_test_results(filename_root, pm):
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=8)
         plt.title(col_name, fontsize=8)
         
-        filename = filename_root + str(graphic) + '.jpg'
+        filename = filename_root + str(graphic) + '.' + image_format
         test_results_graphics.append(filename)
-        plt.savefig(filename, format='jpg', dpi=500)
+        plt.savefig(filename, format=image_format, dpi=500)
         
         graphic = graphic + 1
         plt.close()
