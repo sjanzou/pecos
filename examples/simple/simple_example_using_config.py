@@ -63,7 +63,7 @@ pm.check_corrupt(corrupt_values)
 
 # Add composite signals
 for composite_signal in composite_signals:
-    for key, value in composite_signal.iteritems():
+    for key, value in composite_signal.items():
         signal = pm.evaluate_string(key, value, specs)
         pm.add_signal(key, signal)
 
