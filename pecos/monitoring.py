@@ -71,7 +71,7 @@ class PerformanceMonitoring(object):
             System name
         """    
         # Combine variable name with system name (System: Variable)
-        for key, values in trans.iteritems():
+        for key, values in trans.items():
             self.trans[key] = []
             for value in values:
                 self.trans[key].append(system_name + ':' + value)
@@ -104,7 +104,10 @@ class PerformanceMonitoring(object):
         """
         if type(data) is pd.core.series.Series:
             data = data.to_frame(col_name)
-        
+        if type(data) is not pd.core.frame.DataFrame:
+            logger.warning("Add signal failed")
+            return
+            
         if col_name in self.trans.keys():
             logger.info(col_name + ' already exists in trans')
             return

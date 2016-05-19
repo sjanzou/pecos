@@ -43,7 +43,7 @@ def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
     logger.info("Reading Campbell Scientific CSV file " + file_name)
 
     try:
-        df = pd.read_csv(file_name, skiprows=1, encoding=encoding, index_col=index_col, parse_dates=True, dtype=unicode) #, low_memory=False)
+        df = pd.read_csv(file_name, skiprows=1, encoding=encoding, index_col=index_col, parse_dates=True, dtype ='unicode') #, low_memory=False)
         df = df[2:]
         index = pd.to_datetime(df.index)
         Unnamed = df.filter(regex='Unnamed')
