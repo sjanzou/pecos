@@ -18,6 +18,7 @@ def test_plot_scatter1():
     plt.figure()
     pecos.graphics.plot_scatter(x,y,xaxis_min=0.5, xaxis_max=6.5, yaxis_min=0.5, yaxis_max=3.5)
     plt.savefig(filename, format='png')
+    plt.close()
     
     assert_true(isfile(filename))
 
@@ -31,6 +32,7 @@ def test_plot_scatter2():
     plt.figure()
     pecos.graphics.plot_scatter(x,y,xaxis_min=0.5, xaxis_max=6.5, yaxis_min=0.5, yaxis_max=3.5)
     plt.savefig(filename, format='png')
+    plt.close()
     
     assert_true(isfile(filename))
 
@@ -44,6 +46,7 @@ def test_plot_scatter3():
     plt.figure()
     pecos.graphics.plot_scatter(x,y,xaxis_min=0.5, xaxis_max=3.5, yaxis_min=0.5, yaxis_max=6.5)
     plt.savefig(filename, format='png')
+    plt.close()
     
     assert_true(isfile(filename))
     
@@ -58,6 +61,7 @@ def test_plot_timeseries1():
     plt.figure()
     pecos.graphics.plot_timeseries(df,yaxis_min=0, yaxis_max=20)
     plt.savefig(filename, format='png')
+    plt.close()
     
     assert_true(isfile(filename))
     
@@ -73,6 +77,7 @@ def test_plot_timeseries2():
     plt.figure()
     pecos.graphics.plot_timeseries(df,tfilter, yaxis_min=0, yaxis_max=20)
     plt.savefig(filename, format='png')
+    plt.close()
     
     assert_true(isfile(filename))
 
