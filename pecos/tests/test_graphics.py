@@ -1,5 +1,6 @@
 from nose.tools import *
 from os.path import abspath, dirname, join, isfile
+import os
 import pecos
 import pandas as pd
 import numpy as np
@@ -11,7 +12,9 @@ datadir = abspath(join(testdir, 'data'))
 
 def test_plot_scatter1():
     filename = abspath(join(testdir, 'plot_scatter1.png'))
-    
+    if isfile(filename):
+        os.remove(filename)
+        
     x = pd.DataFrame({'x1' : pd.Series([1., 2., 3.], index=['a', 'b', 'c'])})
     y = pd.DataFrame({'y1' : pd.Series([1., 2., 3.], index=['a', 'b', 'c'])})
     
@@ -24,7 +27,9 @@ def test_plot_scatter1():
 
 def test_plot_scatter2():
     filename = abspath(join(testdir, 'plot_scatter2.png'))
-    
+    if isfile(filename):
+        os.remove(filename)
+        
     x = pd.DataFrame({'x1' : pd.Series([1., 2., 3.], index=['a', 'b', 'c']),
          'x2' : pd.Series([4., 5., 6.], index=['a', 'b', 'c'])})
     y = pd.DataFrame({'y1' : pd.Series([1., 2., 3.], index=['a', 'b', 'c'])})
@@ -38,7 +43,9 @@ def test_plot_scatter2():
 
 def test_plot_scatter3():
     filename = abspath(join(testdir, 'plot_scatter3.png'))
-    
+    if isfile(filename):
+        os.remove(filename)
+        
     y = pd.DataFrame({'y1' : pd.Series([1., 2., 3.], index=['a', 'b', 'c']),
          'y2' : pd.Series([4., 5., 6.], index=['a', 'b', 'c'])})
     x = pd.DataFrame({'x1' : pd.Series([1., 2., 3.], index=['a', 'b', 'c'])})
@@ -52,7 +59,9 @@ def test_plot_scatter3():
     
 def test_plot_timeseries1():
     filename = abspath(join(testdir, 'plot_timeseries1.png'))
-    
+    if isfile(filename):
+        os.remove(filename)
+        
     periods = 5
     index = pd.date_range('1/1/2016', periods=periods, freq='H')
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
@@ -67,7 +76,9 @@ def test_plot_timeseries1():
     
 def test_plot_timeseries2():
     filename = abspath(join(testdir, 'plot_timeseries2.png'))
-    
+    if isfile(filename):
+        os.remove(filename)
+        
     periods = 5
     index = pd.date_range('1/1/2016', periods=periods, freq='H')
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
@@ -106,7 +117,5 @@ def test_plot_test_results2():
     graphics = pecos.graphics.plot_test_results(filename_root, pm)
     
     assert_equals(len(graphics),2)
-    
-if __name__ == '__main__':
-    test_plot_test_results2()
+
     
