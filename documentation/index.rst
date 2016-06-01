@@ -20,7 +20,7 @@ Citing Pecos
 --------------
 To cite Pecos, use the following reference:
 
-* K.A. Klise and J.S. Stein (2016), Performance Monitoring using Pecos, Technical Report SAND2016-3583, Sandia National Laboratories.
+* K.A. Klise and J.S. Stein (2016), Performance Monitoring using Pecos, Technical Report SAND2016-3583, Sandia National Laboratories. :download:`pdf <pdfs/Pecos_ReportV0.1_SAND2016-3583.pdf>`
 
 Contents
 ------------

@@ -131,6 +131,7 @@ def time_integral(data, tfilter=None, per_day=True):
     :math:`dt` is the time step between observations.
     The time integral is computed using the trapezoidal rule from numpy.trapz.
     Results are given in [original data units]*seconds.
+    NaN values are set to 0 for integration.
     
     Parameters
     -----------
@@ -152,11 +153,14 @@ def time_integral(data, tfilter=None, per_day=True):
     
     if tfilter is not None:
         data = data[tfilter]
-        
+    
+    data = data.fillna(0) # fill NaN with 0
+    
     def compute_integral(d):
         val = {}
         tdelta = ((d.index - d.index[0]).values)/1000000000 # convert ns to seconds
         for col in d.columns:
+            print col
             val['Time integral of ' + col] = float(np.trapz(d.loc[:,col], tdelta))
         return val
         
