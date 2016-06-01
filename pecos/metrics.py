@@ -160,7 +160,6 @@ def time_integral(data, tfilter=None, per_day=True):
         val = {}
         tdelta = ((d.index - d.index[0]).values)/1000000000 # convert ns to seconds
         for col in d.columns:
-            print col
             val['Time integral of ' + col] = float(np.trapz(d.loc[:,col], tdelta))
         return val
         
