@@ -238,7 +238,7 @@ def plot_test_results(filename_root, pm, image_format='png'):
     test_results_graphics = []
     
     if pm.test_results.empty:
-        return
+        return test_results_graphics
 
     graphic = 0
 
