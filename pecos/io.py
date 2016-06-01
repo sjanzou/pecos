@@ -242,7 +242,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     logger.info("")
     
 def write_dashboard(filename, column_names, row_names, content, 
-                    title='Pecos Dashboard', footnote='', logo=False, encode=False):
+                    title='Pecos Dashboard', footnote='', logo=False, datatables=False, encode=False):
     """
     Generate a dashboard.  
     The dashboard is used to compare multiple systems.
@@ -291,6 +291,9 @@ def write_dashboard(filename, column_names, row_names, content,
     logo : string (optional)
         Graphic to be added to the report header
     
+    datatables : boolean (optional)
+        Use datatables.net to format the dashboard, default = False.  See https://datatables.net/ for more information.
+    
     encode : boolean (optional)
         Encode graphics in the html, default = False
     """
@@ -301,7 +304,7 @@ def write_dashboard(filename, column_names, row_names, content,
     pd.set_option('display.max_colwidth', -1)
     pd.set_option('display.width', 40)
     
-    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo, encode)
+    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode)
     
     # Write html file
     html_file = open(filename,"w")
@@ -320,6 +323,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
     <title>$title</title>
     <meta charset="UTF-8" />
     </head>
+    <body>
     <table border="0" width="100%">
     <col style="width:70%">
     <col style="width:30%">
@@ -396,6 +400,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
     datestr = date.strftime('%m/%d/%Y')
     template = template + pecos.__version__ + ", " + datestr
     template = template + """
+    </body>
     </html>"""
     
     template = Template(template)
@@ -404,7 +409,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
     
     return html_string
 
-def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, encode):
+def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode):
     
     template = """
     <!DOCTYPE html>
@@ -414,8 +419,14 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     template = template + title
     template = template + """
     </title>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8" />"""
+    if datatables:
+        template = template + """
+        <!-- datatables.net -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.css">"""
+    template = template + """    
     </head>
+    <body>
     <table border="0" width="100%">
     <col style="width:70%">
     <col style="width:30%">
@@ -436,8 +447,14 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     <H2>"""
     template = template + title
     template = template + """
-    </H2>
-    <table border="1" class="dataframe">
+    </H2>"""
+    if datatables:
+        template = template + """
+        <table id="myTable" border="1" class="dataframe display">"""
+    else:
+        template = template + """
+        <table border="1" class="dataframe">"""
+    template = template + """
     <thead>
     <tr>
     <th></th>"""
@@ -495,10 +512,18 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     date = datetime.datetime.now()
     datestr = date.strftime('%m/%d/%Y')
     template = template + pecos.__version__ + ", " + datestr
+    if datatables:
+        template = template + """
+        <!-- jQuery (necessary for datatables.net) -->
+        <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>  
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.js"></script>
+        <script>
+            $(document).ready(function(){
+            $('#myTable').DataTable();
+        });
+        </script>"""
     template = template + """
-    </html>"""
-    
-    template = template + """
+    </body>
     </html>"""
     
     return template
