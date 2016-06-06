@@ -82,7 +82,7 @@ def plot_scatter(x,y,xaxis_min=None, xaxis_max=None, yaxis_min=None, yaxis_max=N
     plt.ylim((yaxis_min, yaxis_max))
     ax.tick_params(axis='both', labelsize=8)
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0+0.2, box.width, box.height*0.8])
+    ax.set_position([box.x0, box.y0+0.15, box.width, box.height*0.75])
     
 def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None, xaxis_max=None, yaxis_min=None, yaxis_max=None):
     """
@@ -207,7 +207,7 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
     ax.tick_params(axis='both', labelsize=8)
     plt.xlabel('Time', fontsize=8)
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0+0.2, box.width, box.height*0.64])
+    ax.set_position([box.x0, box.y0+0.15, box.width, box.height*0.75])
 
 @_nottest
 def plot_test_results(filename_root, pm, image_format='png'):

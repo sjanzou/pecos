@@ -123,6 +123,52 @@ def performance_ratio(E, H_poa, P_ref, G_ref=1000):
     
     return PR
 
+def normalized_current(I, G_poa, I_sco, G_ref=1000):
+    """
+    Compute normalized current defined as:
+
+    :math:`NI = \dfrac{\dfrac{I}{I_{sco}}}{\dfrac{G_{poa}}{G_{ref}}}`
+    
+    where 
+    :math:`I` is current, 
+    :math:`I_{sco}` is the short circuit current at STC conditions, 
+    :math:`G_{poa}` is the plane-of-array irradiance, and 
+    :math:`G_{ref}` is the reference irradiance.
+    
+    Parameters
+    -----------
+    I : pd.DataFrame with a single column or pd.Series
+        Current
+        
+    G_poa : pd.DataFrame with a single column or pd.Series
+         Plane of array irradiance
+         
+    I_sco : float
+        Short circuit current at STC conditions
+        
+    G_ref : float (optional)
+        Reference irradiance, default = 1000
+        
+    Returns
+    -------
+    NI : pd.DataFrame
+        Normalized current
+    """
+    logger.info("Compute Normalized Current")
+    
+    if type(I) is pd.core.frame.DataFrame:
+        I = pd.Series(I.values.values[:,0], index=I.index)
+    if type(G_poa) is pd.core.frame.DataFrame:
+        G_poa = pd.Series(G_poa.values[:,0], index=G_poa.index)
+        
+    N = I/I_sco
+    D = G_poa/G_ref
+    NI = N/D
+    
+    NI = NI.to_frame('Normalized Current')
+    
+    return NI
+    
 def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
     """
     Compute normalized efficiency defined as:
@@ -151,10 +197,10 @@ def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
         
     Returns
     -------
-    PR : pd.DataFrame
-        Performance ratio
+    NE : pd.DataFrame
+        Normalized efficiency
     """
-    logger.info("Compute Performance Ratio")
+    logger.info("Compute Normalized Efficiency")
     
     if type(P) is pd.core.frame.DataFrame:
         P = pd.Series(P.values.values[:,0], index=P.index)
