@@ -130,15 +130,15 @@ def normalized_current(I, G_poa, I_sco, G_ref=1000):
     :math:`NI = \dfrac{\dfrac{I}{I_{sco}}}{\dfrac{G_{poa}}{G_{ref}}}`
     
     where 
-    :math:`P` is the observed power (AC or DC), 
-    :math:`P_{ref}` is the DC power rating at STC conditions, 
+    :math:`I` is current, 
+    :math:`I_{sco}` is the short circuit current at STC conditions, 
     :math:`G_{poa}` is the plane-of-array irradiance, and 
     :math:`G_{ref}` is the reference irradiance.
     
     Parameters
     -----------
     I : pd.DataFrame with a single column or pd.Series
-        Power (AC or DC) 
+        Current
         
     G_poa : pd.DataFrame with a single column or pd.Series
          Plane of array irradiance
