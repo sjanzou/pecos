@@ -21,6 +21,8 @@ except ImportError:
         
 logger = logging.getLogger(__name__)
 
+env = Environment(loader=PackageLoader('pecos', 'templates'))
+
 def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
     """
     Read Campbell Scientific CSV file.
@@ -305,7 +307,7 @@ def write_dashboard(filename, column_names, row_names, content,
     pd.set_option('display.max_colwidth', -1)
     pd.set_option('display.width', 40)
     
-    html_string = _html_template_dashboard2(column_names, row_names, content, title, footnote, logo, datatables, encode)
+    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode)
     
     # Write html file
     html_file = open(filename,"w")
@@ -329,7 +331,6 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
                 img_encode = data.encode("base64")
                 img_dic[im] = img_encode
 
-    env = Environment(loader=PackageLoader('pecos', 'templates'))
     template = env.get_template('monitoring_report.html')
 
     date = datetime.datetime.now()
@@ -344,7 +345,7 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
 
 
 
-def _html_template_dashboard2(column_names, row_names, content, title, footnote, logo, datatables, encode):
+def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode):
     
     img_dic = {}
     if encode:
@@ -356,7 +357,7 @@ def _html_template_dashboard2(column_names, row_names, content, title, footnote,
                         img_encode = data.encode("base64")
                         img_dic[im] = img_encode
 
-    env = Environment(loader=PackageLoader('pecos', 'templates'))
+    
     template = env.get_template('dashboard.html')
 
     date = datetime.datetime.now()
