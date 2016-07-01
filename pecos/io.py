@@ -223,8 +223,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     metrics_html = metrics.to_html(justify='left')
     notes_html = notes_df.to_html(justify='left', header=False)
     
-    sub_dict = {'title': os.path.basename(title),
-                'start_time': str(start_time), 
+    content = {'start_time': str(start_time), 
                 'end_time': str(end_time), 
                 'num_notes': str(notes_df.shape[0]),
                 'notes': notes_html, 
@@ -235,7 +234,10 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
                 'num_metrics': str(metrics.shape[0]),
                 'metrics': metrics_html,
                 'config': config}
-    html_string = _html_template_monitoring_report(sub_dict, logo, encode=encode)
+                
+    title = os.path.basename(title)
+    
+    html_string = _html_template_monitoring_report(content, title, logo, encode)
     
     # Write html file
     html_file = open(filename,"w")
@@ -316,16 +318,17 @@ def write_dashboard(filename, column_names, row_names, content,
     
     logger.info("")
 
-def _html_template_monitoring_report(sub_dict, logo, encode):
-
+def _html_template_monitoring_report(content, title, logo, encode):
+    
+    # if encode == True, encode the images
     img_dic = {}
     if encode:
-        for im in sub_dict['custom_graphics']:
+        for im in content['custom_graphics']:
             with open(im, "rb") as f:
                 data = f.read()
                 img_encode = data.encode("base64")
                 img_dic[im] = img_encode
-        for im in sub_dict['test_results_graphics']:
+        for im in content['test_results_graphics']:
             with open(im, "rb") as f:
                 data = f.read()
                 img_encode = data.encode("base64")
@@ -335,18 +338,14 @@ def _html_template_monitoring_report(sub_dict, logo, encode):
 
     date = datetime.datetime.now()
     datestr = date.strftime('%m/%d/%Y')
-
-    return template.render(sub_dict=sub_dict, 
-                            logo=logo, 
-                            encode=encode, 
-                            img_dic=img_dic,
-                            datestr=datestr,
-                            version=pecos.__version__)
-
-
+    
+    version = pecos.__version__
+    
+    return template.render(**locals())
 
 def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode):
     
+    # if encode == True, encode the images
     img_dic = {}
     if encode:
         for column in column_names:

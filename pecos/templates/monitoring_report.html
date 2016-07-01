@@ -2,7 +2,7 @@
 <body style="background-color:white;">
 
 {% block head %}
-    <title>{{ sub_dict['title'] }}</title>
+    <title>{{ title }}</title>
     {{ super() }}
 {% endblock %}
 
@@ -21,15 +21,15 @@
 </tr>
 </table>
 <hr>
-<H2>{{ sub_dict['title'] }}</H2>
+<H2>{{ title }}</H2>
 
-Start time: {{ sub_dict['start_time'] }} <br>
-End time:  {{ sub_dict['end_time'] }} <br>
-Test Failures: {{ sub_dict['num_test_results'] }} <br>        
-Notes: {{ sub_dict['num_notes'] }} <br>
+Start time: {{ content['start_time'] }} <br>
+End time:  {{ content['end_time'] }} <br>
+Test Failures: {{ content['num_test_results'] }} <br>        
+Notes: {{ content['num_notes'] }} <br>
 <br>
 
-{% for im in sub_dict['custom_graphics'] %}
+{% for im in content['custom_graphics'] %}
     {% if encode %}
         <img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width=700><br>
     {% else %}
@@ -37,18 +37,18 @@ Notes: {{ sub_dict['num_notes'] }} <br>
     {% endif %}
 {% endfor %}
 
-{% if sub_dict['num_metrics']|int > 0 %}
+{% if content['num_metrics']|int > 0 %}
     <H3>Performance Metrics:</H3>
-    {{ sub_dict['metrics'] }}
+    {{ content['metrics'] }}
     <br>
 {% endif %}
 
-{% if sub_dict['num_test_results']|int > 0 %}
+{% if content['num_test_results']|int > 0 %}
     <H3>Test Results:</H3>
-    {{ sub_dict['test_results'] }}
+    {{ content['test_results'] }}
     <br>
 
-    {% for im in sub_dict['test_results_graphics'] %}
+    {% for im in content['test_results_graphics'] %}
         {% if encode %}
             <img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width=700><br>
         {% else %}
@@ -58,17 +58,17 @@ Notes: {{ sub_dict['num_notes'] }} <br>
 
 {% endif %}
 
-{% if sub_dict['num_notes']|int > 0 %}
+{% if content['num_notes']|int > 0 %}
     <H3>Performance Metrics:</H3>
-    {{ sub_dict['notes'] }}
+    {{ content['notes'] }}
     <br>
 {% else %}
     <H3>Notes:</H3> None<br><br>
 {% endif %}
 
-{% if sub_dict['config'] %}
+{% if content['config'] %}
     <b>Configuration Options:</b><br>
-    <pre>{{ sub_dict['config'] }}</pre><br><br>
+    <pre>{{ content['config'] }}</pre><br><br>
 {% endif %}
 
 {{ super() }}
