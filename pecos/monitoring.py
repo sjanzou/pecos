@@ -190,14 +190,23 @@ class PerformanceMonitoring(object):
                 else:
                     var_name = ''
                     system_name = ''
-                s = pd.Series([system_name, \
-                               var_name, \
-                               sub_df.index[block['Start Row'][i]], \
-                               sub_df.index[block['Stop Row'][i]], \
-                               length, \
-                               error_msg], \
-                    index=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
-                self.test_results = self.test_results.append(s, ignore_index=True)
+                frame = pd.DataFrame([system_name, var_name, 
+                                      sub_df.index[block['Start Row'][i]],
+                                      sub_df.index[block['Stop Row'][i]], 
+                                      length, error_msg], 
+                                      index=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])         
+                frame_t = frame.transpose()
+                self.test_results = self.test_results.append(frame_t, ignore_index=True)
+               
+#                s = pd.Series([system_name, \
+#                               var_name, \
+#                               sub_df.index[block['Start Row'][i]], \
+#                               sub_df.index[block['Stop Row'][i]], \
+#                               length, \
+#                               error_msg], \
+#                    index=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+#                self.test_results = self.test_results.append(s, ignore_index=True)
+                
         
     def check_timestamp(self, frequency, expected_start_time=None, expected_end_time=None, min_failures=1):
         """
@@ -591,9 +600,10 @@ class PerformanceMonitoring(object):
         clock_time : pd.DataFrame
             Clock time of the DataFrame index
         """
-        clock_time = ((self.df.index - self.df.index[0]).values)/1000000000 # convert ns to s
-        clock_time = pd.DataFrame(data=clock_time, index=self.df.index, dtype=int)
-        clock_time = np.mod(clock_time, 86400)
+        clock_time = pd.DataFrame(index=self.df.index,data=len(self.df.index)*[np.nan])
+        for i in range(len(self.df.index)):
+            t = self.df.index.time[i]
+            clock_time.loc[self.df.index[i],0] = t.hour*3600 + t.minute*60 + t.second + t.microsecond/1000000
         
         return clock_time
     
