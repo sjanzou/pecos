@@ -197,16 +197,6 @@ class PerformanceMonitoring(object):
                                       index=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])         
                 frame_t = frame.transpose()
                 self.test_results = self.test_results.append(frame_t, ignore_index=True)
-               
-#                s = pd.Series([system_name, \
-#                               var_name, \
-#                               sub_df.index[block['Start Row'][i]], \
-#                               sub_df.index[block['Stop Row'][i]], \
-#                               length, \
-#                               error_msg], \
-#                    index=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
-#                self.test_results = self.test_results.append(s, ignore_index=True)
-                
         
     def check_timestamp(self, frequency, expected_start_time=None, expected_end_time=None, min_failures=1):
         """
