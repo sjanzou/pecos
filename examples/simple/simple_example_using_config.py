@@ -11,13 +11,8 @@ import yaml
 # Initialize logger
 pecos.logger.initialize()
 
-# Input
-system_name = 'Simple'
-analysis_date = '1_1_2015'
-data_file = 'simple.xlsx'
+# Open configuration file and extract information
 config_file = 'simple_config.yml'
-  
-# Open config file and extract information
 fid = open(config_file, 'r')
 config = yaml.load(fid)
 fid.close()
@@ -29,21 +24,12 @@ corrupt_values = config['Corrupt Values']
 range_bounds = config['Range Bounds']
 increment_bounds = config['Increment Bounds']
    
- # Define output files and directories
-results_directory = 'Results'
-if not os.path.exists(results_directory):
-    os.makedirs(results_directory)
-results_subdirectory = os.path.join(results_directory, system_name + '_2015_01_01')
-if not os.path.exists(results_subdirectory):
-    os.makedirs(results_subdirectory)
-metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
-test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
-report_file =  os.path.join(results_subdirectory, system_name + '.html')
-
-# Create an PerformanceMonitoring instance
+# Create a Pecos PerformanceMonitoring data object
 pm = pecos.monitoring.PerformanceMonitoring()
 
-# Populate the PerformanceMonitoring instance
+# Populate the object with a dataframe and translation dictionary
+system_name = 'Simple'
+data_file = 'simple.xlsx'
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
 pm.add_translation_dictionary(translation_dictionary, system_name)
@@ -51,7 +37,7 @@ pm.add_translation_dictionary(translation_dictionary, system_name)
 # Check timestamp
 pm.check_timestamp(specs['Frequency'])
  
-# Generate time filter
+# Generate a time filter
 time_filter = pm.evaluate_string('Time Filter', time_filter)
 pm.add_time_filter(time_filter)
 
@@ -78,17 +64,25 @@ for key,value in increment_bounds.items():
 # Compute metrics
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
- 
+
+ # Define output files and directories
+results_directory = 'Results'
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
+graphics_file_rootname = os.path.join(results_directory, 'test_results')
+custom_graphics_file = os.path.abspath(os.path.join(results_directory, 'custom.png'))
+metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
+test_results_file = os.path.join(results_directory, system_name + '_test_results.csv')
+report_file =  os.path.join(results_directory, system_name + '.html')
+
 # Generate graphics
-test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
-test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
+test_results_graphics = pecos.graphics.plot_test_results(graphics_file_rootname, pm)
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
 df.plot(ax=ax, ylim=[-1.5,1.5])
-custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
-plt.savefig(custom_graphic, format='png', dpi=500)
+plt.savefig(custom_graphics_file, format='png', dpi=500)
 
 # Write metrics, test results, and report files
 pecos.io.write_metrics(metrics_file, QCI)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphic], QCI)
+pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphics_file], QCI)

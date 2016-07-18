@@ -15,26 +15,12 @@ import os
 # Initialize logger
 pecos.logger.initialize()
 
-# Input
-system_name = 'System1'
-analysis_date = '2015'
-data_file = 'System1_2015_performance_metrics.xlsx'
-
- # Define output files and directories
-results_directory = 'Results'
-if not os.path.exists(results_directory):
-    os.makedirs(results_directory)
-results_subdirectory = os.path.join(results_directory, system_name + '_'+analysis_date)
-if not os.path.exists(results_subdirectory):
-    os.makedirs(results_subdirectory)
-metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
-test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
-report_file =  os.path.join(results_subdirectory, system_name + '.html')
-
-# Create an PerformanceMonitoring instance
+# Create a Pecos PerformanceMonitoring data object
 pm = pecos.monitoring.PerformanceMonitoring()
 
-# Populate the PerformanceMonitoring instance
+# Populate the object with a dataframe and translation dictionary
+system_name = 'System1'
+data_file = 'System1_2015_performance_metrics.xlsx'
 df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
 translation_dictionary = dict(zip(df.columns, [[col] for col in df.columns])) # 1:1 translation
@@ -56,15 +42,24 @@ for key in pm.trans.keys():
 # Check increment for all columns
 for key in pm.trans.keys():
     pm.check_increment([-0.5, None], key, absolute_value=False) 
-    
-# Generate graphics
-test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
-test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
-df.plot(ylim=[-0.2,1.2])
-custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
-plt.savefig(custom_graphic, format='png', dpi=500)
 
-# Generate report
+# Define output file names and directories
+results_directory = 'Results'
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
+graphics_file_rootname = os.path.join(results_directory, 'test_results')
+custom_graphics_file = os.path.abspath(os.path.join(results_directory, 'custom.png'))
+test_results_file = os.path.join(results_directory, system_name + '_test_results.csv')
+report_file =  os.path.join(results_directory, system_name + '.html')
+
+# Generate graphics
+test_results_graphics = pecos.graphics.plot_test_results(graphics_file_rootname, pm)
+plt.figure(figsize = (10.0,4.0))
+ax = plt.gca()
+df.plot(ax=ax, ylim=[-0.2,1.2])
+plt.savefig(custom_graphics_file, format='png', dpi=500)
+
+# Write test results and report files
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphic], 
+pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphics_file], 
                                  title='System1 2015 Performance Metrics')

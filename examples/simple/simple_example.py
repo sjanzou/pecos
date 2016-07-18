@@ -19,47 +19,24 @@ import numpy as np
 # Initialize logger
 pecos.logger.initialize()
 
-# Input
+# Create a Pecos PerformanceMonitoring data object
+pm = pecos.monitoring.PerformanceMonitoring()
+
+# Populate the object with a dataframe and translation dictionary
 system_name = 'Simple'
 data_file = 'simple.xlsx'
+df = pd.read_excel(data_file)
 translation_dictionary = {
     'Linear': ['A'],
     'Random': ['B'],
     'Wave': ['C','D']}
-expected_frequency = 900 # s
-corrupt_values = [-999]
-range_bounds = {
-    'Random': [0, 1],
-    'Wave': [-1, 1],
-    'Wave Absolute Error': [None, 0.25]}
-increment_bounds = {
-    'Linear': [0.0001, None],
-    'Random': [0.0001, None],
-    'Wave': [0.0001, 0.6]}
-    
- # Define output files and directories
-results_directory = 'Results'
-if not os.path.exists(results_directory):
-    os.makedirs(results_directory)
-results_subdirectory = os.path.join(results_directory, system_name + '_2015_01_01')
-if not os.path.exists(results_subdirectory):
-    os.makedirs(results_subdirectory)
-metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
-test_results_file = os.path.join(results_subdirectory, system_name + '_test_results.csv')
-report_file =  os.path.join(results_subdirectory, system_name + '.html')
-
-# Create an PerformanceMonitoring instance
-pm = pecos.monitoring.PerformanceMonitoring()
-
-# Populate the PerformanceMonitoring instance
-df = pd.read_excel(data_file)
 pm.add_dataframe(df, system_name)
 pm.add_translation_dictionary(translation_dictionary, system_name)
 
 # Check timestamp
-pm.check_timestamp(expected_frequency)
+pm.check_timestamp(900)
  
-# Generate time filter
+# Generate a time filter
 clock_time = pm.get_clock_time()
 time_filter = (clock_time > 3*3600) & (clock_time < 21*3600)
 pm.add_time_filter(time_filter)
@@ -68,7 +45,7 @@ pm.add_time_filter(time_filter)
 pm.check_missing()
         
 # Check corrupt
-pm.check_corrupt(corrupt_values) 
+pm.check_corrupt([-999]) 
 
 # Add composite signals
 elapsed_time= pm.get_elapsed_time()
@@ -80,28 +57,38 @@ wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
 pm.add_signal('Wave Absolute Error', wave_model_abs_error)
 
 # Check range
-for key,value in range_bounds.items():
-    pm.check_range(value, key)
+pm.check_range([0, 1], 'Random')
+pm.check_range([-1, 1], 'Wave')
+pm.check_range([None, 0.25], 'Wave Absolute Error')
 
 # Check increment
-for key,value in increment_bounds.items():
-    pm.check_increment(value, key) 
+pm.check_increment([0.0001, None], 'Linear') 
+pm.check_increment([0.0001, None], 'Random') 
+pm.check_increment([0.0001, 0.6], 'Wave') 
     
 # Compute metrics
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
- 
+
+# Define output file names and directories
+results_directory = 'Results'
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
+graphics_file_rootname = os.path.join(results_directory, 'test_results')
+custom_graphics_file = os.path.abspath(os.path.join(results_directory, 'custom.png'))
+metrics_file = os.path.join(results_directory, system_name + '_metrics.csv')
+test_results_file = os.path.join(results_directory, system_name + '_test_results.csv')
+report_file =  os.path.join(results_directory, system_name + '.html')
+
 # Generate graphics
-test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
-test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
+test_results_graphics = pecos.graphics.plot_test_results(graphics_file_rootname, pm)
 plt.figure(figsize = (7.0,3.5))
 ax = plt.gca()
 df.plot(ax=ax, ylim=[-1.5,1.5])
-custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
-plt.savefig(custom_graphic, format='png', dpi=500)
-    
+plt.savefig(custom_graphics_file, format='png', dpi=500)
+
 # Write metrics, test results, and report files
 pecos.io.write_metrics(metrics_file, QCI)
 pecos.io.write_test_results(test_results_file, pm.test_results)
-pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphic], QCI)
+pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphics_file], QCI)
                                  

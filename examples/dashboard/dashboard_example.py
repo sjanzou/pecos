@@ -16,24 +16,18 @@ import datetime
 # Initialize logger
 pecos.logger.initialize()
 
+# Define system names, location names, and analysis date
 systems = ['system1', 'system2', 'system3']
 locations = ['location1', 'location2']
 analysis_date = datetime.date.today()-datetime.timedelta(days=1)
-results_directory = 'Results'
-if not os.path.exists(results_directory):
-    os.makedirs(results_directory)
-dashboard_filename = os.path.join(results_directory, 'Dashboard_example.html')
-dashboard_content = {} 
 
-np.random.seed(500)
+dashboard_content = {} # Initialize the dashboard content dictionary
+np.random.seed(500) # Set a random seed for sine wave function
 
 for location_name in locations:
     for system_name in systems:
-        
-        # Input
-        config_file = system_name + '_config.yml'
-        
         # Open config file and extract information
+        config_file = system_name + '_config.yml'
         fid = open(config_file, 'r')
         config = yaml.load(fid)
         fid.close()
@@ -41,21 +35,11 @@ for location_name in locations:
         specs = config['Specifications']
         range_bounds = config['Range Bounds']
     
-        # Define output files and subdirectories
-        location_system = location_name + '_' + system_name
-        location_system_date = location_system + '_' + analysis_date.strftime('%Y_%m_%d')
-        results_subdirectory = os.path.join(results_directory, location_system_date)
-        if not os.path.exists(results_subdirectory):
-            os.makedirs(results_subdirectory)
-        metrics_file = os.path.join(results_directory, location_system + '_metrics.csv')
-        test_results_file = os.path.join(results_subdirectory, location_system_date + '_test_results.csv')
-        report_file =  os.path.join(results_subdirectory, location_system_date + '.html')
-        
-        
-        # Create an PerformanceMonitoring instance
+        # Create a Pecos PerformanceMonitoring data object
         pm = pecos.monitoring.PerformanceMonitoring()
         
-        # Populate the PerformanceMonitoring instance (with fake data)
+        # Populate the object with a dataframe and translation dictionary
+        # In this example, fake data is generated using a sin wave function
         index = pd.date_range(analysis_date, periods=24, freq='H')
         data=np.sin(np.random.rand(3,1)*np.arange(0,24,1))
         df = pd.DataFrame(data=data.transpose(), index=index, columns=['A', 'B', 'C'])
@@ -65,7 +49,7 @@ for location_name in locations:
         # Check timestamp
         pm.check_timestamp(specs['Frequency']) 
         
-        # Generate time filter
+        # Generate a time filter
         clock_time = pm.get_clock_time()
         time_filter = (clock_time > specs['Time Filter Min']*3600) & (clock_time < specs['Time Filter Max']*3600)
         pm.add_time_filter(time_filter)
@@ -81,24 +65,38 @@ for location_name in locations:
         mask = pm.get_test_results_mask()
         QCI = pecos.metrics.qci(mask, pm.tfilter)
         
+        # Define output files and subdirectories
+        location_system = location_name + '_' + system_name
+        location_system_date = location_system + '_' + analysis_date.strftime('%Y_%m_%d')
+        results_directory = 'Results'
+        results_subdirectory = os.path.join(results_directory, location_system_date)
+        if not os.path.exists(results_subdirectory):
+            os.makedirs(results_subdirectory)
+        graphics_file_rootname = os.path.join(results_subdirectory, 'test_results')
+        custom_graphics_file = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
+        metrics_file = os.path.join(results_directory, location_system + '_metrics.csv')
+        test_results_file = os.path.join(results_subdirectory, location_system_date + '_test_results.csv')
+        report_file =  os.path.join(results_subdirectory, location_system_date + '.html')
+        
         # Generate graphics
-        test_results_filename_root = os.path.join(results_subdirectory, 'test_results')
-        test_results_graphics = pecos.graphics.plot_test_results(test_results_filename_root, pm)
+        test_results_graphics = pecos.graphics.plot_test_results(graphics_file_rootname, pm)
         df.plot()
-        custom_graphic = os.path.abspath(os.path.join(results_subdirectory, 'custom.png'))
-        plt.savefig(custom_graphic, format='png', dpi=500)
+        plt.savefig(custom_graphics_file, format='png', dpi=500)
 
-        # Generate reports
-        pecos.io.write_test_results(test_results_file, pm.test_results)
+        # Write metrics, test results, and report files
         pecos.io.write_metrics(metrics_file, QCI)
-        pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphic], QCI)
-            
+        pecos.io.write_test_results(test_results_file, pm.test_results)
+        pecos.io.write_monitoring_report(report_file, pm, test_results_graphics, [custom_graphics_file], QCI)
+        
+        # Store content to be displayed in the dashboard
         metrics_table = QCI.transpose().to_html(bold_rows=False, header=False)
         content = {'text': "Example text for " + location_system, 
-                   'graphics': [custom_graphic], 
+                   'graphics': [custom_graphics_file], 
                    'table':  metrics_table, 
                    'link': os.path.abspath(report_file),
                    'link text': 'Link to Report'}
         dashboard_content[(system_name, location_name)] = content
-        
+
+# Create dashboard  
+dashboard_filename = os.path.join(results_directory, 'Dashboard_example.html')  
 pecos.io.write_dashboard(dashboard_filename, locations, systems, dashboard_content)
