@@ -61,9 +61,9 @@ The script performs the following steps:
 
 Results are saved in examples/simple/Results.  Results include:
 
-* HTML report, **Simple_2015_01_01/Simple.html** (shown below), includes summary tables and graphics
+* HTML report, **Simple.html** (shown below), includes summary tables and graphics
 
-* Test results CSV file, **Simple_2015_01_01/Simple_test_results.csv**, includes information from the summary tables
+* Test results CSV file, **Simple_test_results.csv**, includes information from the summary tables
 
 * Performance metric CSV file, **Simple_metrics.csv**, includes a quality control index based on the analysis.  
 

@@ -20,6 +20,8 @@ and generate reports which include performance metrics, test results, and graphi
 The software was developed specifically for solar photovoltaic system 
 monitoring, but it can be customized for other applications.
 
+For more information, go to http://pecos.readthedocs.io
+
 License
 ------------
 
