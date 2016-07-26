@@ -1,1 +1,2 @@
 include pecos/tests/data/*
+include pecos/templates/*

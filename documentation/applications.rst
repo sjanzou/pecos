@@ -10,8 +10,8 @@ PV system monitoring
 For PV systems, the translation dictionary can be used to group data
 according to the system architecture, which can include multiple strings and modules.
 The time filter can be defined based on sun position and system location.
-The data objects used in Pecos are compatible with pvlib, which can be used to model PV 
-systems [Stein2016]_ (https://github.com/pvlib/pvlib-python).
+The data objects used in Pecos are compatible with PVLIB, which can be used to model PV 
+systems [Stein2016]_ (http://pvlib-python.readthedocs.io/).
 Pecos also includes a function to read Campbell Scientific ascii file format and 
 functions to compute pv performance metrics (i.e. performance ratio, clearness index).
 

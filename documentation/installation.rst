@@ -32,6 +32,8 @@ Optional python packages include:
 
 * pyyaml: store configuration options in human readable data format,
   http://pyyaml.org/
+* PVLIB [Stein2016]_: simulate the performance of photovoltaic energy systems,
+  http://pvlib-python.readthedocs.io/
 * win32com: send email
 
 All other dependencies are part of the Python Standard Library.
