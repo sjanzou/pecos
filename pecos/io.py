@@ -116,10 +116,11 @@ def write_metrics(filename, metrics):
     logger.info("Write metrics file")
 
     try:
-        previous_metrics = pd.read_csv(filename, index_col='TIMESTEP', parse_dates=True)
+        previous_metrics = pd.read_csv(filename, index_col='TIMESTEP') #, parse_dates=True)
     except:
         previous_metrics = pd.DataFrame()
-    
+        
+    metrics.index = metrics.index.to_native_types() # this is nessisary when using timezones
     metrics = metrics.combine_first(previous_metrics) 
     
     fout = open(filename, 'w')
@@ -193,7 +194,6 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
         logger.warning("Empty database")
         start_time = 'NaN'
         end_time = 'NaN'
-        logger.warning("Empty database")
     else:
         start_time = pm.df.index[0]
         end_time = pm.df.index[-1]
@@ -247,7 +247,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     logger.info("")
     
 def write_dashboard(filename, column_names, row_names, content, 
-                    title='Pecos Dashboard', footnote='', logo=False, datatables=False, encode=False):
+                    title='Pecos Dashboard', footnote='', logo=False, im_width=250, datatables=False, encode=False):
     """
     Generate a dashboard.  
     The dashboard is used to compare multiple systems.
@@ -309,7 +309,7 @@ def write_dashboard(filename, column_names, row_names, content,
     pd.set_option('display.max_colwidth', -1)
     pd.set_option('display.width', 40)
     
-    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode)
+    html_string = _html_template_dashboard(column_names, row_names, content, title, footnote, logo, im_width, datatables, encode)
     
     # Write html file
     html_file = open(filename,"w")
@@ -343,7 +343,7 @@ def _html_template_monitoring_report(content, title, logo, encode):
     
     return template.render(**locals())
 
-def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, datatables, encode):
+def _html_template_dashboard(column_names, row_names, content, title, footnote, logo, im_width, datatables, encode):
     
     # if encode == True, encode the images
     img_dic = {}

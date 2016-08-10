@@ -16,7 +16,7 @@
 <tr>
 <td align="left" valign="center">
 {% if logo %}
-    <img  src= + {{ logo }} alt='Logo' />
+    <img  src="{{ logo }}" alt='Logo' />
 {% endif %}
 </td>
 <td align="right" valign="center">
@@ -50,9 +50,9 @@
 						{% if content[row, column]['graphics'] %}
 							{% for im in content[row, column]['graphics'] %}
 								{% if encode %}
-									<img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width=250><br>
+									<img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width="{{ im_width }}"><br>
 								{% else %}
-									<img src={{ im }} alt="Image not loaded" width=250><br>
+									<img src="{{ im }}" alt="Image not loaded" width="{{ im_width }}"><br>
 								{% endif %}
 							{% endfor %}
 						{% endif %}
