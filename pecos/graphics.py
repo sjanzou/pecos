@@ -209,8 +209,39 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
     box = ax.get_position()
     ax.set_position([box.x0, box.y0+0.15, box.width, box.height*0.75])
 
+def plot_colorblock(values, vmin=0, vmax=1, nColors=12, colors=[(0.75, 0.15, 0.15), (1, 0.75, 0.15), (0.15, 0.75, 0.15)]):
+    """ 
+    Create a colorblock figure.  Default color scheme is red to yellow to green with 12 colors.  
+    This function can be used to generate dashboards with simple color indicators in each cell.
+    
+    Parameters
+    -----------
+    values : 2D np.array
+        Values to plot in the colorblock
+    
+    vmin : float (optional)
+        Colomap minimum, default = 0
+    
+    vmax : float (optional)
+        Colomap maximum, default = 1
+    
+    num_colors : int (optional)
+        Number of colors in the colormap
+    
+    colors : list (optional)
+        List of colors, colors can be specified in any way understandable by matplotlib.colors.ColorConverter.to_rgb().
+        Default is red to yellow to green.
+    """
+    from matplotlib.colors import LinearSegmentedColormap
+    cmap = LinearSegmentedColormap.from_list(name='custom', colors = colors, N=nColors)
+    
+    fig = plt.imshow(values, cmap=cmap, aspect='equal', vmin=vmin, vmax=vmax)
+    plt.axis('off')
+    fig.axes.get_xaxis().set_visible(False)
+    fig.axes.get_yaxis().set_visible(False)
+    
 @_nottest
-def plot_test_results(filename_root, pm, image_format='png'):
+def plot_test_results(filename_root, pm, image_format='png', dpi=500):
     """
     Create test results graphics which highlight data points that
     failed a quality control test.
@@ -269,9 +300,10 @@ def plot_test_results(filename_root, pm, image_format='png'):
         
         filename = filename_root + str(graphic) + '.' + image_format
         test_results_graphics.append(filename)
-        plt.savefig(filename, format=image_format, dpi=500)
+        plt.savefig(filename, format=image_format, dpi=dpi)
         
         graphic = graphic + 1
         plt.close()
 
     return test_results_graphics
+

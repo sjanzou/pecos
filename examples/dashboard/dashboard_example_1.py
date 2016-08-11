@@ -68,7 +68,7 @@ for location_name in locations:
         # Define output files and subdirectories
         location_system = location_name + '_' + system_name
         location_system_date = location_system + '_' + analysis_date.strftime('%Y_%m_%d')
-        results_directory = 'Results'
+        results_directory = 'Results_1'
         results_subdirectory = os.path.join(results_directory, location_system_date)
         if not os.path.exists(results_subdirectory):
             os.makedirs(results_subdirectory)
