@@ -569,7 +569,7 @@ class PerformanceMonitoring(object):
 
     def get_elapsed_time(self):
         """
-        Returns elapsed time in seconds from the DataFrame index.
+        Returns the elapsed time in seconds for each Timestamp in the DataFrame index.
         
         Returns
         --------
@@ -583,17 +583,19 @@ class PerformanceMonitoring(object):
     
     def get_clock_time(self):
         """
-        Returns clock time in seconds from the DataFrame index.
+        Returns the time of day in seconds past midnight for each Timestamp in the DataFrame index.
         
         Returns
         --------
         clock_time : pd.DataFrame
             Clock time of the DataFrame index
         """
-        clock_time = pd.DataFrame(index=self.df.index,data=len(self.df.index)*[np.nan])
-        for i in range(len(self.df.index)):
-            t = self.df.index.time[i]
-            clock_time.loc[self.df.index[i],0] = t.hour*3600 + t.minute*60 + t.second + t.microsecond/1000000
+        
+        secofday = self.df.index.hour*3600 + \
+                   self.df.index.minute*60 + \
+                   self.df.index.second + \
+                   self.df.index.microsecond/1000000.0
+        clock_time = pd.DataFrame(secofday, index=self.df.index)
         
         return clock_time
     
