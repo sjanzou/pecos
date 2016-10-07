@@ -9,10 +9,12 @@ import os
 from os.path import abspath, dirname, join
 import pecos.graphics
 import datetime
-import pprint
-from string import Template
 from jinja2 import Environment, PackageLoader
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+    
 try:
     from nose.tools import nottest as _nottest
 except ImportError:
@@ -98,11 +100,6 @@ def send_email(subject, body, recipient, sender, attachment=None,
     """
     
     logger.info("Sending email")
-    
-    import smtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from email.mime.application import MIMEApplication
     
     msg = MIMEMultipart()
     msg['Subject'] = subject
