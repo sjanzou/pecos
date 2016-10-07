@@ -70,13 +70,13 @@ def plot_scatter(x,y,xaxis_min=None, xaxis_max=None, yaxis_min=None, yaxis_max=N
     # Format axis
     xmin_plt, xmax_plt = plt.xlim()
     ymin_plt, ymax_plt = plt.ylim()
-    if not xaxis_min:
+    if xaxis_min is None:
         xaxis_min = xmin_plt
-    if not xaxis_max:
+    if xaxis_max is None:
         xaxis_max = xmax_plt
-    if not yaxis_min:
+    if yaxis_min is None:
         yaxis_min = ymin_plt
-    if not yaxis_max:
+    if yaxis_max is None:
         yaxis_max = ymax_plt
     plt.xlim((xaxis_min, xaxis_max))
     plt.ylim((yaxis_min, yaxis_max))
@@ -193,13 +193,13 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
     
     # Format axis
     y_range = (ymax_plt - ymin_plt)
-    if not xaxis_min:
+    if xaxis_min is None:
         xaxis_min = xmin_plt
-    if not xaxis_max:
+    if xaxis_max is None:
         xaxis_max = xmax_plt
-    if not yaxis_min:
+    if yaxis_min is None:
         yaxis_min = ymin_plt-y_range/10
-    if not yaxis_max:
+    if yaxis_max is None:
         yaxis_max = ymax_plt+y_range/10
     plt.xlim((xaxis_min, xaxis_max))
     plt.ylim((yaxis_min, yaxis_max))
@@ -241,7 +241,7 @@ def plot_colorblock(values, vmin=0, vmax=1, nColors=12, colors=[(0.75, 0.15, 0.1
     fig.axes.get_yaxis().set_visible(False)
     
 @_nottest
-def plot_test_results(filename_root, pm, image_format='png', dpi=500):
+def plot_test_results(filename_root, pm, image_format='png', dpi=500, figsize=(7.0, 2.5)):
     """
     Create test results graphics which highlight data points that
     failed a quality control test.
@@ -289,7 +289,7 @@ def plot_test_results(filename_root, pm, image_format='png', dpi=500):
         if test_results_group['Error Flag'].all() in ['Duplicate timestamp', 'Missing data', 'Corrupt data', 'Missing timestamp', 'Nonmonotonic timestamp']:
             continue
         logger.info("Creating graphic for " + col_name)
-        plt.figure(figsize = (7.0,2.5))
+        plt.figure(figsize = figsize)
         plot_timeseries(pm.df[col_name], tfilter, test_results_group = test_results_group)
 
         ax = plt.gca()
