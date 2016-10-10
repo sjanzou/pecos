@@ -9,10 +9,12 @@ import os
 from os.path import abspath, dirname, join
 import pecos.graphics
 import datetime
-import pprint
-from string import Template
 from jinja2 import Environment, PackageLoader
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+    
 try:
     from nose.tools import nottest as _nottest
 except ImportError:
@@ -65,41 +67,68 @@ def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
 
     return df
     
-def send_email(subject, html_body, recipient, attachment=None):
+def send_email(subject, body, recipient, sender, attachment=None, 
+               host='localhost', username=None, password=None):
     """
-    Send email via Outlook.
+    Send email using python smtplib and email packages.
     
     Parameters
     ----------
     subject : string
         Subject text
         
-    html_body : string
-        HTML body text
+    body : string
+        Email body, in HTML or plain format
     
-    recipient : string
-        Email address or addresses, separated by semicolon
+    recipient : list of string
+        Recipient email address or addresses
     
+    sender : string
+        Sender email address
+        
     attachment : string (optional)
-        Name of file to attached, with full path
+        Name of file to attach
+        
+    host : string (optional)
+        Name of email host (or host:port), default = 'localhost'
+    
+    username : string (optional)
+        Email username for authentication
+    
+    password : string (optional)
+        Email password for authentication
     """
-    try:
-        import win32com.client
-    except:
-        logger.info('Could not import win32com.client')
-        return
-
+    
     logger.info("Sending email")
     
-    olMailItem = 0x0
-    obj = win32com.client.Dispatch("Outlook.Application")
-    newMail = obj.CreateItem(olMailItem)
-    newMail.Subject = subject
-    newMail.HTMLBody = html_body
-    newMail.To = recipient
-    if attachment:
-        newMail.Attachments.Add(attachment)
-    newMail.Send()
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['To'] = ', '.join(recipient)
+    msg['From'] = sender
+    
+    if "</html>" in body.lower():
+        content = MIMEText(body, 'html')
+    else:
+        content = MIMEText(body, 'plain')
+    
+    msg.attach(content)
+
+    if attachment is not None:
+        fp = open(attachment, "rb")  # Read as a binary file, even if it's text  
+        att = MIMEApplication(fp.read())
+        att.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment))
+        fp.close()
+        msg.attach(att)
+    
+    s = smtplib.SMTP(host)
+    try: # Authentication
+        s.ehlo()
+        s.starttls()
+        s.login(username, password)
+    except:
+        pass
+    s.sendmail(sender, recipient, msg.as_string())
+    s.quit()
 
 def write_metrics(filename, metrics):
     """
