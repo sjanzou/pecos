@@ -180,7 +180,8 @@ def write_test_results(filename, test_results):
     fout.close()
 
 def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graphics=[], metrics=None, 
-                             title='Pecos Monitoring Report', config={}, logo=False, encode=False):
+                            title='Pecos Monitoring Report', config={}, logo=False, 
+                            im_width_test_results=700, im_width_custom=700, encode=False):
     """
     Generate a monitoring report.  
     The monitoring report is used to report quality control test results for a single system.
@@ -213,6 +214,12 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     logo : string (optional)
         Graphic to be added to the report header
     
+    im_width_test_results=700 : float (optional)
+        Image width for test results graphics in the HTML report, default = 700
+    
+    im_width_custom=700 : float (optional)
+        Image width for custom graphics in the HTML report, default = 700
+        
     encode : boolean (optional)
         Encode graphics in the html, default = False
     """
@@ -266,7 +273,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
                 
     title = os.path.basename(title)
     
-    html_string = _html_template_monitoring_report(content, title, logo, encode)
+    html_string = _html_template_monitoring_report(content, title, logo, im_width_test_results, im_width_custom, encode)
     
     # Write html file
     html_file = open(filename,"w")
@@ -325,6 +332,9 @@ def write_dashboard(filename, column_names, row_names, content,
     logo : string (optional)
         Graphic to be added to the report header
     
+    im_width : float (optional)
+        Image width in the HTML report, default = 250
+        
     datatables : boolean (optional)
         Use datatables.net to format the dashboard, default = False.  See https://datatables.net/ for more information.
     
@@ -347,7 +357,7 @@ def write_dashboard(filename, column_names, row_names, content,
     
     logger.info("")
 
-def _html_template_monitoring_report(content, title, logo, encode):
+def _html_template_monitoring_report(content, title, logo, im_width_test_results, im_width_custom, encode):
     
     # if encode == True, encode the images
     img_dic = {}

@@ -249,14 +249,17 @@ class PerformanceMonitoring(object):
         mask[mask.index[0]] = False
         mask = pd.DataFrame(mask)
         mask.columns = [0]
-
-        self.append_test_results(mask, 'Duplicate timestamp', variable_name=False, min_failures=min_failures)
+        mask['TEMP'] = mask.index # remove duplicates in the mask
+        mask.drop_duplicates(subset='TEMP', keep='last', inplace=True)
+        del mask['TEMP']
         
-        # Drop duplicate timestamps
+        # Drop duplicate timestamps (this has to be done before the results are appended)
         self.df['TEMP'] = self.df.index
         #self.df.drop_duplicates(subset='TEMP', take_last=False, inplace=True)
         self.df.drop_duplicates(subset='TEMP', keep='first', inplace=True)
         
+        self.append_test_results(mask, 'Duplicate timestamp', variable_name=False, min_failures=min_failures)
+    
         # reindex timestamps
         missing = []
         for i in rng:
@@ -636,10 +639,10 @@ class PerformanceMonitoring(object):
             error_flag = self.test_results.loc[i, 'Error Flag']
             if error_flag in ['Nonmonotonic timestamp', 'Duplicate timestamp']:
                 continue
-            if variable == '':
+            if variable == '': # occurs when data is missing
                 test_results_mask.loc[start_date:end_date] = False
             else:
-                if system == '':
+                if system == '': # occurs when data is a composite signal
                     column_name = variable
                 else:
                     column_name = system + ':'+ variable

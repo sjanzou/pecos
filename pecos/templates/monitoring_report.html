@@ -31,9 +31,9 @@ Notes: {{ content['num_notes'] }} <br>
 
 {% for im in content['custom_graphics'] %}
     {% if encode %}
-        <img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width=700><br>
+        <img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width="{{ im_width_custom }}"><br>
     {% else %}
-        <img src="{{ im }}" alt="Image not loaded" width=700><br>
+        <img src="{{ im }}" alt="Image not loaded" width="{{ im_width_custom }}"><br>
     {% endif %}
 {% endfor %}
 
@@ -50,9 +50,9 @@ Notes: {{ content['num_notes'] }} <br>
 
     {% for im in content['test_results_graphics'] %}
         {% if encode %}
-            <img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width=700><br>
+            <img src="data:image/png;base64,{{ img_dic[im] }}" alt='Image not loaded' width="{{ im_width_test_results }}"><br>
         {% else %}
-            <img src="{{ im }}" alt="Image not loaded" width=700><br>
+            <img src="{{ im }}" alt="Image not loaded" width="{{ im_width_test_results }}"><br>
         {% endif %}
     {% endfor %}
 

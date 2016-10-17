@@ -1,7 +1,7 @@
 Installation
 ======================================
 
-Pecos requires Python 2.7 along with several python 
+Pecos requires Python (2.7, 3.4, or 3.5) along with several python 
 package dependencies.  Information on installing and using python can be found at 
 https://www.python.org/.  Python distributions, such as Python(x,y) and Anaconda,
 can also be used to manage the Python interface.  
@@ -34,7 +34,6 @@ Optional python packages include:
   http://pyyaml.org/
 * PVLIB [Stein2016]_: simulate the performance of photovoltaic energy systems,
   http://pvlib-python.readthedocs.io/
-* win32com: send email
 
 All other dependencies are part of the Python Standard Library.
 

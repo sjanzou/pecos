@@ -13,7 +13,4 @@ Tests can be run locally using nosetests::
 
 	nosetests -v --with-coverage --cover-package=pecos pecos
 
-The development team includes:
-
-* Katherine Klise, kaklise@sandia.gov
-* Joshua Stein, jsstein@sandia.gov
+See https://github.com/sandialabs/pecos/graphs/contributors for a list of contributors.
