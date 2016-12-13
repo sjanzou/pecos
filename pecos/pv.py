@@ -224,8 +224,7 @@ def performance_index(E, E_predicted):
     where 
     :math:`E` is the observed energy from a PV system and  
     :math:`\hat{E}` is the predicted energy over the same time frame.
-    :math:`\hat{E}` can be computed using by first predicting power using 
-    ``pecos.pv.basic_pvlib_performance_model`` or methods in ``pvlib.pvsystem`` 
+    :math:`\hat{E}` can be computed using methods in ``pvlib.pvsystem`` 
     and then convert power to energy using ``pecos.pv.enery``.
     
     Unlike with the performance ratio, the performance index should be very 
@@ -330,79 +329,3 @@ def clearness_index(H_dn, H_ea):
     Kt = Kt.to_frame('Clearness Index')
     
     return Kt
-
-def basic_pvlib_performance_model(parameters, latitude, longitude, wind_speed, 
-                                  air_temp, poa_global, poa_diffuse=None, 
-                                  model='SAPM'):
-    """
-    Compute a very basic pv performance model using the SAPM or single diode model from pvlib.
-    Input includes observed wind speed, air temperature, and POA irradiance.
-    Default model options, defined in pvlib, are used to compute the performance model.
-    Use pvlib directly to customize the model.
-    
-    Parameters
-    -----------
-    parameters : dict
-        Model parameters, see ``pvlib.pvsystem`` module for more details
-        
-    latitude : float
-        Latitude
-        
-    longitude : float
-        Longitude
-    
-    wind speed : pd.DataFrame with a single column or pd.Series
-        Wind speed time series
-        
-    air_temp : pd.DataFrame with a single column or pd.Series
-        Air temperature time series
-    
-    poa_global : pd.DataFrame with a single column or pd.Series
-        Global POA irradiance time series
-    
-    poa_diffuse : pd.DataFrame with a single column or pd.Series (optional)
-        Diffuse POA irradiance time series, default = 0
-        
-    model : string (optional)
-        'SAPM' or 'singlediode', default = 'SAPM'
-    
-    Returns
-    ---------
-    model : pd.DataFrame
-        Predicted Isc, Imp, Voc, Vmp
-    """
-    import pvlib
-
-    if type(wind_speed) is pd.core.frame.DataFrame:
-        wind_speed = pd.Series(wind_speed.values[:,0], index=wind_speed.index)
-    if type(air_temp) is pd.core.frame.DataFrame:
-        air_temp = pd.Series(air_temp.values[:,0], index=air_temp.index)
-    if type(poa_global) is pd.core.frame.DataFrame:
-        poa_global = pd.Series(poa_global.values[:,0], index=poa_global.index)
-    if type(poa_diffuse) is pd.core.frame.DataFrame:
-        poa_diffuse = pd.Series(poa_diffuse.values[:,0], index=poa_diffuse.index)
-    if poa_diffuse is None:
-        poa_diffuse = pd.Series(data=0, index=poa_global.index)
-         
-    index = poa_global.index  
-        
-    # Copute sun position
-    solarposition = pvlib.solarposition.ephemeris(index, latitude, longitude)
-    
-    # Compute cell temperature
-    celltemp = pvlib.pvsystem.sapm_celltemp(poa_global, wind_speed, air_temp)
-
-    # Compute alsolute airmass
-    airmass_relative  = pvlib.atmosphere.relativeairmass(solarposition['zenith'])
-    airmass_absolute = pvlib.atmosphere.absoluteairmass(airmass_relative)
-    
-    # Compute aoi
-    aoi = pvlib.irradiance.aoi(latitude, 180, solarposition['zenith'], solarposition['azimuth'])
-           
-    if model == 'SAPM':
-        model = pvlib.pvsystem.sapm(parameters, poa_global, poa_diffuse, celltemp['temp_cell'], airmass_absolute, aoi)
-    elif model == 'singlediode':
-        (photocurrent, saturation_current, resistance_series, resistance_shunt, nNsVth) = pvlib.pvsystem.calcparams_desoto(poa_global, celltemp['temp_cell'], parameters['Aisc'], parameters, 0, 0)
-        model = pvlib.pvsystem.singlediode(parameters, photocurrent, saturation_current, resistance_series, resistance_shunt, nNsVth)
-
-    return model

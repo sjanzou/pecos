@@ -4,10 +4,33 @@ import pandas as pd
 import numpy as np
 
 def sapm(pm, poa, wind, temp, sapm_parameters, location):
-    sapm_model = pecos.pv.basic_pvlib_performance_model(sapm_parameters, 
-                                         location['Latitude'], 
-                                         location['Longitude'], 
-                                         wind, temp, poa)
+    
+    # pvlib expects Pandas series
+    if type(wind) is pd.core.frame.DataFrame:
+        wind = pd.Series(wind.values[:,0], index=wind.index)
+    if type(temp) is pd.core.frame.DataFrame:
+        temp = pd.Series(temp.values[:,0], index=temp.index)
+    if type(poa) is pd.core.frame.DataFrame:
+        poa = pd.Series(poa.values[:,0], index=poa.index)
+    poa_diffuse = pd.Series(data=0, index=poa.index)
+         
+    index = poa.index  
+        
+    # Copute sun position
+    solarposition = pvlib.solarposition.ephemeris(index, location['Latitude'], location['Longitude'])
+    
+    # Compute cell temperature
+    celltemp = pvlib.pvsystem.sapm_celltemp(poa, wind, temp)
+
+    # Compute alsolute airmass
+    airmass_relative  = pvlib.atmosphere.relativeairmass(solarposition['zenith'])
+    airmass_absolute = pvlib.atmosphere.absoluteairmass(airmass_relative)
+    
+    # Compute aoi
+    aoi = pvlib.irradiance.aoi(location['Latitude'], 180, solarposition['zenith'], solarposition['azimuth'])
+           
+    Ee = pvlib.pvsystem.sapm_effective_irradiance(poa, poa_diffuse, airmass_absolute, aoi, sapm_parameters)
+    sapm_model = pvlib.pvsystem.sapm(Ee, celltemp['temp_cell'], sapm_parameters)
     
     # Compute the relative error between observed and predicted DC Power.  
     # Add the composite signal and run a range test
