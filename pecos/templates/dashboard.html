@@ -60,7 +60,9 @@
 							{{ content[row, column]['table'] }} <br>
 						{% endif %}
 						{% if content[row, column]['link'] %}
-							<A href="{{ content[row, column]['link'] }}">{{ content[row, column]['link text'] }}</A>
+							{% for link_text, link_html in content[row, column]['link'].items() %}
+								<A href="{{ link_html }}">{{ link_text }}</A><br>
+							{% endfor %}
 						{% endif %}
 					</td>
 				{% endfor %}

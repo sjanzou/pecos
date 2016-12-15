@@ -310,9 +310,8 @@ def write_dashboard(filename, column_names, row_names, content,
         
         - text (string) =  text at the top of each cell
         - graphics (list of strings) =  a list of graphics file names.  Each file name includes the full path
-        - table (string) = a table in html format, for example a table of performance metrics.  DataFrames can be converted to an html string using df.to_html() or df.transpose().to_html().
-        - link (string) = html link, with full path
-        - link text (string) = the name of the link, i.e. 'Link to monitoring report'
+        - table (string) = a table in html format, for example a table of performance metrics.  DataFrames can be converted to an html string using df.to_html() or df.transpose().to_html().  Values in the table can be colorcoded using pandas Styler class. 
+        - link (dict) = a dictonary where keys define the name of the link and values define the html link (with full path)
         
         For example::
         
@@ -320,8 +319,7 @@ def write_dashboard(filename, column_names, row_names, content,
                 'text': 'text at the top', 
                 'graphic': ['C:\\\\pecos\\\\results\\\\custom_graphic.png'], 
                 'table': df.to_html(), 
-                'link': 'C:\\\\pecos\\\\results\\\\monitoring_report.html', 
-                'link text': 'Link to monitoring report'}}
+                'link': {'Link to monitoring report': 'C:\\\\pecos\\\\results\\\\monitoring_report.html'}}
         
     title : string (optional)
         Dashboard title, default = 'Pecos Dashboard'

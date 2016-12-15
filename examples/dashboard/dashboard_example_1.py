@@ -93,8 +93,7 @@ for location_name in locations:
         content = {'text': "Example text for " + location_system, 
                    'graphics': [custom_graphics_file], 
                    'table':  metrics_table, 
-                   'link': os.path.abspath(report_file),
-                   'link text': 'Link to Report'}
+                   'link': {'Link to Report': os.path.abspath(report_file)}}
         dashboard_content[(system_name, location_name)] = content
 
 # Create dashboard  
