@@ -11,7 +11,7 @@ Some of the changes in this release are not backward compatible:
 * Bug fix setting axis limits in figures.
 * Bug fix for reporting duplicate time steps.  
 * Improved efficiency for get_clock_time function.
-* Added dashboard example that uses color blocks to indicate number of 
-   test failures.
+* Added dashboard example that uses color blocks to indicate number of
+  test failures.
 * Removed basic_pvlib_performance_model, the pv_example now uses 
-   pvlib directly to compute a basic model (API change).
+  pvlib directly to compute a basic model (API change).
