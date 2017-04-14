@@ -346,7 +346,7 @@ class Test_check_exact_times(unittest.TestCase):
         pass
 
     def test_check_exact_times_true(self):
-        self.pm.check_timestamp(3600, check_exact_times=True)
+        self.pm.check_timestamp(3600, exact_times=True)
         expected = pd.DataFrame(
             array([['', '', Timestamp('2016-10-17 02:05:00', freq='3600S'),
                    Timestamp('2016-10-17 03:05:00', freq='3600S'), 2,
@@ -357,10 +357,21 @@ class Test_check_exact_times(unittest.TestCase):
         assert_frame_equal(expected, self.pm.test_results)
 
     def test_check_exact_times_false(self):
-        self.pm.check_timestamp(3600, check_exact_times=False)
+        self.pm.check_timestamp(3600, exact_times=False)
         expected = pd.DataFrame(
             array([['', '', Timestamp('2016-10-17 02:00:00'),
                     Timestamp('2016-10-17 02:00:00'), 1, 'Missing timestamp']], dtype=object),
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            index=RangeIndex(start=0, stop=1, step=1)
+            )
+        assert_frame_equal(expected, self.pm.test_results)
+
+    def test_check_exact_times_true_with_start_time(self):
+        self.pm.check_timestamp(3600, expected_start_time=Timestamp('2016-10-17 01:00:00'), exact_times=True)
+        expected = pd.DataFrame(
+            array([['', '', Timestamp('2016-10-17 01:00:00', freq='3600S'),
+                   Timestamp('2016-10-17 03:00:00', freq='3600S'), 3,
+                   'Missing timestamp']], dtype=object),
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )

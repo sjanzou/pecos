@@ -200,7 +200,7 @@ class PerformanceMonitoring(object):
 
     def check_timestamp(self, frequency, expected_start_time=None,
                         expected_end_time=None, min_failures=1,
-                        check_exact_times=True):
+                        exact_times=True):
         """
         Check time series for missing, non-monotonic and duplicate
         timestamps.
@@ -222,10 +222,13 @@ class PerformanceMonitoring(object):
             Minimum number of consecutive failures required for
             reporting, default = 1
 
-        check_exact_times : bool (optional)
-            Controls how missing times are checked. If True, times must
-            occur at a regular frequency. If False, times only need
-            to occur once or more within each period.
+        exact_times : bool (optional)
+            Controls how missing times are checked. 
+            If True, times are expected to occur at regular intervals 
+            (specified in frequency) and the dataframe is reindexed to match the 
+            expected frequency.
+            If False, times only need to occur once or more within each interval 
+            (specified in frequency) and the dataframe is not reindexed.
         """
         logger.info("Check timestamp")
 
@@ -276,28 +279,31 @@ class PerformanceMonitoring(object):
         self.append_test_results(mask, 'Duplicate timestamp',
                                  variable_name=False,
                                  min_failures=min_failures)
-
-        if check_exact_times:
+        del self.df['TEMP']
+        
+        if exact_times:
             missing = []
             for i in rng:
                 if i not in self.df.index:
                     missing.append(i)
-            # reindex timestamps
+            # reindex dataframe
             self.df = self.df.reindex(index=rng)
             mask = pd.DataFrame(data=self.df.shape[0]*[False],
                                 index=self.df.index)
             mask.loc[missing] = True
-        else:
-            # uses pandas >= 0.18 resample syntax
-            df = self.df.drop('TEMP', axis=1)
-            mask = df.resample('{}s'.format(frequency)).count() == 0
-
-        self.append_test_results(mask, 'Missing timestamp',
+            self.append_test_results(mask, 'Missing timestamp',
                                  variable_name=False,
                                  min_failures=min_failures)
-
-        del self.df['TEMP']
-
+        else:
+            # uses pandas >= 0.18 resample syntax
+            df_index = self.df.index
+            mask = self.df.resample('{}s'.format(frequency)).count() == 0
+            self.df.index = mask.index
+            self.append_test_results(mask, 'Missing timestamp',
+                                 variable_name=False,
+                                 min_failures=min_failures)
+            self.df.index = df_index
+        
     def check_range(self, bound, key=None, specs={}, rolling_mean=1, min_failures=1):
         """
         Check data range.
