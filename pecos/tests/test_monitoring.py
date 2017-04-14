@@ -348,8 +348,8 @@ class Test_check_exact_times(unittest.TestCase):
     def test_check_exact_times_true(self):
         self.pm.check_timestamp(3600, exact_times=True)
         expected = pd.DataFrame(
-            array([['', '', Timestamp('2016-10-17 02:05:00', freq='3600S'),
-                   Timestamp('2016-10-17 03:05:00', freq='3600S'), 2,
+            array([['', '', Timestamp('2016-10-17 02:05:00'),
+                   Timestamp('2016-10-17 03:05:00'), 2,
                    'Missing timestamp']], dtype=object),
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
@@ -369,8 +369,8 @@ class Test_check_exact_times(unittest.TestCase):
     def test_check_exact_times_true_with_start_time(self):
         self.pm.check_timestamp(3600, expected_start_time=Timestamp('2016-10-17 01:00:00'), exact_times=True)
         expected = pd.DataFrame(
-            array([['', '', Timestamp('2016-10-17 01:00:00', freq='3600S'),
-                   Timestamp('2016-10-17 03:00:00', freq='3600S'), 3,
+            array([['', '', Timestamp('2016-10-17 01:00:00'),
+                   Timestamp('2016-10-17 03:00:00'), 3,
                    'Missing timestamp']], dtype=object),
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)

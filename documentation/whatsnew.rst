@@ -1,6 +1,8 @@
 Release Notes
 ================
 
+.. include:: whatsnew/v0.1.5.rst
+
 .. include:: whatsnew/v0.1.4.rst
 
 .. include:: whatsnew/v0.1.3.rst
