@@ -16,7 +16,6 @@ import sys
 import os
 import shlex
 
-    
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -42,12 +41,13 @@ extensions = [
     'sphinx.ext.intersphinx',
 ]
 
-autosummary_generate = True
 viewcode_import = True
 numpydoc_show_class_members = True
 numpydoc_class_members_toctree = False
 autodoc_member_order = 'bysource'
 autoclass_content = 'both'
+numfig=True
+numfig_format = {'figure':  'Figure %s', 'table': 'Table %s', 'code-block': 'Listing %s'}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -127,8 +127,8 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #html_theme = 'sphinxdoc'
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
@@ -245,9 +245,10 @@ latex_elements = {
 
 # Additional stuff for the LaTeX preamble.
 'preamble': '''
-        \\pagestyle{plain}
-        \\pagenumbering{arabic}
-        \\renewcommand{\\refname}{References}
+  \pagestyle{plain}
+  \pagenumbering{arabic}
+  \\renewcommand{\\refname}{References}
+  \\raggedright
 ''',
 
 # Latex figure (float) alignment
@@ -283,7 +284,6 @@ latex_documents = [
 latex_domain_indices = False
 
 latex_use_modindex = False
-
 
 # -- Options for manual page output ---------------------------------------
 

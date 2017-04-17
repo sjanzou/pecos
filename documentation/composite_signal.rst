@@ -1,12 +1,11 @@
 Composite signals
 ==================
 
-Composite signals are used to generate new data columns based on existing data.  
+Composite signals are new data signal generated from existing data or from models.  
 Composite signals can be used to add modeled data values or relationships between 
-data columns.  Data created from composite signals can be used in the quality 
-control tests.  
+data columns to quality control tests.  
 
-The following example adds 'Wave Model' data to the PerformanceMonitor object::
+In the :ref:`simple_example`, a 'Wave Model' composite signal is added to the PerformanceMonitoring object::
 
 	elapsed_time= pm.get_elapsed_time()
 	wave_model = np.sin(10*(elapsed_time/86400))

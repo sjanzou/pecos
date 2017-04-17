@@ -12,10 +12,10 @@ and alert system operators when the system has changed.
 Automated quality control and performance monitoring can allow system 
 operators to quickly detect performance issues.  
 
-Pecos is an open source python package designed to address this need.
+Pecos is an open source Python package designed to address this need.
 Pecos includes built-in functionality to monitor performance of time series data, 
 subject to a series of quality control tests.
-The python package includes methods to run quality control tests defined by the user
+The Python package includes methods to run quality control tests defined by the user
 and generate reports which include performance metrics, test results, and graphics.
 The software was developed specifically for solar photovoltaic system 
 monitoring, but it can be customized for other applications.
@@ -31,9 +31,10 @@ Organization
 ------------
 
 Directories
-  * pecos - python package
-  * documentation - user manual
-  * examples - examples
+  * pecos - Python package
+  * documentation - User manual
+  * examples - Examples
+  * ci - Software requirements
 
 Contact
 -------

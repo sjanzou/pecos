@@ -7,6 +7,27 @@ import pandas as pd
 testdir = dirname(abspath(__file__))
 datadir = join(testdir,'data')
 
+def test_pd_far():
+    index = pd.date_range('1/1/2016', periods=4, freq='H')
+    
+    actual = np.array([[True,  False, False], 
+                       [False, False, True], 
+                       [True,  False, False], 
+                       [True,  True,  True]])
+    actual = pd.DataFrame(data=actual, index=index, columns=['A', 'B', 'C'])
+    
+    obser = np.array([[True, False, True], 
+                      [True, False, True], 
+                      [True, True,  False], 
+                      [True, False, False]])
+    obser = pd.DataFrame(data=obser, index=index, columns=['A', 'B', 'C'])
+    
+    prob_detection = pecos.metrics.probability_of_detection(obser, actual)
+    false_alarm = pecos.metrics.false_alarm_rate(obser, actual)
+    
+    assert_almost_equal(prob_detection, 3/6.0, 5)
+    assert_almost_equal(false_alarm, 2/6.0, 5)
+    
 def test_time_integral():
     periods = 5
     index = pd.date_range('1/1/2016', periods=periods, freq='H')

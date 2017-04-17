@@ -1,14 +1,15 @@
 Translation dictionary
 -----------------------
-A translation dictionary maps database column names into common names.  
+A translation dictionary maps DataFrame column names into common names.  
 The translation dictionary can also be used to group columns with similar 
 properties into a single variable.  
+Using grouped variables, Pecos can run a signal set of quality control tests on the group.
 
 Each entry in a translation dictionary is a key:value pair where 
-'key' is the common name of the data and 'value' is a list of original column names in the database.  
-For example, {temp: [temp1,temp2]} means that columns named 'temp1' and 'temp2'  in the 
-database file are assigned to the common name 'temp' in Pecos.
-In the simple example, the following translation dictionary is used to rename column
+'key' is the common name of the data and 'value' is a list of original column names in the DataFrame.  
+For example, {temp: [temp1,temp2]} means that columns named 'temp1' and 'temp2' in the 
+DataFrame file are assigned to the common name 'temp' in Pecos.
+In the :ref:`simple_example`, the following translation dictionary is used to rename column
 'A' to 'Linear', 'B' to 'Random', and group columns 'C' and 'D' to 'Wave'::
  
 	trans = {
@@ -28,7 +29,7 @@ If no translation is desired (i.e. raw column names are used), a 1:1 map can be 
 As with DataFrames, multiple translation dictionaries can be added to the 
 PerformanceMonitoring object, distinguished by the 'system_name'.
 
-Keys defined in the translation dictionary can be used in quality control tests,
+Keys defined in the translation dictionary are used in quality control tests,
 for example::
 
 	pm.check_range([-1,1], 'Wave')

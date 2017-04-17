@@ -149,7 +149,10 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
                 test_results_group2 = grouped2.get_group(error_flag)
                 
                 error_label = '\n'.join(textwrap.wrap(error_flag, 30))
-                warning_label = '\n'.join(textwrap.wrap('Warning ' + str(test_results_group2.index.values).strip('[]'), 30)) #str(out_df2.index.values).strip('[]'), 30))
+                if len(test_results_group2.index.values) > 4:
+                    warning_label = '\n'.join(textwrap.wrap('Warning ' + str(test_results_group2.index.values[0:4]).strip('[]') + '...', 30))
+                else:
+                    warning_label = '\n'.join(textwrap.wrap('Warning ' + str(test_results_group2.index.values).strip('[]'), 30))
                 error_label = error_label + '\n' + warning_label
                 
                 date_idx2 = np.array([False]*len(data.index))

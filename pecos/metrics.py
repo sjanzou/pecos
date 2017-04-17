@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 
 def qci(mask, tfilter=None, per_day=True):
     """
-    Compute the quality control index defined as:
+    Compute the quality control index (QCI), defined as:
     
     :math:`QCI=\dfrac{\sum_{d\in D}\sum_{t\in T}X_{dt}}{|DT|}`
     
     where 
     :math:`D` is the set of data columns and 
-    :math:`T` is the set of time stamps in the analysis.  
+    :math:`T` is the set of timestamps in the analysis.  
     :math:`X_{dt}` is a data point for column :math:`d` time t` that passed all quality control test.  
     :math:`|DT|` is the number of data points in the analysis.
     
@@ -63,7 +63,7 @@ def qci(mask, tfilter=None, per_day=True):
 
 def rmse(x1, x2, tfilter=None, per_day=True):
     """
-    Compute the root mean squared error defined as:
+    Compute the root mean squared error (RMSE), defined as:
     
     :math:`RMSE=\sqrt{\dfrac{\sum{(x_1-x_2)^2}}{n}}`
     
@@ -122,7 +122,7 @@ def rmse(x1, x2, tfilter=None, per_day=True):
     
 def time_integral(data, tfilter=None, per_day=True):
     """
-    Compute the time integral of each column in the DataFrame defined as:
+    Compute the time integral (F) of each column in the DataFrame, defined as:
     
     :math:`F=\int{fdt}`
     
@@ -176,3 +176,91 @@ def time_integral(data, tfilter=None, per_day=True):
         F = pd.DataFrame(F, index=[0])
     
     return F
+
+def probability_of_detection(observed, actual, tfilter=None):
+    """ 
+    Compute probability of detection (PD), defined as:
+        
+    :math:`PD=\dfrac{TP}{TP+FN}`
+    
+    where 
+    :math:`TP` is number of true positives and  
+    :math:`FN` is the number of false negatives.
+    
+    Parameters
+    ----------
+    observed : pd.Dataframe
+        Estimated conditions (True = background, False = anomolous), 
+        returned from pm.get_test_results_mask()
+    
+    actual : pd.Dataframe
+        Actual conditions, (True = background, False = anomolous)
+   
+    Returns
+    -------
+    PD : float
+        Probability of detection
+    """
+    # Remove time filter
+    if tfilter is not None:
+        observed = observed[tfilter]
+        actual = actual[tfilter]
+
+    # True positive (TP) = anomolous condition where tests fail
+    # TP is 1 where the statement is true, Nan where the statement is false
+    TP = (observed.where(observed == False)+1) == (actual.where(actual == False)+1)
+    TP_count = TP.sum().sum()
+    
+    # False negative (FN) = anomolous condition where tests pass
+    # FN is 1 where the statement is true, Nan where the statement is false
+    FN = (observed.where(observed == True)) == (actual.where(actual == False)+1)
+    FN_count = FN.sum().sum()
+    
+    # Probability of detection
+    PD = TP_count/float(TP_count+FN_count)
+    
+    return PD
+
+def false_alarm_rate(observed, actual, tfilter=None):
+    """ 
+    Compute false alarm rate (FAR), defined as:
+        
+    :math:`FAR=\dfrac{TN}{TN+FP}`
+    
+    where 
+    :math:`TN` is number of true negatives and  
+    :math:`FP` is the number of false positives.
+    
+    Parameters
+    ----------
+    estimated : pd.Dataframe
+        Estimated conditions (True = background, False = anomolous), 
+        returned from pm.get_test_results_mask()
+    
+    actual : pd.Dataframe
+        Actual conditions, (True = background, False = anomolous)
+    
+    Returns
+    -------
+    FAR : float
+        False alarm rate
+    """
+    # Remove time filter
+    if tfilter is not None:
+        observed = observed[tfilter]
+        actual = actual[tfilter]
+
+    # True negative (TN) = normal condition where tests pass
+    # TN is 1 where the statement is true, Nan where the statement is false
+    TN = (observed.where(observed == True)) == (actual.where(actual == True))
+    TN_count = TN.sum().sum()
+    
+    # False positive (FP) = normal condition where tests fail
+    # FP is 1 where the statement is true, Nan where the statement is false
+    FP = (observed.where(observed == False)+1) == (actual.where(actual == True))
+    FP_count = FP.sum().sum()
+    
+    # False alarm rate
+    FAR = 1-TN_count/float(TN_count+FP_count)
+    
+    return FAR

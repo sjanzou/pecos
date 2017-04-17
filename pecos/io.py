@@ -70,7 +70,7 @@ def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
 def send_email(subject, body, recipient, sender, attachment=None, 
                host='localhost', username=None, password=None):
     """
-    Send email using python smtplib and email packages.
+    Send email using Python smtplib and email packages.
     
     Parameters
     ----------

@@ -8,7 +8,7 @@ and alert system operators when the system has changed.
 Automated quality control and performance monitoring can allow system 
 operators to quickly detect performance issues.  
 
-Pecos is an open source python package designed to address this need.  
+Pecos is an open source Python package designed to address this need.  
 Pecos includes built-in functionality to monitor performance of time series data.  
 The software can be used to automatically run a series of quality control 
 tests and generate customized reports which include performance metrics, 

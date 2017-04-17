@@ -1,7 +1,7 @@
 Overview
 ================
 
-Pecos is an open-source python package designed to monitor performance of time series data, 
+Pecos is an open-source Python package designed to monitor performance of time series data, 
 subject to a series of quality control tests.  
 The software includes methods to 
 run quality control tests defined by the user
@@ -9,7 +9,7 @@ and generate reports which include performance metrics, test results, and graphi
 The software can be customized for specific applications. 
 Some high-level features include:
 
-* Pecos uses Pandas DataFrames [McKinney2013]_ for time series analysis.  This dependency 
+* Pecos uses Pandas DataFrames [Mcki13]_ for time series analysis.  This dependency 
   facilitates a wide range of analysis options and date-time functionality.
 
 * Data columns can be easily reassigned to common names through the use of a
@@ -19,12 +19,13 @@ Some high-level features include:
 * Time filters can be used to eliminate data at specific times from quality 
   control tests (i.e. early evening and late afternoon).  
 
-* Application specific models can be incorporated into performance monitoring tests.
+* Application specific models can be incorporated into quality control tests 
+  to compare measured to modeled data values.
 
 * General and custom performance metrics can be saved to keep a  
   running history of system health. 
 
-* Analysis can be setup to run on an automated schedule (i.e. Pecos can be 
+* Analysis can be set up to run on an automated schedule (i.e. Pecos can be 
   run each day to analyze data collected on the previous day). 
   
 * HTML formatted reports can be sent via email or hosted on a website.  
