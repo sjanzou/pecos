@@ -1,0 +1,6 @@
+.. _whatsnew_0150:
+
+v0.1.5 (Master branch)
+-----------------------
+
+* Added ability to check for regular or irregular timestamps in check_timestamp.
