@@ -534,7 +534,7 @@ class PerformanceMonitoring(object):
 
     def evaluate_string(self, col_name, string_to_eval, specs={}):
         """
-        Returns the evaluated python equation written as a string (BETA).
+        Returns the evaluated Python equation written as a string (BETA).
         For each {keyword} in string_to_eval,
         {keyword} is first expanded to self.df[self.trans[keyword]],
         if that fails, then {keyword} is expanded to specs[keyword].

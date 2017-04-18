@@ -1,42 +1,55 @@
 Installation
 ======================================
 
-Pecos requires Python (2.7, 3.4, or 3.5) along with several python 
-package dependencies.  Information on installing and using python can be found at 
-https://www.python.org/.  Python distributions, such as Python(x,y) and Anaconda,
-can also be used to manage the Python interface.  
-These distributions include the Python packages needed for Pecos.
+Pecos requires Python (2.7, 3.4, or 3.5) along with several Python 
+package dependencies.  Information on installing and using Python can be found at 
+https://www.python.org/.  Python distributions, such as Anaconda,
+are recommended to manage the Python interface.  
+Anaconda Python distributions include the Python packages needed to run Pecos.
 
-To install Pecos using pip::
+Pecos can be installed using pip, git, or a downloaded zip file.  
+Note that the pip installation will NOT include the examples folder referenced in this manual.
+
+**pip:** To install Pecos using pip::
 
 	pip install pecos 
 	
-To build Pecos from source using git::
+**git**: To install Pecos using git::
 
 	git clone https://github.com/sandialabs/pecos
 	cd pecos
 	python setup.py install
 
-Python package dependencies include:
+**zip file**: To install Pecos using a downloaded zip file, go to https://github.com/sandialabs/pecos, 
+select the "Clone or download" button and then select "Download ZIP".
+This downloads a zip file called pecos-master.zip.
+To download a specific release, go to https://github.com/sandialabs/pecos/releases and select a zip file.
+The software can then be installed by unzipping the file and running setup.py::
 
-* Pandas [McKinney2013]_: analyze and store time series data, 
+	unzip WNTR-master.zip
+	cd WNTR-master
+	python setup.py install
+		
+Required Python package dependencies include:
+
+* Pandas [Mcki13]_: used to analyze and store time series data, 
   http://pandas.pydata.org/
-* Numpy [vanderWalt2011]_: support large, multi-dimensional arrays and matrices, 
+* Numpy [VaCV11]_: used to support large, multi-dimensional arrays and matrices, 
   http://www.numpy.org/
-* Jinja [Ronacher2008]_: template engine, 
+* Jinja [Rona08]_: used to generate HTML templates, 
   http://jinja.pocoo.org/
-* Matplotlib [Hunter2007]_: produce figures, 
+* Matplotlib [Hunt07]_: used to produce figures, 
   http://matplotlib.org/
 
-Optional python packages include:
+Optional Python packages dependencies include:
 
-* pyyaml: store configuration options in human readable data format,
+* pyyaml: used to store configuration options in human readable data format,
   http://pyyaml.org/
-* PVLIB [Stein2016]_: simulate the performance of photovoltaic energy systems,
+* PVLIB [SHFH16]_: used to simulate the performance of photovoltaic energy systems,
   http://pvlib-python.readthedocs.io/
 
 All other dependencies are part of the Python Standard Library.
 
-To use Pecos, import the package from within a python console::
+To use Pecos, import the package from a Python console::
 
 	import pecos	

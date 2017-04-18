@@ -10,8 +10,12 @@ The following example defines a time filter between 3 AM and 9 PM::
 
 	clock_time = pm.get_clock_time()
 	time_filter = (clock_time > 3*3600) & (clock_time < 21*3600)
+
+The time filter can also be defined based on properties of the DataFrame, for example::
+
+	time_filter = pm.df[pm.trans['Random']] > 0.5
 	
-The time filter can also be defined based on sun position, see **pv_example.py** in the examples/pv directory.
+For some applications, it is useful to define the time filter based on sun position, as demonstrated in **pv_example.py** in the examples/pv directory.
 
 The time filter can then be added to the PerformanceMonitoring object as follows::
 

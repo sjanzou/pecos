@@ -1,3 +1,5 @@
+.. _simple_example:
+
 Simple example
 ================
 
@@ -16,7 +18,7 @@ contains 4 columns of data (A through D).
 The data includes 
 missing timestamps, 
 duplicate timestamps, non-monotonic timestamps, corrupt data, data out 
-of expected range, data that doesn't change, and data that changes abruptly.
+of expected range, data that doesn't change, and data that changes abruptly, as listed below.
 
 * Missing timestamp at 5:00 
 
@@ -47,7 +49,7 @@ The script performs the following steps:
   
   * Corrupt data values
   
-  * Upper and lower bounds for data range and data increments 
+  * Upper and lower bounds for expected data range and data increments 
   
   * sine wave model to compute measurement error
   
@@ -55,8 +57,10 @@ The script performs the following steps:
 
 * Run quality control tests
 
-* Generate an HTML report, test results CSV file, and performance metrics CSV file
- 
+* Save test results and performance metrics to CSV files
+
+* Generate an HTML report
+
 .. literalinclude:: ../examples/simple/simple_example.py
 
 Results are saved in examples/simple/Results.  Results include:

@@ -1,12 +1,23 @@
 References
 ==============
+..
+	Citations begins with 4 letters:
+		one author: first 4 letters of name
+		two authors: first 2 letters of author1, first 2 letters of author 2
+		three authors: first 2 letters of author1, first letter of author 2, first letter of author 3
+		four authors: first letter of each author
+		more than four authors: first letter of first four authors
+	
+	The next two digits are the year (century ignored)
+	
+	If the 6 digits match another citation, add a lower case letter (a, b, ...)
 
-.. [Hunter2007] John D. Hunter. Matplotlib: A 2D Graphics Environment, Computing in Science & Engineering, 9, 90-95 (2007), DOI:10.1109/MCSE.2007.55
+.. [Hunt07] Hunter, J.D. (2007). Matplotlib: A 2D graphics environment. Computing in Science & Engineering, 3(9), 90-95.
 
-.. [McKinney2013] W. McKinney, (2013) Python for Data Analysis: Data Wrangling with Pandas, NumPy, and IPython
+.. [Mcki13] McKinney W. (2013). Python for Data Analysis: Data Wrangling with Pandas, NumPy, and IPython. O'Reilly Media, 1 edition, 466P.
 
-.. [Ronacher2008] Armin Ronacher, (2008), Template Designer Documentation, http://jinja.pocoo.org/docs/dev/templates/ accessed July 1, 2016.
+.. [Rona08] Ronacher, A. (2008). Template Designer Documentation, http://jinja.pocoo.org/docs/dev/templates/ accessed July 1, 2016.
 
-.. [Stein2016] J.S. Stein, W.F. Holmgren, J. Forbess, and C.W. Hansen, PVLIB: Open Source Photovoltaic Performance Modeling Functions for Matlab and Python, in 43rd Photovoltaic Specialists Conference, 2016
+.. [SHFH16] Stein, J.S., Holmgren, W.F., Forbess, J., & Hansen, C.W. (2016). PVLIB: Open Source Photovoltaic Performance Modeling Functions for Matlab and Python, in 43rd Photovoltaic Specialists Conference.
 
-.. [vanderWalt2011] Stefan van der Walt, S. Chris Colbert and Gael Varoquaux. The NumPy Array: A Structure for Efficient Numerical Computation, Computing in Science & Engineering, 13, 22-30 (2011), DOI:10.1109/MCSE.2011.37
+.. [VaCV11] van der Walt, S., Colbert, S.C., & Varoquaux, G. (2011). The NumPy array: A structure for efficient numerical computation. Computing in Science & Engineering, 13, 22-30.
