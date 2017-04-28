@@ -14,6 +14,11 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
+   
+from sqlalchemy import create_engine
+
+# Import MinimalModbus (http://minimalmodbus.readthedocs.io/en/master/)
+import minimalmodbus   
     
 try:
     from nose.tools import nottest as _nottest
@@ -402,3 +407,91 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     version = pecos.__version__
 
     return template.render(**locals())
+
+def _define_device(device,config):
+	
+	"""
+	Define the modbus instrument
+	:param device:
+	:param config: 
+	:return instr:
+	"""
+	
+	usb = config['%s'%device][0]['Connection'][0]['usb']
+	address = config['%s'%device][0]['Connection'][0]['address']
+	baud = config['%s'%device][0]['Connection'][0]['baud']
+	bsize = config['%s'%device][0]['Connection'][0]['byte_size']
+	stopb = config['%s'%device][0]['Connection'][0]['stopbits']
+
+	instr = minimalmodbus.Instrument(usb,address)
+	instr.serial.baudrate = baud
+	#instr.serial.parity = serial.PARITY_EVEN
+	instr.serial.bytesize = bsize
+	instr.serial.stopbits = stopb
+	
+	return instr
+    
+def device_to_client(config):
+
+	''' Extract Database Information '''
+	host = config['DAQ'][0]['Database'][0]['ip']
+	port = config['DAQ'][0]['Database'][0]['port']
+	db = config['DAQ'][0]['Database'][0]['db']
+	table = config['DAQ'][0]['Database'][0]['table']
+	user = config['DAQ'][0]['Database'][0]['user']
+	pswd = config['DAQ'][0]['Database'][0]['pswd']
+	
+	sec0 = float(datetime.datetime.now().strftime('%s'))
+	while True: 
+		
+		dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		dsec = float(datetime.datetime.now().strftime('%s')) - sec0
+		
+		if dsec > 0:
+			
+			data,labels = [],[]
+			for device in config['DAQ'][0]["Devices"]:
+				
+				"""
+				Read channels on modbus device
+				"""
+				i = 0
+				while i < 5:
+					try:
+						instr = define_device(device,config)
+						"""TODO: Convert value if negative (read_registers() outputs unsigned int16 in the range 0 to 65535)"""
+						d = instr.read_registers(0,config['%s'%device][0]['Connection'][0]['channels'],functioncode=config['%s'%device][0]['Connection'][0]['fcode'])
+						break
+					except:
+						d = [np.nan] * config['%s'%device][0]['Connection'][0]['channels']
+					i += 1
+				
+					if i == 4:
+						logging.warning('Device Connection Fail: Device %s at %s'%(device,dt))
+				
+				"""
+				Scale channel values
+				"""
+				try:
+					d = [a*b for a,b in zip(config['%s'%device][0]['Scale'],d)]
+				except:
+					#logging.warning('Data Scale Fail: Device %s at %s'%(device,dt))
+					d = [np.nan] * config['%s'%device][0]['Connection'][0]['channels']
+				
+
+				data.extend(d)
+				labels.extend(config['%s'%device][0]['Name'])
+			
+			data.extend([dt])
+			labels.extend(['datetime'])
+			
+			df = pd.DataFrame(data).T
+			df.columns = labels
+			try:
+				engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)								# Connect to database
+				df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False) #,dtype = data_type)		# Write DataFrame to database
+			except:
+				logging.warning('MySQL Insert Fail: at %s'%(dt))
+			
+		sec0 = sec1
+	
