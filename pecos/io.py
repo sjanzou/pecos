@@ -433,6 +433,17 @@ def _define_device(device,config):
     
 def device_to_client(config):
 
+	"""
+	Read channels on modbus device
+	
+	Parameters
+    ----------
+    DAQ : string
+        Data aquisition device names
+    Database : string
+    	Database login credentials  
+	"""
+
 	''' Extract Database Information '''
 	host = config['DAQ'][0]['Database'][0]['ip']
 	port = config['DAQ'][0]['Database'][0]['port']
@@ -455,19 +466,45 @@ def device_to_client(config):
 				"""
 				Read channels on modbus device
 				"""
-				i = 0
-				while i < 5:
-					try:
-						instr = define_device(device,config)
-						"""TODO: Convert value if negative (read_registers() outputs unsigned int16 in the range 0 to 65535)"""
-						d = instr.read_registers(0,config['%s'%device][0]['Connection'][0]['channels'],functioncode=config['%s'%device][0]['Connection'][0]['fcode'])
-						break
-					except:
-						d = [np.nan] * config['%s'%device][0]['Connection'][0]['channels']
-					i += 1
+
+				instr = _define_device(device,config)	
+
+				if config['%s'%device][0]['Connection'][0]['consecutive_channels']:
+						
+					i = 0
+					while i < 5:
+						try:	
+							start = config['%s'%device][0]['channel'][0][0]
+							number = len(config['%s'%device][0]['channels'])
+							"""TODO: Convert value if negative (read_registers() outputs unsigned int16 in the range 0 to 65535)"""
+							d = instr.read_registers(start,number,functioncode=config['%s'%device][0]['Connection'][0]['fcode'])	
+							break
+							
+						except:
+							if i == 4:
+								d = [None] * len(config['%s'%device][0]['Connection'][0]['channels'])
+								logging.warning('Device Connection Fail: Device %s at %s'%(device,dt))
+							
+						i += 1
+						
+				else:
 				
-					if i == 4:
-						logging.warning('Device Connection Fail: Device %s at %s'%(device,dt))
+					for chan in config['%s'%device][0]['channel']):		
+						d = []
+						for j in range(len(config['%s'%device][0]['Connection'][0]['channels'])):
+							
+							i = 0
+							while i < 3:
+								try:
+									d = instr.read_register(config['%s'%device][0]['channel'][0][j],numberOfRegisters=config['%s'%device][0]['number_registers'][0][j])
+									break
+								except:
+									if i == 2:
+										d = [None] 
+										logging.warning('Device Connection Fail: Device %s, Channel %s, at %s'%(device,config['%s'%device][0]['channel'][0][j],dt))
+								
+								d.append(d)
+								i += 1					
 				
 				"""
 				Scale channel values
@@ -476,7 +513,7 @@ def device_to_client(config):
 					d = [a*b for a,b in zip(config['%s'%device][0]['Scale'],d)]
 				except:
 					#logging.warning('Data Scale Fail: Device %s at %s'%(device,dt))
-					d = [np.nan] * config['%s'%device][0]['Connection'][0]['channels']
+					d = [None] * config['%s'%device][0]['Connection'][0]['channels']
 				
 
 				data.extend(d)
