@@ -7,9 +7,11 @@ database.
 Input: Configuration File 
 -----------------------------
 
+**DAQ**
 
-Read Channel(s) on modbus device
------------------------------
+
+**DAQ Name(s)**
+
 
 
 Read Channel(s) on modbus device
