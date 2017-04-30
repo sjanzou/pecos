@@ -7,13 +7,19 @@ database.
 Input: Configuration File 
 -----------------------------
 
-**DAQ List**
+**DAQ Information**
 
+* Device Names
+* Collection Interval
 
 **Data Storage Credentials**
 
-
-**Collection Interval**
+* IP Address (ip)
+* Port (port)
+* Database (db)
+* Table (table)
+* Username (user)
+* Password (pswd)
 
 
 **Device Information**
