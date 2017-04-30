@@ -7,11 +7,21 @@ database.
 Input: Configuration File 
 -----------------------------
 
-**DAQ**
+**DAQ List**
 
 
-**DAQ Name(s)**
+**Data Storage Credentials**
 
+
+**Collection Interval**
+
+
+**Device Information**
+
+* Connection
+* Scale Factors
+* Sensor Type
+* Sensor Name
 
 
 Read Channel(s) on modbus device
