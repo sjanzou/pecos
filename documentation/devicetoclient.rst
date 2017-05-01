@@ -32,6 +32,7 @@ of devices can range from 1 to N.  The database credentials include the host ip 
 MySQL port (typically 3306), database name, table name, username, and password.  The 
 collection section defines the polling intervale (seconds) and the number of retries if a
 connection error occurs. 
+
 .. code-block:: json
 
     {
