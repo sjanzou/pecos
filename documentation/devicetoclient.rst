@@ -7,6 +7,7 @@ database.
 Input
 ----------------------------- 
 The function requires two inputs:
+
 * Configuration File
 * Log file directory
  
