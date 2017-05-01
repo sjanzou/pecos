@@ -429,6 +429,18 @@ def _define_device(device,config):
 	instr.serial.parity = parity
 
 	return instr
+	
+def _mysql_insert(user,pswd,host,db):
+	
+	from sqlalchemy import create_engine
+	
+	try:
+		engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)								# Connect to database
+		df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False) #,dtype = data_type)		# Write DataFrame to database
+	except:
+		logging.warning('MySQL Insert Fail: at %s'%(dt))
+
+	
     
 def device_to_client(config,log_dir):
 
@@ -488,11 +500,8 @@ def device_to_client(config,log_dir):
 	Return
 	----------
 	Insert modbus device channel values into MySQL database	
-	"""
+	""" 
 	
-	#from sqlalchemy import create_engine 
-	#logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
-
 	''' Extract Database Information '''
 	host = config['DAQ'][0]['Database'][0]['ip']
 	port = config['DAQ'][0]['Database'][0]['port']
@@ -506,9 +515,7 @@ def device_to_client(config,log_dir):
 	
 		h = logging.StreamHandler()
 		file = logging.basicConfig(filename=log_dir+'error_log_%s.log'%(datetime.datetime.now().strftime("%Y_%m")),format='%(levelname)s:%(message)s',level=logging.WARNING)
-		#logging.basicConfig(format='%(levelname)s:%(message)s',level=logging.INFO)
 	
-		
 		sec1 = float(datetime.datetime.now().strftime('%s'))
 		if sec1 - sec0 >= config['DAQ'][0]['Collection'][0]['Interval']:
 			run = True
@@ -595,8 +602,4 @@ def device_to_client(config,log_dir):
 			df = df.where((pd.notnull(df)),None)
 
 			''' Insert datat into database '''
-			try:
-				engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)								# Connect to database
-				df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False) #,dtype = data_type)		# Write DataFrame to database
-			except:
-				logging.warning('MySQL Insert Fail: at %s'%(dt))
+			_mysql_insert(user,pswd,host,db)
