@@ -69,7 +69,6 @@ connection error occurs.
 
 
 **Device Information**
-
 .. code-block:: json
 	"DeviceA": [
         {
