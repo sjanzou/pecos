@@ -98,37 +98,7 @@ connection error occurs.
 
 **Channel Information**  
 
-.. code-block:: json          
-        
-        [ 
-        "consecutive_channels":[0,1,2,3,4,5,6,7],
-        "single_channels":[128],
-        "single_channels_signed":[true],
-            
-        "Scale":[0.1,0.1,0.1,0.1,0.1,0.01,0.0,0.0,0.01],
-        "Type":[
-            "Temp",
-            "Temp",
-            "Temp",
-            "Temp",
-            "Temp",
-            "Humidity",
-            "Empty",
-            "Empty",
-            "Temp"
-        ],
-        "Name":[
-            "Spire_Ambient",
-            "Spire_NE",
-            "Spire_SW",
-            "Thermostat",
-            "Humid_Temp",
-            "Humidity",
-            "Temp_Ch6",
-            "Temp_Ch7",
-            "MLTL_CJC"
-        ]
-        ]
+
 
 
 
