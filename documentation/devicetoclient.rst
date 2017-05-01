@@ -15,12 +15,20 @@ The function requires two inputs:
 Read Channel(s) on modbus device
 -----------------------------
 The function reads a modbus device registers using https://minimalmodbus.readthedocs.io/en/master/.
-The current version of this function uses the
+The current version of this function uses the read_register() and read_registers() 
+functions from minimalmodbus.  The read_register function:
 
-	read_register()
+	16 bit registers
 	
-	read_registers()
+	interger values between 0 to 65535("Unsigned INT16")
+	
+	integer values between -32768 to 32767("Signed INT16")
+	
+The read_registers function:
 
+	16 bit registers
+	
+	interger values between 0 to 65535("Unsigned INT16") 
 
 Scale value(s)
 -----------------------------
