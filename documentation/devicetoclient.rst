@@ -13,12 +13,14 @@ The configuration file is structured as follows:
 
     {
         "DAQ": [
-        	{"value",
+        	{
         	
         	}
         ],
-        "ICPDAS1": "value2",
-        ...
+        "Device A": [
+        	{
+        	
+        	}
     }
 
 
