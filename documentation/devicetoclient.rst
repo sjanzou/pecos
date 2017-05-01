@@ -14,7 +14,7 @@ The function requires two inputs:
 
 Read Channel(s) on modbus device
 -----------------------------
-The function reads a modbus device registers using the 
+The function reads a modbus device registers using the <https://gist.github.com/1855764>;
 
 	minimal
 
