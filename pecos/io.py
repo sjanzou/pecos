@@ -441,33 +441,33 @@ def device_to_client(config,log_dir):
 	----------
 	DAQ : string
 		Data aquisition device names
-    Database : string
-    	Database login credentials
-    	- ip
-    	- port
-    	- db 
-    	- table
-    	- user
-    	- pswd
-    Collection: string
-    	- Interval
-    	- Retries 
-    	
-    Connection : string
-    	- usb : string
-    	- address : integer
-    	- consecutive_channels : bolean
-    	- single_channels : bolean
-    	- baud : integer
-    	- parity : string
-    	- byte_size : integer
-    	- stopbits : interger
-    	- timeout : float
-    	- fcode : integer
-    	
-    consecutive_channels : string
-    	define the register numbers for the consecutive channels
-    	e.g [0,1,2,3,4,5,6,7]
+	Database : string
+		Database login credentials
+		- ip
+		- port
+		- db 
+		- table
+		- user
+		- pswd
+	Collection: string
+		- Interval
+		- Retries 
+		
+	Connection : string
+		- usb : string
+		- address : integer
+		- consecutive_channels : bolean
+		- single_channels : bolean
+		- baud : integer
+		- parity : string
+		- byte_size : integer
+		- stopbits : interger
+		- timeout : float
+		- fcode : integer
+		
+	consecutive_channels : string
+		define the register numbers for the consecutive channels
+		e.g [0,1,2,3,4,5,6,7]
     	
     single_channels : string
     	define the register number(s) for the single channel(s)
