@@ -17,7 +17,7 @@ The configuration file is structured as follows:
         		"Device Names, Database Credentials, and Collection Information"
         	}
         ],
-        "Device A, ..., N": [
+        "Device 1, ..., N": [
         	{
         		"Modbus connection, channel information, scale factors, type, and names"
         	}
@@ -26,14 +26,19 @@ The configuration file is structured as follows:
 
 
 **DAQ (Data Acquisition)**
-
+The DAQ section of the configuration file defines the devices to be polled, the database 
+that will store the data, and the collection interval and number of retries.  The number 
+of devices can range from 1 to N.  The database credentials include the host ip address,
+MySQL port (typically 3306), database name, table name, username, and password.  The 
+collection section defines the polling intervale (seconds) and the number of retries if a
+connection error occurs. 
 .. code-block:: json
 
     {
         "DAQ": [
         		{
         			"Devices":[
-    					"DeviceA",
+    					"Device1",
     					"DeviceN"
     				],
     				"Database":[
