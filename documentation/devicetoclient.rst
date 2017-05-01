@@ -97,6 +97,7 @@ connection error occurs.
             
 
 **Channel Information**  
+
 .. code-block:: json          
         
         [ 
