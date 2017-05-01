@@ -512,10 +512,9 @@ def device_to_client(config,log_dir):
 	
 	sec0 = float(datetime.datetime.now().strftime('%s'))
 	while True: 
-	
 		h = logging.StreamHandler()
 		file = logging.basicConfig(filename=log_dir+'error_log_%s.log'%(datetime.datetime.now().strftime("%Y_%m")),format='%(levelname)s:%(message)s',level=logging.WARNING)
-	
+		
 		sec1 = float(datetime.datetime.now().strftime('%s'))
 		if sec1 - sec0 >= config['DAQ'][0]['Collection'][0]['Interval']:
 			run = True
@@ -524,20 +523,18 @@ def device_to_client(config,log_dir):
 			run = False
 		
 		if run:
-		
 			dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-			#print datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 			
 			data,labels = [],[]
 			retry = config['DAQ'][0]['Collection'][0]['Retries']
 			for device in config['DAQ'][0]["Devices"]:
-				
+			
 				""" Read channels on modbus device """
-				instr = _define_device(device,config)	
+				instr = _define_device(device,config)
 				
 				''' Read Multiple Registers in a Row '''
 				if config['%s'%device][0]['Connection'][0]['consecutive_channels']:
-						
+				
 					dm = []
 					i = 0
 					while i < retry:
@@ -547,22 +544,18 @@ def device_to_client(config,log_dir):
 							"""TODO: Convert value if negative (read_registers() outputs unsigned int16 in the range 0 to 65535)"""
 							dm = instr.read_registers(start,number,functioncode=config['%s'%device][0]['Connection'][0]['fcode'])								
 							break
-							
 						except:
 							if i == retry-1:
 								dm = [np.nan] * len(config['%s'%device][0]['consecutive_channels'])
 								logging.warning('Device Connection Fail: Device %s at %s'%(device,dt))
 							else:
 								pass
-							
 						i += 1
-					
+				
 				''' Read Single Register at a time '''	
 				if config['%s'%device][0]['Connection'][0]['single_channels']:
-				
 					ds = []
 					for chan in config['%s'%device][0]['single_channels']:
-
 						i = 0
 						while i < retry:
 							try:
@@ -575,11 +568,8 @@ def device_to_client(config,log_dir):
 									logging.warning('Device Connection Fail: Device %s, Channel %s, at %s'%(device,chan,dt))
 								else:
 									pass
-							
 							i += 1
-								
-						ds.extend(d)												
-				
+						ds.extend(d)
 				dm.extend(ds)
 	
 				''' Scale channel values '''
