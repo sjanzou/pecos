@@ -19,7 +19,6 @@ The configuration file has two main sections that define the data acquisition an
 individual devices as shown here:
 
 .. code-block:: json
-
     {
         "DAQ": [
         	{
@@ -44,7 +43,6 @@ collection section defines the polling intervale (seconds) and the number of ret
 connection error occurs. 
 
 .. code-block:: json
-
     "DAQ": [
         	{
         		"Devices":[
@@ -99,7 +97,6 @@ connection error occurs.
             
 
 **Channel Information**  
-
 .. code-block:: json          
         
         [ 
