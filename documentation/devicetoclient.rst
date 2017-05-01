@@ -74,6 +74,7 @@ connection error occurs.
 
 
 **Connection**
+
 .. code-block:: json
 
     "DeviceA": [
