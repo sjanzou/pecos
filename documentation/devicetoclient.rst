@@ -45,32 +45,31 @@ connection error occurs.
 
 .. code-block:: json
 
-    {
-        "DAQ": [
-        		{
-        			"Devices":[
-    					"Device1",
-    					"DeviceN"
-    				],
-    				"Database":[
-    					{
-    						"ip": "127.0.0.1",
-    						"port":3306,
-    						"db":"database name",
-    						"table":"table name",
-    						"user":"username",
-    						"pswd":"password"
-    					}
-    				],
-    				"Collection":[
-    					{
-    						"Interval":1,
-    						"Retries":5
-    					}
-    				]
-        		}
-        	]
-    }
+    "DAQ": [
+        	{
+        		"Devices":[
+    				"Device1",
+    				"DeviceN"
+    			],
+    			"Database":[
+    				{
+    					"ip": "127.0.0.1",
+    					"port":3306,
+    					"db":"database name",
+    					"table":"table name",
+    					"user":"username",
+    					"pswd":"password"
+    				}
+    			],
+    			"Collection":[
+    				{
+    					"Interval":1,
+    					"Retries":5
+    				}
+    			]
+        	}
+        ]
+
 
 
 **Device Information**
