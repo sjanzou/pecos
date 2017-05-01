@@ -7,6 +7,21 @@ database.
 Input: Configuration File 
 -----------------------------
 
+The configuration file is structured as follows:
+
+.. code-block:: json
+
+    {
+        "DAQ": [
+        	{"value",
+        	
+        	}
+        ],
+        "ICPDAS1": "value2",
+        ...
+    }
+
+
 **DAQ Information**
 
 * Device Names
@@ -14,13 +29,7 @@ Input: Configuration File
 	- 1
 * Collection Interval
 
-.. code-block:: json
 
-    {
-        "key": "value",
-        "key2": "value2",
-        ...
-    }
 
 **Data Storage Credentials**
 
