@@ -14,6 +14,9 @@ The function requires two inputs:
 
 Read Channel(s) on modbus device
 -----------------------------
+The function reads a modbus device registers using the 
+
+	minimal
 
 
 Scale value(s)
