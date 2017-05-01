@@ -37,10 +37,12 @@ configuration file settings.
 
 Scale value(s)
 -----------------------------
+The modbus values are stored in a string and scaled using 
+
+	d = [a*b for a,b in zip(Scale Factors,values)]
 
 
-
-Output: Stored Sensor Values (MySQL or CSV)
+Output: Stored Sensor Values (MySQL)
 -----------------------------
 
 
