@@ -4,10 +4,14 @@ Device to Client
 The :class:`~pecos.io.device_to_client` function collects data from a modbus device and stores it in a local 
 database.     
 
-Input: Configuration File 
+Configuration File 
+-----------------------------
+
+Configuration File 
 -----------------------------
 
 The configuration file is structured as follows:
+
 .. code-block:: json
 
     {
@@ -27,7 +31,8 @@ The configuration file is structured as follows:
 **DAQ (Data Acquisition)**
 The DAQ section of the configuration file defines the devices to be polled, the database 
 that will store the data, and the collection interval and number of retries.  The number 
-of devices can range from 1 to N.  The database credentials include the host ip address,
+of devices can range from 1 to N.  The database credentials include the host ip address 
+(127.0.0.1 or localhost for local storage),
 MySQL port (typically 3306), database name, table name, username, and password.  The 
 collection section defines the polling intervale (seconds) and the number of retries if a
 connection error occurs. 
