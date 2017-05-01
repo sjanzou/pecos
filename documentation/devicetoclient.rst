@@ -21,11 +21,44 @@ The configuration file is structured as follows:
         	{
         	
         	}
+        ],
+        "Device B": [
+        	{
+        	
+        	}
         ]
     }
 
 
-**DAQ Information**
+**DAQ (Data Acquisition)**
+
+.. code-block:: json
+
+    {
+        "DAQ": [
+        	{
+        		"Devices":[
+    			"ICPDAS1"
+    			],
+    		"Database":[
+    			{
+    				"ip": "127.0.0.1",
+    				"port":3306,
+    				"db":"solar",
+    				"table":"predicts",
+    				"user":"pseldata",
+    				"pswd":"sanddb"
+    			}
+    		],
+    		"Collection":[{
+    			"Interval":1,
+    			"Retries":5
+    			}
+    		]
+        	
+        	}
+        ]
+    }
 
 * Device Names
 * Data Storage Credential (MySQL)
