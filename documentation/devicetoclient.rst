@@ -11,7 +11,7 @@ Input: Configuration File
 
 * Device Names
 * Data Storage Credential (MySQL)
-- 1
+	- 1
 * Collection Interval
 
 **Data Storage Credentials**
