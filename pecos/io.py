@@ -468,27 +468,26 @@ def device_to_client(config,log_dir):
 	consecutive_channels : string
 		define the register numbers for the consecutive channels
 		e.g [0,1,2,3,4,5,6,7]
-    	
-    single_channels : string
-    	define the register number(s) for the single channel(s)
-    	e.g [128]
-
-    Scale : string
-    	define the scale factor for all channels being collected, often used
-    	to convert from mV to Volts
-    	e.g. [0.1,0.1,0.1,0.1,0.1,0.01,0.0,0.0,0.1]
-    	
-    Type : string
-    	define the type of sensors
-    	e.g. "Temperature", "Voltage"
-    	
-    Name : string
-    	define the channel name to be stored in the database
-    	
-    Return
-    ----------
-    Insert modbus device channel values into MySQL database	
-    	
+	
+	single_channels : string
+		define the register number(s) for the single channel(s)
+		e.g [128]
+		
+	Scale : string
+		define the scale factor for all channels being collected, often used
+		to convert from mV to Volts
+		e.g. [0.1,0.1,0.1,0.1,0.1,0.01,0.0,0.0,0.1]
+		
+	Type : string
+		define the type of sensors
+		e.g. "Temperature", "Voltage"
+		
+	Name : string
+		define the channel name to be stored in the database
+	
+	Return
+	----------
+	Insert modbus device channel values into MySQL database	
 	"""
 	
 	#from sqlalchemy import create_engine 
