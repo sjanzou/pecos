@@ -87,12 +87,12 @@ connection error occurs.
             	}
             ],
             
-            
             "consecutive_channels":[0,1,2,3,4,5,6,7],
             "single_channels":[128],
             "single_channels_signed":[true],
-            
+
             "Scale":[0.1,0.1,0.1,0.1,0.1,0.01,0.0,0.0,0.01],
+            
             "Type":[
             	"Temp",
             	"Temp",
@@ -104,6 +104,7 @@ connection error occurs.
             	"Empty",
             	"Temp"
             ],
+            
             "Name":[
             	"Spire_Ambient",
             	"Spire_NE",
