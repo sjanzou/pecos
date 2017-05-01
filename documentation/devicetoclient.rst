@@ -14,15 +14,10 @@ The configuration file is structured as follows:
     {
         "DAQ": [
         	{
-        	
+        		"Device Names, Database Credentials, Collection Information"
         	}
         ],
-        "Device A": [
-        	{
-        	
-        	}
-        ],
-        "Device B": [
+        "Device A, ..., N": [
         	{
         	
         	}
