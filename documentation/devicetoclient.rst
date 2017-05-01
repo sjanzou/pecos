@@ -113,6 +113,9 @@ Each device has a specific connection requiremsnets.  This includes the usb port
 baud rate, parity, byte_size, stopbits, and timeout.  The configuration file also defines
 if there are consecutive channels and/or single channels to be read.  The consecutive channels 
 use the read_registers() function and the single channels use the read_register().
+
+The scale factors for each device are also defined as a single string in the configuration 
+file.  The sensor type and name are each describe as a string.
 .. code-block:: json
 	"DeviceA": [
         {
