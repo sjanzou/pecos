@@ -39,12 +39,16 @@ Scale value(s)
 -----------------------------
 The modbus values are stored in a string and scaled using 
 
-	d = [a*b for a,b in zip(Scale Factors,values)]
+	Scaled Values = [a*b for a,b in zip(Scale Factors,Values)]
 
 
 Output: Stored Sensor Values (MySQL)
 -----------------------------
+The scaled values are converted into a pandas DataFrame and inserted into a MySQL database
 
+	engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)
+		
+	df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False)
 
 Configuration File 
 -----------------------------
