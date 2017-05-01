@@ -45,6 +45,9 @@ The modbus values are stored in a string and scaled using
 Output: Stored Sensor Values (MySQL)
 -----------------------------
 The scaled values are converted into a pandas DataFrame and inserted into a MySQL database
+using the sqlalchemy engine
+
+	from sqlalchemy import create_engine
 
 	engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)
 		
