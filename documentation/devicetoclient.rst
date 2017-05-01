@@ -14,12 +14,12 @@ The configuration file is structured as follows:
     {
         "DAQ": [
         	{
-        		"Device Names, Database Credentials, Collection Information"
+        		"Device Names, Database Credentials, and Collection Information"
         	}
         ],
         "Device A, ..., N": [
         	{
-        	
+        		"Modbus connection, channel information, scale factors, type, and names"
         	}
         ]
     }
