@@ -14,6 +14,14 @@ Input: Configuration File
 	- 1
 * Collection Interval
 
+.. code-block:: json
+
+    {
+        "key": "value",
+        "key2": "value2",
+        ...
+    }
+
 **Data Storage Credentials**
 
 * IP Address (ip)
