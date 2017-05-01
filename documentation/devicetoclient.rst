@@ -2,13 +2,25 @@ Device to Client
 ==================
 
 The :class:`~pecos.io.device_to_client` function collects data from a modbus device and stores it in a local 
-database.     
+database.  
 
-Capabilities 
+Input
+----------------------------- 
+The function requires two inputs:
+* Configuration File
+* Log file directory
+ 
+
+Read Channel(s) on modbus device
 -----------------------------
 
 
-Process 
+Scale value(s)
+-----------------------------
+
+
+
+Output: Stored Sensor Values (MySQL or CSV)
 -----------------------------
 
 
@@ -69,6 +81,12 @@ connection error occurs.
 
 
 **Device Information**
+
+**Connection**
+
+
+**Channel Information**  
+
 .. code-block:: json
 	"DeviceA": [
         {
@@ -119,26 +137,10 @@ connection error occurs.
         }       
     ]
 
-**Connection**
-
-
-            
-
-**Channel Information**  
 
 
 
 
 
 
-Read Channel(s) on modbus device
------------------------------
 
-
-Scale value(s)
------------------------------
-
-
-
-Output: Stored Sensor Values (MySQL or CSV)
------------------------------
