@@ -31,20 +31,20 @@ The configuration file is structured as follows:
 
     {
         "DAQ": [
-        	{
-        		"Devices":[
-    			"ICPDAS1"
-    			],
-    		"Database":[
-    			{
-    				"ip": "127.0.0.1",
-    				"port":3306,
-    				"db":"solar",
-    				"table":"predicts",
-    				"user":"pseldata",
-    				"pswd":"sanddb"
-    			}
-    		],
+        		{
+        			"Devices":[
+    					"DeviceA"
+    				],
+    				"Database":[
+    					{
+    						"ip": "127.0.0.1",
+    						"port":3306,
+    						"db":"database name",
+    						"table":"table name",
+    						"user":"username",
+    						"pswd":"password"
+    					}
+    				],
     		"Collection":[{
     			"Interval":1,
     			"Retries":5
