@@ -21,6 +21,7 @@ The configuration file is structured as follows:
         	{
         	
         	}
+        ]
     }
 
 
