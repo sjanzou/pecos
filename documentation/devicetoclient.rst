@@ -109,12 +109,10 @@ connection error occurs.
 
 
 **Device Information**
-
-**Connection**
-
-
-**Channel Information**  
-
+Each device has a specific connection requiremsnets.  This includes the usb port, address,
+baud rate, parity, byte_size, stopbits, and timeout.  The configuration file also defines
+if there are consecutive channels and/or single channels to be read.  The consecutive channels 
+use the read_registers() function and the single channels use the read_register().
 .. code-block:: json
 	"DeviceA": [
         {
