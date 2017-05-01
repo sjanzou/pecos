@@ -109,6 +109,7 @@ connection error occurs.
 
 
 **Device Information**
+
 Each device has a specific connection requiremsnets.  This includes the usb port, address,
 baud rate, parity, byte_size, stopbits, and timeout.  The configuration file also defines
 if there are consecutive channels and/or single channels to be read.  The consecutive channels 
