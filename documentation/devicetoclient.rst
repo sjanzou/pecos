@@ -33,7 +33,8 @@ The configuration file is structured as follows:
         "DAQ": [
         		{
         			"Devices":[
-    					"DeviceA"
+    					"DeviceA",
+    					"DeviceN"
     				],
     				"Database":[
     					{
@@ -45,14 +46,14 @@ The configuration file is structured as follows:
     						"pswd":"password"
     					}
     				],
-    		"Collection":[{
-    			"Interval":1,
-    			"Retries":5
-    			}
-    		]
-        	
-        	}
-        ]
+    				"Collection":[
+    					{
+    						"Interval":1,
+    						"Retries":5
+    					}
+    				]
+        		}
+        	]
     }
 
 * Device Names
