@@ -73,12 +73,7 @@ connection error occurs.
 
 
 **Device Information**
-.. code-block:: json
 
-    "DeviceA": [
-        	"Connection":[
-            
-            ],
 
 **Connection**
 .. code-block:: json
