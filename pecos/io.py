@@ -475,8 +475,8 @@ def device_to_client(config,log_dir):
 	Connection : string
 		- usb : string
 		- address : integer
-		- consecutive_channels : bolean
-		- single_channels : bolean
+		- consecutive_channels : string
+		- single_channels : string
 		- baud : integer
 		- parity : string
 		- byte_size : integer
@@ -487,10 +487,16 @@ def device_to_client(config,log_dir):
 	consecutive_channels : string
 		define the register numbers for the consecutive channels
 		e.g [0,1,2,3,4,5,6,7]
+		unsigned INT16 0 to 65535
 	
 	single_channels : string
 		define the register number(s) for the single channel(s)
 		e.g [128]
+		
+	single_channels_signed : boolean
+		define if the single channel register is signed or unsigned
+		signed: true, signed INT16 -32768 to 32767
+		unsigned: false, unsigned INT16 0 to 65535
 		
 	Scale : string
 		define the scale factor for all channels being collected, often used
@@ -539,7 +545,7 @@ def device_to_client(config,log_dir):
 				""" Read channels on modbus device """
 				instr = _define_device(device,config)
 				
-				''' Read Multiple Registers in a Row '''
+				''' Read Multiple (16 bit) Registers in a Row '''
 				if config['%s'%device][0]['Connection'][0]['consecutive_channels']:
 				
 					dm = []
@@ -559,15 +565,14 @@ def device_to_client(config,log_dir):
 								pass
 						i += 1
 				
-				''' Read Single Register at a time '''	
+				''' Read Single (16 bit) Register at a time '''	
 				if config['%s'%device][0]['Connection'][0]['single_channels']:
 					ds = []
-					for chan in config['%s'%device][0]['single_channels']:
+					for chan,chan_signed in zip(config['%s'%device][0]['single_channels'],config['%s'%device][0]['single_channels_signed']):
 						i = 0
 						while i < retry:
 							try:
-								"""TODO: Convert value if negative (read_register() outputs unsigned int16 in the range 0 to 65535)"""
-								d = [instr.read_register(chan, numberOfDecimals=1, functioncode=config['%s'%device][0]['Connection'][0]['fcode'], signed=False)]
+								d = [instr.read_register(chan, numberOfDecimals=0, functioncode=config['%s'%device][0]['Connection'][0]['fcode'], signed=chan_signed)]
 								break
 							except:
 								if i == retry-1:
@@ -597,6 +602,7 @@ def device_to_client(config,log_dir):
 			df = pd.DataFrame(data).T
 			df.columns = labels
 			df = df.where((pd.notnull(df)),None)
+			print df
 
 			''' Insert datat into database '''
 			_mysql_insert(user,pswd,host,db,dt)
