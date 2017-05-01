@@ -3,7 +3,8 @@ Performance Monitoring using Pecos
 
 .. toctree::
    :maxdepth: 1
-	
+   
+   acknowledgements
    overview
    installation
    example
