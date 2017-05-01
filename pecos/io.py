@@ -430,7 +430,7 @@ def _define_device(device,config):
 
 	return instr
 	
-def _mysql_insert(user,pswd,host,db):
+def _mysql_insert(user,pswd,host,db,dt):
 	
 	from sqlalchemy import create_engine
 	
@@ -439,9 +439,7 @@ def _mysql_insert(user,pswd,host,db):
 		df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False) #,dtype = data_type)		# Write DataFrame to database
 	except:
 		logging.warning('MySQL Insert Fail: at %s'%(dt))
-
-	
-    
+  
 def device_to_client(config,log_dir):
 
 	"""
@@ -592,4 +590,4 @@ def device_to_client(config,log_dir):
 			df = df.where((pd.notnull(df)),None)
 
 			''' Insert datat into database '''
-			_mysql_insert(user,pswd,host,db)
+			_mysql_insert(user,pswd,host,db,dt)
