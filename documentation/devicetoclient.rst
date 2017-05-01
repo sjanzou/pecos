@@ -17,7 +17,6 @@ Configuration File
 
 The configuration file has two main sections that define the data acquisition and each 
 individual devices as shown here:
-
 .. code-block:: json
     {
         "DAQ": [
