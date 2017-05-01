@@ -10,6 +10,8 @@ Input: Configuration File
 **DAQ Information**
 
 * Device Names
+* Data Storage Credential (MySQL)
+** 1
 * Collection Interval
 
 **Data Storage Credentials**
