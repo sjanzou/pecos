@@ -14,9 +14,14 @@ The function requires two inputs:
 
 Read Channel(s) on modbus device
 -----------------------------
-The function reads a modbus device registers using the https://minimalmodbus.readthedocs.io/en/master/
+The function reads a modbus device registers using
 
-	minimal
+	https://minimalmodbus.readthedocs.io/en/master/
+
+The current version uses the
+
+	read_register()
+	read_registers()
 
 
 Scale value(s)
