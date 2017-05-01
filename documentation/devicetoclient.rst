@@ -73,24 +73,31 @@ connection error occurs.
 
 
 **Device Information**
-
 .. code-block:: json
 
     "DeviceA": [
         	"Connection":[
-            {
-            	"usb": "/dev/ttyUSB0",
-            	"address":21,
-            	"consecutive_channels":"True",
-            	"single_channels":"True",
-            	"baud":9600,
-            	"parity": "N",
-            	"byte_size":8,
-            	"stopbits":1,
-            	"timeout":0.05,
-            	"fcode":4
-            }
-        ]
+            
+            ],
+
+**Connection**
+.. code-block:: json
+
+    "DeviceA": [
+        	"Connection":[
+            	{
+            		"usb": "/dev/ttyUSB0",
+            		"address":21,
+            		"consecutive_channels":"True",
+            		"single_channels":"True",
+            		"baud":9600,
+            		"parity": "N",
+            		"byte_size":8,
+            		"stopbits":1,
+            		"timeout":0.05,
+            		"fcode":4
+            	}
+        	]
             
 
 **Channel Information**  
