@@ -438,9 +438,9 @@ def device_to_client(config,log_dir):
 	data aquistion (DAQ) and the individual devies.
 	
 	Parameters
-    ----------
-    DAQ : string
-        Data aquisition device names
+	----------
+	DAQ : string
+		Data aquisition device names
     Database : string
     	Database login credentials
     	- ip
