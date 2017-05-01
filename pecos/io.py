@@ -14,11 +14,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-   
-from sqlalchemy import create_engine
-
-# Import MinimalModbus (http://minimalmodbus.readthedocs.io/en/master/)
-import minimalmodbus   
     
 try:
     from nose.tools import nottest as _nottest
@@ -417,32 +412,87 @@ def _define_device(device,config):
 	:return instr:
 	"""
 	
+	# Import MinimalModbus (http://minimalmodbus.readthedocs.io/en/master/)
+	import minimalmodbus 
+
 	usb = config['%s'%device][0]['Connection'][0]['usb']
 	address = config['%s'%device][0]['Connection'][0]['address']
 	baud = config['%s'%device][0]['Connection'][0]['baud']
 	bsize = config['%s'%device][0]['Connection'][0]['byte_size']
 	stopb = config['%s'%device][0]['Connection'][0]['stopbits']
+	parity = config['%s'%device][0]['Connection'][0]['parity']
 
 	instr = minimalmodbus.Instrument(usb,address)
 	instr.serial.baudrate = baud
-	#instr.serial.parity = serial.PARITY_EVEN
 	instr.serial.bytesize = bsize
 	instr.serial.stopbits = stopb
-	
+	instr.serial.parity = parity
+
 	return instr
     
-def device_to_client(config):
+def device_to_client(config,log_dir):
 
 	"""
-	Read channels on modbus device
+	Read channels on modbus device, scale the values, and store in a MySQL database.
+	The inputs are provided by a json configuration file that describe general information 
+	data aquistion (DAQ) and the individual devies.
 	
 	Parameters
     ----------
     DAQ : string
         Data aquisition device names
     Database : string
-    	Database login credentials  
+    	Database login credentials
+    	- ip
+    	- port
+    	- db 
+    	- table
+    	- user
+    	- pswd
+    Collection: string
+    	- Interval
+    	- Retries 
+    	
+    Connection : string
+    	- usb : string
+    	- address : integer
+    	- consecutive_channels : bolean
+    	- single_channels : bolean
+    	- baud : integer
+    	- parity : string
+    	- byte_size : integer
+    	- stopbits : interger
+    	- timeout : float
+    	- fcode : integer
+    	
+    consecutive_channels : string
+    	define the register numbers for the consecutive channels
+    	e.g [0,1,2,3,4,5,6,7]
+    	
+    single_channels : string
+    	define the register number(s) for the single channel(s)
+    	e.g [128]
+
+    Scale : string
+    	define the scale factor for all channels being collected, often used
+    	to convert from mV to Volts
+    	e.g. [0.1,0.1,0.1,0.1,0.1,0.01,0.0,0.0,0.1]
+    	
+    Type : string
+    	define the type of sensors
+    	e.g. "Temperature", "Voltage"
+    	
+    Name : string
+    	define the channel name to be stored in the database
+    	
+    Return
+    ----------
+    Insert modbus device channel values into MySQL database	
+    	
 	"""
+	
+	#from sqlalchemy import create_engine 
+	#logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
 
 	''' Extract Database Information '''
 	host = config['DAQ'][0]['Database'][0]['ip']
@@ -454,81 +504,100 @@ def device_to_client(config):
 	
 	sec0 = float(datetime.datetime.now().strftime('%s'))
 	while True: 
+	
+		h = logging.StreamHandler()
+		file = logging.basicConfig(filename=log_dir+'error_log_%s.log'%(datetime.datetime.now().strftime("%Y_%m")),format='%(levelname)s:%(message)s',level=logging.WARNING)
+		#logging.basicConfig(format='%(levelname)s:%(message)s',level=logging.INFO)
+	
 		
-		dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		dsec = float(datetime.datetime.now().strftime('%s')) - sec0
+		sec1 = float(datetime.datetime.now().strftime('%s'))
+		if sec1 - sec0 >= config['DAQ'][0]['Collection'][0]['Interval']:
+			run = True
+			sec0 = sec1
+		else:
+			run = False
 		
-		if dsec > 0:
+		if run:
+		
+			dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			#print datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 			
 			data,labels = [],[]
+			retry = config['DAQ'][0]['Collection'][0]['Retries']
 			for device in config['DAQ'][0]["Devices"]:
 				
-				"""
-				Read channels on modbus device
-				"""
-
+				""" Read channels on modbus device """
 				instr = _define_device(device,config)	
-
+				
+				''' Read Multiple Registers in a Row '''
 				if config['%s'%device][0]['Connection'][0]['consecutive_channels']:
 						
+					dm = []
 					i = 0
-					while i < 5:
-						try:	
-							start = config['%s'%device][0]['channel'][0][0]
-							number = len(config['%s'%device][0]['channels'])
+					while i < retry:
+						try:
+							start = (config['%s'%device][0]['consecutive_channels'][0])
+							number = (len(config['%s'%device][0]['consecutive_channels']))
 							"""TODO: Convert value if negative (read_registers() outputs unsigned int16 in the range 0 to 65535)"""
-							d = instr.read_registers(start,number,functioncode=config['%s'%device][0]['Connection'][0]['fcode'])	
+							dm = instr.read_registers(start,number,functioncode=config['%s'%device][0]['Connection'][0]['fcode'])								
 							break
 							
 						except:
-							if i == 4:
-								d = [None] * len(config['%s'%device][0]['Connection'][0]['channels'])
+							if i == retry-1:
+								dm = [np.nan] * len(config['%s'%device][0]['consecutive_channels'])
 								logging.warning('Device Connection Fail: Device %s at %s'%(device,dt))
+							else:
+								pass
 							
 						i += 1
-						
-				else:
+					
+				''' Read Single Register at a time '''	
+				if config['%s'%device][0]['Connection'][0]['single_channels']:
 				
-					for chan in config['%s'%device][0]['channel']):		
-						d = []
-						for j in range(len(config['%s'%device][0]['Connection'][0]['channels'])):
-							
-							i = 0
-							while i < 3:
-								try:
-									d = instr.read_register(config['%s'%device][0]['channel'][0][j],numberOfRegisters=config['%s'%device][0]['number_registers'][0][j])
-									break
-								except:
-									if i == 2:
-										d = [None] 
-										logging.warning('Device Connection Fail: Device %s, Channel %s, at %s'%(device,config['%s'%device][0]['channel'][0][j],dt))
-								
-								d.append(d)
-								i += 1					
-				
-				"""
-				Scale channel values
-				"""
-				try:
-					d = [a*b for a,b in zip(config['%s'%device][0]['Scale'],d)]
-				except:
-					#logging.warning('Data Scale Fail: Device %s at %s'%(device,dt))
-					d = [None] * config['%s'%device][0]['Connection'][0]['channels']
-				
+					ds = []
+					for chan in config['%s'%device][0]['single_channels']:
 
+						i = 0
+						while i < retry:
+							try:
+								"""TODO: Convert value if negative (read_register() outputs unsigned int16 in the range 0 to 65535)"""
+								d = [instr.read_register(chan, numberOfDecimals=1, functioncode=config['%s'%device][0]['Connection'][0]['fcode'], signed=False)]
+								break
+							except:
+								if i == retry-1:
+									d = [np.nan] 
+									logging.warning('Device Connection Fail: Device %s, Channel %s, at %s'%(device,chan,dt))
+								else:
+									pass
+							
+							i += 1
+								
+						ds.extend(d)												
+				
+				dm.extend(ds)
+	
+				''' Scale channel values '''
+				try:
+					d = [a*b for a,b in zip(config['%s'%device][0]['Scale'],dm)]
+				except:
+					d = [np.nan] * len(dm)
+					logging.warning('Data Scale Fail: Device %s at %s'%(device,dt))
+					
 				data.extend(d)
 				labels.extend(config['%s'%device][0]['Name'])
-			
+
+			''' Add datetime to collected channel values and labels '''
 			data.extend([dt])
 			labels.extend(['datetime'])
 			
+			''' Convert collected data into pandas DataFrame format '''
 			df = pd.DataFrame(data).T
 			df.columns = labels
+			df = df.where((pd.notnull(df)),None)
+
+			''' Insert datat into database '''
 			try:
 				engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)								# Connect to database
 				df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False) #,dtype = data_type)		# Write DataFrame to database
 			except:
 				logging.warning('MySQL Insert Fail: at %s'%(dt))
-			
-		sec0 = sec1
-	
