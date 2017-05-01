@@ -407,8 +407,8 @@ def _define_device(device,config):
 	
 	"""
 	Define the modbus instrument
-	:param device:
-	:param config: 
+	:param device: device name
+	:param config: modbus configuration information (usb, address,baud,byte_size, stopbits, parity)
 	:return instr:
 	"""
 	
@@ -431,6 +431,15 @@ def _define_device(device,config):
 	return instr
 	
 def _mysql_insert(user,pswd,host,db,dt):
+	
+	"""
+	Insert data into MySQL database
+	:param user: databse username
+	:param pswd: database pasword
+	:param host: database host
+	:param db: database name
+	:param dt: current datetime
+	"""
 	
 	from sqlalchemy import create_engine
 	
