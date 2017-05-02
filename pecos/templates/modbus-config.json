@@ -8,10 +8,10 @@
     			{
     				"ip": "127.0.0.1",
     				"port":3306,
-    				"db":"solar",
-    				"table":"predicts",
-    				"user":"pseldata",
-    				"pswd":"sanddb"
+    				"db":"database name",
+    				"table":"table name",
+    				"user":"username",
+    				"pswd":"password"
     			}
     		],
     		"Collection":[{
