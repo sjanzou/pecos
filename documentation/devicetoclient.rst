@@ -23,20 +23,20 @@ The configuration options are described below.
   The dictionary has the following keys:
 
   * **IP**: IP address (string) 
-  * **Port**: 
+  * **Port**: Often 3306 for MySQL
   * **Database**: 
   * **Table**: 
   * **Username**: 
   * **Password**: 
-  * **Interval**: 
-  * **Retries**: 
+  * **Interval**: data collection frequency (seconds)
+  * **Retries**: number of retries for each channel
 
 * **Devices**: A list of dictionaries that contain information about each device (one dictionary per device).  
   Each dictionary has the following keys:
 
   * **Name**: Device name (string)
-  * **USB**: 
-  * **Address**:         
+  * **USB**: e.g. linux /dev/ttyUSB0
+  * **Address**: modbus slave address        
   * **Baud**: 
   * **Parity**: 
   * **Bytes**: 
@@ -48,8 +48,11 @@ The configuration options are described below.
   
     * **Name**: Data name (string)
     * **Type**: Data type (string)
-    * **Scale**: Scaling factor (float)
-    * **Channel**: ??
+    * **Scale**: Scaling factor (integer)
+    * **Conversion**: Conversion factor (float)
+    * **Channel**: Register number (integer)
+    * **Signed**: True (signed 16 bit integer) False (unsigned 16 bit integer)
+    * **Fcode**: Function code (3-holding register or 4-input register)
 
 Example configuration options are shown below.
 
