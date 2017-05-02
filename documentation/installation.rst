@@ -43,6 +43,10 @@ Required Python package dependencies include:
 
 Optional Python packages dependencies include:
 
+* sqlalchemy: used to ...,
+  https://www.sqlalchemy.org/
+* minimalmodbus: used to ...
+  https://minimalmodbus.readthedocs.io
 * pyyaml: used to store configuration options in human readable data format,
   http://pyyaml.org/
 * PVLIB [SHFH16]_: used to simulate the performance of photovoltaic energy systems,

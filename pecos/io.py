@@ -14,7 +14,13 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-    
+
+try:
+    from sqlalchemy import create_engine
+    import minimalmodbus 
+except:
+    pass
+
 try:
     from nose.tools import nottest as _nottest
 except ImportError:
@@ -403,206 +409,82 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
 
     return template.render(**locals())
 
-def _define_device(device,config):
-	
-	"""
-	Define the modbus instrument
-	:param device: device name
-	:param config: modbus configuration information (usb, address,baud,byte_size, stopbits, parity)
-	:return instr:
-	"""
-	
-	# Import MinimalModbus (http://minimalmodbus.readthedocs.io/en/master/)
-	import minimalmodbus 
-
-	usb = config['%s'%device][0]['Connection'][0]['usb']
-	address = config['%s'%device][0]['Connection'][0]['address']
-	baud = config['%s'%device][0]['Connection'][0]['baud']
-	bsize = config['%s'%device][0]['Connection'][0]['byte_size']
-	stopb = config['%s'%device][0]['Connection'][0]['stopbits']
-	parity = config['%s'%device][0]['Connection'][0]['parity']
-
-	instr = minimalmodbus.Instrument(usb,address)
-	instr.serial.baudrate = baud
-	instr.serial.bytesize = bsize
-	instr.serial.stopbits = stopb
-	instr.serial.parity = parity
-
-	return instr
-	
-def _mysql_insert(user,pswd,host,db,dt):
-	
-	"""
-	Insert data into MySQL database
-	:param user: databse username
-	:param pswd: database pasword
-	:param host: database host
-	:param db: database name
-	:param dt: current datetime
-	"""
-	
-	from sqlalchemy import create_engine
-	
-	try:
-		engine = create_engine('mysql://'+user+':'+pswd+'@'+host+'/'+db)								# Connect to database
-		df.to_sql(name='%s'%table,con=engine, if_exists='append', index=False) #,dtype = data_type)		# Write DataFrame to database
-	except:
-		logging.warning('MySQL Insert Fail: at %s'%(dt))
-  
-def device_to_client(config,log_dir):
-
-	"""
-	Read channels on modbus device, scale the values, and store in a MySQL database.
-	The inputs are provided by a json configuration file that describe general information 
-	data aquistion (DAQ) and the individual devies.
-	
-	Parameters
-	----------
-	DAQ : string
-		Data aquisition device names
-	Database : string
-		Database login credentials
-		- ip
-		- port
-		- db 
-		- table
-		- user
-		- pswd
-	Collection: string
-		- Interval
-		- Retries 
-		
-	Connection : string
-		- usb : string
-		- address : integer
-		- consecutive_channels : string
-		- single_channels : string
-		- baud : integer
-		- parity : string
-		- byte_size : integer
-		- stopbits : interger
-		- timeout : float
-		- fcode : integer
-		
-	consecutive_channels : string
-		define the register numbers for the consecutive channels
-		e.g [0,1,2,3,4,5,6,7]
-		unsigned INT16 0 to 65535
-	
-	single_channels : string
-		define the register number(s) for the single channel(s)
-		e.g [128]
-		
-	single_channels_signed : boolean
-		define if the single channel register is signed or unsigned
-		signed: true, signed INT16 -32768 to 32767
-		unsigned: false, unsigned INT16 0 to 65535
-		
-	Scale : string
-		define the scale factor for all channels being collected, often used
-		to convert from mV to Volts
-		e.g. [0.1,0.1,0.1,0.1,0.1,0.01,0.0,0.0,0.1]
-		
-	Type : string
-		define the type of sensors
-		e.g. "Temperature", "Voltage"
-		
-	Name : string
-		define the channel name to be stored in the database
-	
-	Return
-	----------
-	Insert modbus device channel values into MySQL database	
-	""" 
-	
-	''' Extract Database Information '''
-	host = config['DAQ'][0]['Database'][0]['ip']
-	port = config['DAQ'][0]['Database'][0]['port']
-	db = config['DAQ'][0]['Database'][0]['db']
-	table = config['DAQ'][0]['Database'][0]['table']
-	user = config['DAQ'][0]['Database'][0]['user']
-	pswd = config['DAQ'][0]['Database'][0]['pswd']
-	
-	sec0 = float(datetime.datetime.now().strftime('%s'))
-	while True: 
-		h = logging.StreamHandler()
-		file = logging.basicConfig(filename=log_dir+'error_log_%s.log'%(datetime.datetime.now().strftime("%Y_%m")),format='%(levelname)s:%(message)s',level=logging.WARNING)
-		
-		sec1 = float(datetime.datetime.now().strftime('%s'))
-		if sec1 - sec0 >= config['DAQ'][0]['Collection'][0]['Interval']:
-			run = True
-			sec0 = sec1
-		else:
-			run = False
-		
-		if run:
-			dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-			
-			data,labels = [],[]
-			retry = config['DAQ'][0]['Collection'][0]['Retries']
-			for device in config['DAQ'][0]["Devices"]:
-			
-				""" Read channels on modbus device """
-				instr = _define_device(device,config)
-				
-				''' Read Multiple (16 bit) Registers in a Row '''
-				if config['%s'%device][0]['Connection'][0]['consecutive_channels']:
-				
-					dm = []
-					i = 0
-					while i < retry:
-						try:
-							start = (config['%s'%device][0]['consecutive_channels'][0])
-							number = (len(config['%s'%device][0]['consecutive_channels']))
-							"""TODO: Convert value if negative (read_registers() outputs unsigned int16 in the range 0 to 65535)"""
-							dm = instr.read_registers(start,number,functioncode=config['%s'%device][0]['Connection'][0]['fcode'])								
-							break
-						except:
-							if i == retry-1:
-								dm = [np.nan] * len(config['%s'%device][0]['consecutive_channels'])
-								logging.warning('Device Connection Fail: Device %s at %s'%(device,dt))
-							else:
-								pass
-						i += 1
-				
-				''' Read Single (16 bit) Register at a time '''	
-				if config['%s'%device][0]['Connection'][0]['single_channels']:
-					ds = []
-					for chan,chan_signed in zip(config['%s'%device][0]['single_channels'],config['%s'%device][0]['single_channels_signed']):
-						i = 0
-						while i < retry:
-							try:
-								d = [instr.read_register(chan, numberOfDecimals=0, functioncode=config['%s'%device][0]['Connection'][0]['fcode'], signed=chan_signed)]
-								break
-							except:
-								if i == retry-1:
-									d = [np.nan] 
-									logging.warning('Device Connection Fail: Device %s, Channel %s, at %s'%(device,chan,dt))
-								else:
-									pass
-							i += 1
-						ds.extend(d)
-				dm.extend(ds)
-	
-				''' Scale channel values '''
-				try:
-					d = [a*b for a,b in zip(config['%s'%device][0]['Scale'],dm)]
-				except:
-					d = [np.nan] * len(dm)
-					logging.warning('Data Scale Fail: Device %s at %s'%(device,dt))
-					
-				data.extend(d)
-				labels.extend(config['%s'%device][0]['Name'])
-
-			''' Add datetime to collected channel values and labels '''
-			data.extend([dt])
-			labels.extend(['datetime'])
-			
-			''' Convert collected data into pandas DataFrame format '''
-			df = pd.DataFrame(data).T
-			df.columns = labels
-			df = df.where((pd.notnull(df)),None)
-			print df
-
-			''' Insert datat into database '''
-			_mysql_insert(user,pswd,host,db,dt)
+def device_to_client(config):
+    """
+    Read channels on modbus device, scale the values, and store in a MySQL database.
+    The inputs are provided by a dictonary that describe general information for
+    data aquistion and devices.
+    
+    Parameters
+    ----------
+    config : dictionary
+        Configuration options, see :ref:`devicetoclient_config`
+    """ 
+    
+    # Extract Database Information
+    sec0 = float(datetime.datetime.now().strftime('%s'))
+    while True: 
+        logging.info('Device to client: '+str(datetime.datetime.now()))
+        sec1 = float(datetime.datetime.now().strftime('%s'))
+        if sec1 - sec0 >= config['Client']['Interval']:
+            run = True
+            sec0 = sec1
+        else:
+            run = False
+        
+        if run:
+            dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            labels = []
+            retry = config['Client']['Retries']
+            for device in config['Devices']:
+                # Read channels on modbus device 
+                instr = minimalmodbus.Instrument(device['USB'],device['Address'])
+                instr.serial.baudrate = device['Baud']
+                instr.serial.bytesize = device['Bytes']
+                instr.serial.stopbits = device['Stopbits']
+                instr.serial.parity = device['Parity']
+                
+                for data in device['Data']:
+                    ds = []
+                    chan = data['Channel']
+                    chan_signed = data['Signed']
+                    i = 0
+                    while i < retry:
+                        try:
+                            d = [instr.read_register(chan, numberOfDecimals=data['Scale'], 
+                                                         functioncode=data['fcode'], signed=chan_signed)]
+                            break
+                        except:
+                            if i == retry-1:
+                                d = [np.nan] 
+                            else:
+                                pass
+                        i += 1
+                    ds.extend(d)
+                    ds = ds*data['Conversion']                                    
+                
+                labels.extend(device['Name'])
+            
+            # Add datetime to collected channel values and labels
+            ds.extend([dt])
+            labels.extend(['datetime'])
+            logging.info(ds)
+            
+            # Convert collected data into pandas DataFrame format
+            df = pd.DataFrame(ds).T
+            df.columns = labels
+            df = df.where((pd.notnull(df)),None)
+            
+            # Insert datat into database 
+            ### config['Client']['Port'] was never used
+            try:
+                # Connect to database
+                engine = create_engine('mysql://'+config['Client']['Username']+ \
+                                       ':'+config['Client']['Password']+'@'+ \
+                                        config['Client']['IP']+'/'+ \
+                                        config['Client']['Database'])	
+                # Write DataFrame to database
+                df.to_sql(name=config['Client']['Table'],con=engine, 
+                          if_exists='append', index=False) #,dtype = data_type)		
+            except:
+                logging.warning('MySQL Insert Fail: at %s'%(dt))

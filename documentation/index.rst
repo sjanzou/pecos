@@ -41,6 +41,7 @@ Contents
    scheduler
    results
    applications
+   devicetoclient
    license
    whatsnew
    developers
