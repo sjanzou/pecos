@@ -434,7 +434,7 @@ def device_to_client(config):
         
         if run:
             dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            labels = []
+            labels,dall = [],[]
             retry = config['Client']['Retries']
             for device in config['Devices']:
                 # Read channels on modbus device 
@@ -444,37 +444,40 @@ def device_to_client(config):
                 instr.serial.stopbits = device['Stopbits']
                 instr.serial.parity = device['Parity']
                 
+                ds,ls = [],[]
                 for data in device['Data']:
-                    ds = []
-                    chan = data['Channel']
-                    chan_signed = data['Signed']
                     i = 0
                     while i < retry:
+                        l = data['Name']
                         try:
-                            d = [instr.read_register(chan, numberOfDecimals=data['Scale'], 
-                                                         functioncode=data['fcode'], signed=chan_signed)]
+                            d = instr.read_register(data['Channel'], 
+                            						numberOfDecimals=data['Scale'], 
+                            						functioncode=data['Fcode'], 
+                            						signed=data['Signed']) * data['Conversion']
                             break
                         except:
                             if i == retry-1:
-                                d = [np.nan] 
+                                d = np.nan
                             else:
                                 pass
                         i += 1
-                    ds.extend(d)
-                    ds = ds*data['Conversion']                                    
+
+                    ds.append(d)
+                    ls.append(l) 
                 
-                labels.extend(device['Name'])
-            
+                dall.extend(ds)
+                labels.extend(ls)  
+
             # Add datetime to collected channel values and labels
-            ds.extend([dt])
+            dall.extend([dt])
             labels.extend(['datetime'])
             logging.info(ds)
-            
+  
             # Convert collected data into pandas DataFrame format
-            df = pd.DataFrame(ds).T
+            df = pd.DataFrame(dall).T
             df.columns = labels
             df = df.where((pd.notnull(df)),None)
-            
+
             # Insert datat into database 
             ### config['Client']['Port'] was never used
             try:
@@ -487,4 +490,4 @@ def device_to_client(config):
                 df.to_sql(name=config['Client']['Table'],con=engine, 
                           if_exists='append', index=False) #,dtype = data_type)		
             except:
-                logging.warning('MySQL Insert Fail: at %s'%(dt))
+                pass
