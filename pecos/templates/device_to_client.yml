@@ -1,12 +1,12 @@
 Client: 
   IP: 127.0.0.1
   Port: 3306
-  Database: solar
-  Table: predicts
-  Username: myusername
-  Password: mypassword
+  Database: db name
+  Table: table name
+  Username: username
+  Password: password
   Interval: 1 
-  Retries: 5
+  Retries: 2
 
 Devices: 
 - Name: Device1
@@ -20,8 +20,24 @@ Devices:
   Data:
   - Name: AmbientTemp
     Type: Temp
-    Scale: 0.10
-    Conversion: 1.5
-    Channel: 4
+    Scale: 1
+    Conversion: 1.0
+    Channel: 0
+    Signed: True
+    Fcode: 4
+- Name: Device2
+  USB: /dev/ttyUSB0       
+  Address: 21        
+  Baud: 9600
+  Parity: N
+  Bytes: 8
+  Stopbits: 1
+  Timeout: 0.05
+  Data:
+  - Name: DC Power
+    Type: Power
+    Scale: 1
+    Conversion: 1.0
+    Channel: 0
     Signed: True
     Fcode: 4
