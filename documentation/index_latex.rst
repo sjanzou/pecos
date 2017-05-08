@@ -18,6 +18,7 @@ Performance Monitoring using Pecos
    scheduler
    results
    applications
+   daq
    license
    reference
 

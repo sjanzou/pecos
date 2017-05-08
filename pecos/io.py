@@ -411,9 +411,9 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
 
 def device_to_client(config):
     """
-    Read channels on modbus device, scale the values, and store in a MySQL database.
-    The inputs are provided by a dictonary that describe general information for
-    data aquistion and devices.
+    Read channels on modbus device, scale and calibrate the values, and store teh data in a MySQL database.
+    The inputs are provided by a configuration dictonary that describe general information for
+    data aquistion and the devices.
     
     Parameters
     ----------
@@ -479,7 +479,6 @@ def device_to_client(config):
             df = df.where((pd.notnull(df)),None)
 
             # Insert datat into database 
-            ### config['Client']['Port'] was never used
             try:
                 # Connect to database
                 engine = create_engine('mysql://'+config['Client']['Username']+ \

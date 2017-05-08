@@ -41,7 +41,7 @@ Contents
    scheduler
    results
    applications
-   devicetoclient
+   daq
    license
    whatsnew
    developers

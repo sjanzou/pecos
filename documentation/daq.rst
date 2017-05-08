@@ -37,20 +37,20 @@ The configuration options are described below.
   * **USB**: serial connection (string) e.g. /dev/ttyUSB0 for linux
   * **Address**: modbus slave address (string)       
   * **Baud**: data transfer rate in bits per second (integer)
-  * **Parity**: set parity of transmitted data for error checking (string) Possible values: N, E, O
+  * **Parity**: parity of transmitted data for error checking (string). Possible values: N, E, O
   * **Bytes**: number of data bits (integer)
   * **Stopbits**: number of stop bits (integer)
   * **Timeout**: read timeout value in seconds (integer)  
   * **Data**: A list of dictionaries that contain information about each data stream (one dictionary per data stream). 
     Each dictionary has the following keys:
   
-    * **Name**: Data name (string)
-    * **Type**: Data type (string)
-    * **Scale**: Scaling factor (integer)
-    * **Conversion**: Conversion factor (float)
-    * **Channel**: Register number (integer)
-    * **Signed**: define if the data should be interpreted as unsigned or signed.  Can be True or False (bool)
-    * **Fcode**: modbus function code.  Can be 3 or 4 (integer) 
+    * **Name**: data name (string)
+    * **Type**: data type (string)
+    * **Scale**: scaling factor (integer)
+    * **Conversion**: conversion factor (float)
+    * **Channel**: register number (integer)
+    * **Signed**: define data as unsigned or signed (bool)
+    * **Fcode**: modbus function code (integer). Possible values: 3,4
 
 Example configuration options are shown below.
 
