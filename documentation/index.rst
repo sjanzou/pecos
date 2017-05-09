@@ -41,6 +41,7 @@ Contents
    scheduler
    results
    applications
+   daq
    license
    whatsnew
    developers

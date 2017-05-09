@@ -14,7 +14,13 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-    
+
+try:
+    from sqlalchemy import create_engine
+    import minimalmodbus 
+except:
+    pass
+
 try:
     from nose.tools import nottest as _nottest
 except ImportError:
@@ -402,3 +408,85 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     version = pecos.__version__
 
     return template.render(**locals())
+
+def device_to_client(config):
+    """
+    Read channels on modbus device, scale and calibrate the values, and store teh data in a MySQL database.
+    The inputs are provided by a configuration dictonary that describe general information for
+    data aquistion and the devices.
+    
+    Parameters
+    ----------
+    config : dictionary
+        Configuration options, see :ref:`devicetoclient_config`
+    """ 
+    
+    # Extract Database Information
+    sec0 = float(datetime.datetime.now().strftime('%s'))
+    while True: 
+        logging.info('Device to client: '+str(datetime.datetime.now()))
+        sec1 = float(datetime.datetime.now().strftime('%s'))
+        if sec1 - sec0 >= config['Client']['Interval']:
+            run = True
+            sec0 = sec1
+        else:
+            run = False
+        
+        if run:
+            dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            labels,dall = [],[]
+            retry = config['Client']['Retries']
+            for device in config['Devices']:
+                # Read channels on modbus device 
+                instr = minimalmodbus.Instrument(device['USB'],device['Address'])
+                instr.serial.baudrate = device['Baud']
+                instr.serial.bytesize = device['Bytes']
+                instr.serial.stopbits = device['Stopbits']
+                instr.serial.parity = device['Parity']
+                
+                ds,ls = [],[]
+                for data in device['Data']:
+                    i = 0
+                    while i < retry:
+                        l = data['Name']
+                        try:
+                            d = instr.read_register(data['Channel'], 
+                            						numberOfDecimals=data['Scale'], 
+                            						functioncode=data['Fcode'], 
+                            						signed=data['Signed']) * data['Conversion']
+                            break
+                        except:
+                            if i == retry-1:
+                                d = np.nan
+                            else:
+                                pass
+                        i += 1
+
+                    ds.append(d)
+                    ls.append(l) 
+                
+                dall.extend(ds)
+                labels.extend(ls)  
+
+            # Add datetime to collected channel values and labels
+            dall.extend([dt])
+            labels.extend(['datetime'])
+            logging.info(ds)
+  
+            # Convert collected data into pandas DataFrame format
+            df = pd.DataFrame(dall).T
+            df.columns = labels
+            df = df.where((pd.notnull(df)),None)
+
+            # Insert datat into database 
+            try:
+                # Connect to database
+                engine = create_engine('mysql://'+config['Client']['Username']+ \
+                                       ':'+config['Client']['Password']+'@'+ \
+                                        config['Client']['IP']+'/'+ \
+                                        config['Client']['Database'])	
+                # Write DataFrame to database
+                df.to_sql(name=config['Client']['Table'],con=engine, 
+                          if_exists='append', index=False) #,dtype = data_type)		
+            except:
+                pass

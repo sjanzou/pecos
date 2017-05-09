@@ -29,3 +29,5 @@ Some high-level features include:
   run each day to analyze data collected on the previous day). 
   
 * HTML formatted reports can be sent via email or hosted on a website.  
+
+* Data acquisition methods can be used to transfer data from sensors to an SQL database. 

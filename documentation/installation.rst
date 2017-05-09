@@ -43,6 +43,10 @@ Required Python package dependencies include:
 
 Optional Python packages dependencies include:
 
+* minimalmodbus: used to collect data from a modbus device, 
+  https://minimalmodbus.readthedocs.io
+* sqlalchemy: used to insert data into a MySQL database,
+  https://www.sqlalchemy.org/
 * pyyaml: used to store configuration options in human readable data format,
   http://pyyaml.org/
 * PVLIB [SHFH16]_: used to simulate the performance of photovoltaic energy systems,
