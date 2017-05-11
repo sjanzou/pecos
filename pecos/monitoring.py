@@ -525,18 +525,16 @@ class PerformanceMonitoring(object):
         argmin_df = df.rolling(window_str).apply(np.nanargmin) 
         # Replace nan with 0
         argmax_df[argmax_df.isnull()] = 0 
-        argmin_df[argmin_df.isnull()] = 0
-        # Convert to int
-        argmax_df = argmax_df.astype(int)
-        argmin_df = argmin_df.astype(int)
-                            
+        argmin_df[argmin_df.isnull()] = 0               
         # Shift the position to account for the moving window
         rng = pd.date_range(df.index[0], periods=2, freq=window_str)
         nshift = (df.index < rng[1]).sum()
-        
         index_shift = pd.Series(np.append(np.zeros(nshift-1), np.arange(len(df)-(nshift-1))), index=df.index)
         argmax_df = argmax_df.add(index_shift, axis=0)
         argmin_df = argmin_df.add(index_shift, axis=0)
+         # Convert to int
+        argmax_df = argmax_df.astype(int)
+        argmin_df = argmin_df.astype(int)
         
         # Extract the max/min time in each window
         tmax_df = pd.DataFrame(argmax_df.index[argmax_df], 
