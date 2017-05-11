@@ -11,6 +11,7 @@ Quality controls tests fall into five categories:
 * Corrupt data
 * Range
 * Increment
+* Delta
 
 Timestamp test
 --------------------
@@ -71,21 +72,21 @@ checks for data with values -999 or 999 in the entire DataFrame.
 
 Range test
 --------------------
-The :class:`~pecos.monitoring.PerformanceMonitoring.check_range` method is used to check that data is within an expected range.
+The :class:`~pecos.monitoring.PerformanceMonitoring.check_range` method is used to check if data is within expected bounds.
 Range tests are very flexible.  The test can be used to check for expected range on modeled
 vs. measured values (i.e. absolute error or relative error) or an expected
 relationships between data columns (i.e. column A divided by column B). 
 An upper bound, lower bound or both can be specified.  
-Additionally, the data can be smoothed using a rolling mean.
+Additionally, the data can be smoothed using a rolling mean before the test is run.
 Input includes:
 
 * Upper and lower bound
 
 * Data column (default = all columns)
 
-* Rolling mean window (default = 1 timestamp, which indicates no rolling mean)
+* Rolling window used to smooth the data before test is run (default = 0)
 
-* Minimum number of consecutive failures for reporting (default = 1 timestamp)
+* Minimum number of consecutive failures for reporting (default = 1)
 
 For example::
 
@@ -96,11 +97,11 @@ using a rolling average of 2 time steps.
 
 Increment test
 --------------------
-The :class:`~pecos.monitoring.PerformanceMonitoring.check_increment` method is used to check that the difference between 
-consecutive data values (or other specified increment) is within an expected range.
+The :class:`~pecos.monitoring.PerformanceMonitoring.check_increment` method is used to check if the difference between 
+consecutive data values (or other specified increment) is within expected bounds.
 This method can be used to test if data is not changing or if the data has an 
 abrupt change.  Like the check_range method, the user can specify if the data
-should be smoothed using a rolling mean.  
+should be smoothed using a rolling mean before the test is run.  
 Input includes:
 
 * Upper and lower bound
@@ -111,9 +112,9 @@ Input includes:
 
 * Flag indicating if the absolute value is taken (default = True)
 
-* Rolling mean window (default = 1 timestamp, which indicates no rolling mean)
+* Rolling window used to smooth the data before test is run (default = 0)
 
-* Minimum number of consecutive failures for reporting (default = 1 timestamp)
+* Minimum number of consecutive failures for reporting (default = 1)
 
 For example::
 
@@ -121,7 +122,39 @@ For example::
 
 checks if value increments are greater than 0.000001 for 60 consecutive time steps::
 
-	pm.check_increment([-800, None], absolute_value = False)
+	pm.check_increment([-800, None], absolute_value=False)
 
 checks if value increments decrease by more than -800 in a single time step.
 
+Delta test
+--------------------
+The :class:`~pecos.monitoring.PerformanceMonitoring.check_delta` method is used to check if the difference between 
+the minimum and maximum data value within a moving window is within expected bounds.
+As compared to the check_increment test, this method is intended to be a more robust way of 
+checking if data is not changing or if the data has an 
+abrupt change.  Currently, this method is not efficient for large data sets (> 100000 pts). 
+Like the check_range method, the user can specify if the data
+should be smoothed using a rolling mean before the test is run.  
+Input includes:
+
+* Upper and lower bound
+
+* Data column (default = all columns)
+
+* Size of the moving window used to compute the difference between the minimum and maximum (default = 3600 seconds)
+
+* Flag indicating if the absolute value is taken (default = True)
+
+* Rolling window used to smooth the data before test is run (default = 0)
+
+* Minimum number of consecutive failures for reporting (default = 1)
+
+For example::
+
+	pm.check_delta([None, 0.000001], window=3600)
+
+checks if data changes by more than 0.000001 in 1 hour::
+
+	pm.check_delta([-800, None], window=1800, absolute_value=False)
+
+checks if data decrease by more than -800 in 30 minutes.

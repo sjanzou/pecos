@@ -123,7 +123,6 @@ class Test_simple_example(unittest.TestCase):
              ('', '', pd.Timestamp('2015-01-01 05:00:00'), pd.Timestamp('2015-01-01 05:00:00'), 1.0, 'Missing timestamp')],
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
 
-
         assert_frame_equal(test_results, expected, check_dtype=False)
 
     def test_check_missing(self):
@@ -194,10 +193,32 @@ class Test_simple_example(unittest.TestCase):
         Column C does not follow the expected sine function from 13:00 until 16:15. The change is abrupt and gradually corrected.
         """
         expected = pd.DataFrame(
-            [('Simple', 'A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:30:00'), 10.0, 'Increment < lower bound, 0.0001'),
-             ('Simple', 'C', pd.Timestamp('2015-01-01 13:00:00'), pd.Timestamp('2015-01-01 13:00:00'), 1.0, 'Increment > upper bound, 0.6')],
+            [('Simple', 'A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:30:00'), 10.0, '|Increment| < lower bound, 0.0001'),
+             ('Simple', 'C', pd.Timestamp('2015-01-01 13:00:00'), pd.Timestamp('2015-01-01 13:00:00'), 1.0, '|Increment| > upper bound, 0.6')],
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
 
+        assert_frame_equal(temp, expected, check_dtype=False)
+    
+    def test_check_delta(self):
+        self.pm.check_corrupt([-999])
+        self.pm.check_delta([0.0001, None], window=2*3600)
+        self.pm.check_delta([None, 0.6], 'Wave', window=1800)
+
+        temp = self.pm.test_results[['Delta' in ef for ef in self.pm.test_results['Error Flag']]]
+        temp.index = np.arange(temp.shape[0])
+
+        """
+        Column A has the same value (0.5) from 12:00 until 14:30
+        Column C does not follow the expected sine function from 13:00 until 16:15. The change is abrupt and gradually corrected.
+        """
+        expected = pd.DataFrame(
+            [('Simple', 'A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:15:00'), 9.0, '|Delta| < lower bound, 0.0001'),
+             ('Simple', 'C', pd.Timestamp('2015-01-01 09:45:00'), pd.Timestamp('2015-01-01 09:45:00'), 1.0, '|Delta| < lower bound, 0.0001'), # this is included because of the preceding NaNs
+             ('Simple', 'C', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 13:00:00'), 2.0, '|Delta| > upper bound, 0.6')],
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+        
+        print(temp)
+        print(expected)
         assert_frame_equal(temp, expected, check_dtype=False)
 
     def test_composite_signal(self):
@@ -268,11 +289,11 @@ class Test_simple_example(unittest.TestCase):
 2                                      2015-01-01 17:00:00-07:00  2015-01-01 17:00:00-07:00         1              Duplicate timestamp
 3                                      2015-01-01 05:00:00-07:00  2015-01-01 05:00:00-07:00         1                Missing timestamp
 4               Wave Absolute Error C  2015-01-01 13:00:00-07:00  2015-01-01 14:45:00-07:00         8         Data > upper bound, 0.25
-5       Simple                      A  2015-01-01 12:15:00-07:00  2015-01-01 14:30:00-07:00        10  Increment < lower bound, 0.0001
+5       Simple                      A  2015-01-01 12:15:00-07:00  2015-01-01 14:30:00-07:00        10  |Increment| < lower bound, 0.0001
 6       Simple                      B  2015-01-01 06:30:00-07:00  2015-01-01 06:30:00-07:00         1            Data < lower bound, 0
 7       Simple                      B  2015-01-01 15:30:00-07:00  2015-01-01 15:30:00-07:00         1            Data > upper bound, 1
 8       Simple                      C  2015-01-01 07:30:00-07:00  2015-01-01 09:30:00-07:00         9                     Corrupt data
-9       Simple                      C  2015-01-01 13:00:00-07:00  2015-01-01 13:00:00-07:00         1     Increment > upper bound, 0.6
+9       Simple                      C  2015-01-01 13:00:00-07:00  2015-01-01 13:00:00-07:00         1     |Increment| > upper bound, 0.6
 10      Simple                      D  2015-01-01 17:45:00-07:00  2015-01-01 18:15:00-07:00         3                     Missing data
 11      Simple                      D  2015-01-01 11:15:00-07:00  2015-01-01 11:15:00-07:00         1           Data < lower bound, -1
 12      Simple                      D  2015-01-01 12:45:00-07:00  2015-01-01 12:45:00-07:00         1           Data < lower bound, -1
@@ -327,7 +348,7 @@ class Test_get_time(unittest.TestCase):
         assert_list_equal(clock_time.iloc[:,0].values.tolist(), expected.tolist())
 
 
-class Test_check_exact_times(unittest.TestCase):
+class Test_check_timestamp(unittest.TestCase):
 
     @classmethod
     def setUp(self):
@@ -336,7 +357,7 @@ class Test_check_exact_times(unittest.TestCase):
         index = pd.DatetimeIndex([pd.Timestamp('20161017 01:05:00'),
                                   pd.Timestamp('20161017 03:03:00'),
                                   pd.Timestamp('20161017 03:50:00')])
-        df = pd.DataFrame({'test': [0, 2, 3]}, index=index)
+        df = pd.DataFrame({'A': [0, 2, 3], 'B': [4, np.nan, 6]}, index=index)
 
         self.pm = pecos.monitoring.PerformanceMonitoring()
         self.pm.add_dataframe(df, 'Test')
@@ -376,3 +397,68 @@ class Test_check_exact_times(unittest.TestCase):
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
+
+class Test_check_delta(unittest.TestCase):
+
+    @classmethod
+    def setUp(self):
+        index = pd.date_range('1/1/2017', periods=24, freq='H')
+        data = {'A': [0.5,-0.3,0.2,0,0.5,-0.45,0.35,-0.4,0.5,1.5,0.5,-0.5,0.5,-0.5,5,6,10,10.5,10,10.3,10,10.8,10,9.9], 
+                'B': [0,1,2.2,3,3.8,5,6,7.1,8,9,10,5,-2,1,0,0.5,0,5,3,9.5,8.2,7,np.nan,5]}
+        df = pd.DataFrame(data, index=index)
+        trans = dict(zip(df.columns, [[col] for col in df.columns]))
+        
+        self.pm = pecos.monitoring.PerformanceMonitoring()
+        self.pm.add_dataframe(df, 'Test')
+        self.pm.add_translation_dictionary(trans, 'Test')
+
+    @classmethod
+    def tearDown(self):
+        pass
+    
+    def test_deadsensor(self):
+        # dead sensor = < 1 in 5 hours
+        self.pm.check_delta([1, None], window=5*3600+1, absolute_value=True)
+        expected = pd.DataFrame(
+            array([['Test', 'A', Timestamp('2017-01-01 00:00:00'), Timestamp('2017-01-01 05:00:00'), 6, '|Delta| < lower bound, 1'],
+                   ['Test', 'A', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 23:00:00'), 8, '|Delta| < lower bound, 1']], dtype=object),
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            index=RangeIndex(start=0, stop=2, step=1)
+            )
+        print(self.pm.test_results)
+        
+        assert_frame_equal(expected, self.pm.test_results)
+        
+    def test_abrupt_change(self):
+        # abrupt change = > 7 in 3 hours
+        self.pm.check_delta([None, 7], window=3*3600+1, absolute_value=True)
+        expected = pd.DataFrame(
+            array([['Test', 'A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, '|Delta| > upper bound, 7'],
+                   ['Test', 'B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, '|Delta| > upper bound, 7'],
+                   ['Test', 'B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, '|Delta| > upper bound, 7']], dtype=object),
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            index=RangeIndex(start=0, stop=3, step=1)
+            )
+        assert_frame_equal(expected, self.pm.test_results)
+        
+    def test_abrupt_positive_change(self):
+        # abrupt positive change = > 7 in 3 hours
+        self.pm.check_delta([None, 7], window=3*3600+1, absolute_value=False)
+        expected = pd.DataFrame(
+            array([['Test', 'A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, 'Delta > upper bound, 7'],
+                   ['Test', 'B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, 'Delta > upper bound, 7']], dtype=object),
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            index=RangeIndex(start=0, stop=2, step=1)
+            )
+        assert_frame_equal(expected, self.pm.test_results)
+        
+    def test_abrupt_negative_change(self):
+        # abrupt negative change = < -7 in 3 hours
+        self.pm.check_delta([-7, None], window=3*3600+1, absolute_value=False)
+        expected = pd.DataFrame(
+            array([['Test', 'B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, 'Delta < lower bound, -7']], dtype=object),
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            index=RangeIndex(start=0, stop=1, step=1)
+            )
+        assert_frame_equal(expected, self.pm.test_results)
+
