@@ -124,7 +124,7 @@ class PerformanceMonitoring(object):
             logger.warning("Add signal failed: " + col_name)
             return
 
-    def append_test_results(self, mask, error_msg, min_failures=1, variable_name=True): #, sub_df=None):
+    def append_test_results(self, mask, error_msg, min_failures=1, use_mask_only=False): 
         """
         Append QC results to the PerformanceMonitoring object.
 
@@ -139,11 +139,14 @@ class PerformanceMonitoring(object):
         min_failures : int (optional)
             Minimum number of consecutive failures required for reporting, default = 1
 
-        variable_name : boolean  (optional)
-            Add variable name to QC results, set to False for timestamp tests, default = True
+        use_mask_only : boolean  (optional)
+            When True, the mask is used directly to determine test 
+            results and the system/variable name is not included in the test_results.
+            When False, the mask is used in combination with pm.df
+            to extract test results. Default = False
         """
-        if len(mask.columns) == 1 and mask.columns[0] == 0:
-            sub_df = self.df
+        if use_mask_only:
+            sub_df = mask 
         else:
             sub_df = self.df[mask.columns]
 
@@ -180,16 +183,17 @@ class PerformanceMonitoring(object):
         for i in range(len(block['Start Col'])):
             length = block['Stop Row'][i] - block['Start Row'][i] + 1
             if length >= min_failures:
-                if variable_name:
+                if use_mask_only:
+                    var_name = ''
+                    system_name = ''
+                else:
                     var_name = sub_df.iloc[:,block['Start Col'][i]].name #sub_df.icol(block['Start Col'][i]).name
                     system_name = ''
                     temp = var_name.split(':')
                     if len(temp) == 2:
                         var_name = temp[1]
                         system_name = temp[0]
-                else:
-                    var_name = ''
-                    system_name = ''
+                    
                 frame = pd.DataFrame([system_name, var_name,
                                       sub_df.index[block['Start Row'][i]],
                                       sub_df.index[block['Stop Row'][i]],
@@ -252,7 +256,7 @@ class PerformanceMonitoring(object):
         mask.columns = [0]
 
         self.append_test_results(mask, 'Nonmonotonic timestamp',
-                                 variable_name=False,
+                                 use_mask_only=True,
                                  min_failures=min_failures)
 
         # If not monotonic, sort df by timestamp
@@ -277,36 +281,33 @@ class PerformanceMonitoring(object):
         self.df.drop_duplicates(subset='TEMP', keep='first', inplace=True)
 
         self.append_test_results(mask, 'Duplicate timestamp',
-                                 variable_name=False,
+                                 use_mask_only=True,
                                  min_failures=min_failures)
         del self.df['TEMP']
         
         if exact_times:
-            missing = []
-            for i in rng:
-                if i not in self.df.index:
-                    missing.append(i)
+            temp = pd.Index(rng)
+            missing = temp.difference(self.df.index).tolist()
             # reindex dataframe
             self.df = self.df.reindex(index=rng)
             mask = pd.DataFrame(data=self.df.shape[0]*[False],
                                 index=self.df.index)
             mask.loc[missing] = True
             self.append_test_results(mask, 'Missing timestamp',
-                                 variable_name=False,
+                                 use_mask_only=True,
                                  min_failures=min_failures)
         else:
             # uses pandas >= 0.18 resample syntax
-            df_index = self.df.index
-            mask = self.df.resample('{}s'.format(frequency)).count() == 0
-            self.df.index = mask.index
+            df_index = pd.DataFrame(index=self.df.index)
+            df_index[0]=1 # populate with placeholder values
+            mask = df_index.resample('{}s'.format(frequency)).count() == 0
             self.append_test_results(mask, 'Missing timestamp',
-                                 variable_name=False,
+                                 use_mask_only=True,
                                  min_failures=min_failures)
-            self.df.index = df_index
         
-    def check_range(self, bound, key=None, specs={}, rolling_mean=1, min_failures=1):
+    def check_range(self, bound, key=None, specs={}, rolling_mean=0, min_failures=1):
         """
-        Check data range.
+        Check bounds on data.
 
         Parameters
         ----------
@@ -320,12 +321,13 @@ class PerformanceMonitoring(object):
             Constants used in bound
 
         rolling_mean : int (optional)
-            Rolling mean window in number of time steps, default = 1
+            Size of the moving window (in seconds) used to smooth data using a
+            rolling mean before the test is run, default = 0 (i.e., not used)
 
         min_failures : int (optional)
             Minimum number of consecutive failures required for reporting, default = 1
         """
-        logger.info("Check variable ranges")
+        logger.info("Check data range")
 
         if self.df.empty:
             logger.info("Empty database")
@@ -344,8 +346,9 @@ class PerformanceMonitoring(object):
             df = self.df
 
         # Compute moving average
-        if rolling_mean > 1:
-            df = pd.rolling_mean(df, rolling_mean)
+        if rolling_mean > 0:
+            rolling_mean_str = str(rolling_mean) + 's' 
+            df = df.rolling(rolling_mean_str).mean()
 
         # Evaluate strings for bound values
         for i in range(len(bound)):
@@ -360,7 +363,7 @@ class PerformanceMonitoring(object):
             if not tfilter.empty:
                 mask[~tfilter] = False
             if mask.sum(axis=1).sum(axis=0) > 0:
-                self.append_test_results(mask, 'Data < lower bound, '+str(bound[0]), min_failures=min_failures) # sub_df=df)
+                self.append_test_results(mask, 'Data < lower bound, '+str(bound[0]), min_failures=min_failures) 
 
         # Upper Bound
         if bound[1] is not None:
@@ -368,11 +371,12 @@ class PerformanceMonitoring(object):
             if not tfilter.empty:
                 mask[~tfilter] = False
             if mask.sum(axis=1).sum(axis=0) > 0:
-                self.append_test_results(mask, 'Data > upper bound, '+str(bound[1]), min_failures=min_failures) #sub_df=df)
+                self.append_test_results(mask, 'Data > upper bound, '+str(bound[1]), min_failures=min_failures)
 
-    def check_increment(self, bound, key=None, specs={}, increment=1, absolute_value=True, rolling_mean=1, min_failures=1):
+    def check_increment(self, bound, key=None, specs={}, increment=1, 
+                        absolute_value=True, rolling_mean=0, min_failures=1):
         """
-        Check range on data increments.
+        Check bounds on the difference between data values separated by a set increment.
 
         Parameters
         ----------
@@ -392,7 +396,8 @@ class PerformanceMonitoring(object):
             Take the absolute value of the increment data, default = True
 
         rolling_mean : int (optional)
-            Rolling mean window in number of time steps, default = 1
+            Size of the moving window (in seconds) used to smooth data using a
+            rolling mean before the test is run, default = 0 (i.e., not used)
 
         min_failures : int (optional)
             Minimum number of consecutive failures required for reporting, default = 1
@@ -416,8 +421,9 @@ class PerformanceMonitoring(object):
             df = self.df
 
         # Compute moving average
-        if rolling_mean > 1:
-            df = pd.rolling_mean(df, rolling_mean)
+        if rolling_mean > 0:
+            rolling_mean_str = str(rolling_mean) + 's' 
+            df = df.rolling(rolling_mean_str).mean()
 
         # Compute interval
         if absolute_value:
@@ -431,14 +437,19 @@ class PerformanceMonitoring(object):
                 bound[i] = None
             elif type(bound[i]) is str:
                 bound[i] = self.evaluate_string('', bound[i], specs)
-
+        
+        if absolute_value:
+            error_flag_prefix = '|Increment|'
+        else:
+            error_flag_prefix = 'Increment'
+            
         # Lower Bound
         if bound[0] is not None:
             mask = (df < bound[0])
             if not tfilter.empty:
                 mask[~tfilter] = False
             if mask.sum(axis=1).sum(axis=0) > 0:
-                self.append_test_results(mask, 'Increment < lower bound, '+str(bound[0]), min_failures=min_failures) #sub_df=df)
+                self.append_test_results(mask, error_flag_prefix+' < lower bound, '+str(bound[0]), min_failures=min_failures) 
 
         # Upper Bound
         if bound[1] is not None:
@@ -446,7 +457,143 @@ class PerformanceMonitoring(object):
             if not tfilter.empty:
                 mask[~tfilter] = False
             if mask.sum(axis=1).sum(axis=0) > 0:
-                self.append_test_results(mask, 'Increment > upper bound, '+str(bound[1]), min_failures=min_failures) #sub_df=df)
+                self.append_test_results(mask, error_flag_prefix+' > upper bound, '+str(bound[1]), min_failures=min_failures) 
+
+    def check_delta(self, bound, key=None, specs={}, window=3600, 
+                    absolute_value=True, rolling_mean=0, min_failures=1):
+        """
+        Check bounds on the difference between max and min data values within 
+		 a rolling window (Note, this method is currently NOT efficient for large 
+        data sets (> 100000 pts) because it uses df.rolling().apply() to find 
+        the index of min and max and to work with NaNs).
+
+        Parameters
+        ----------
+        bound : list of floats
+            [lower bound, upper bound], None can be used in place of a lower 
+            or upper bound
+
+        key : string (optional)
+            Translation dictionary key. If not specified, all columns are used 
+            in the test.
+
+        specs : dictionary (optional)
+            Constants used in bound
+
+        window : int (optional)
+            Size of the moving window (in seconds) used to compute delta, 
+            default = 3600
+
+        absolute_value : boolean (optional)
+            Take the absolute value of delta, default = True
+
+        rolling_mean : int (optional)
+            Size of the moving window (in seconds) used to smooth data using a
+            rolling mean before the test is run, default = 0 (i.e., not used)
+
+        min_failures : int (optional)
+            Minimum number of consecutive failures required for reporting, 
+            default = 1
+        """
+        logger.info("Check delta (max-min) range")
+
+        if self.df.empty:
+            logger.info("Empty database")
+            return
+
+        tfilter = self.tfilter
+
+        # Isolate subset if key is not None
+        if key is not None:
+            try:
+                df = self.df[self.trans[key]]
+            except:
+                logger.warning("Insufficient data for Check Increment: " + key)
+                return
+        else:
+            df = self.df
+
+        # Compute moving average
+        if rolling_mean > 0:
+            rolling_mean_str = str(rolling_mean) + 's' 
+            df = df.rolling(rolling_mean_str).mean()
+        
+        window_str = str(window) + 's' 
+
+        # Extract the max/min position in each window
+        argmax_df = df.rolling(window_str).apply(np.nanargmax) 
+        argmin_df = df.rolling(window_str).apply(np.nanargmin) 
+        # Replace nan with 0
+        argmax_df[argmax_df.isnull()] = 0 
+        argmin_df[argmin_df.isnull()] = 0               
+        # Shift the position to account for the moving window
+        rng = pd.date_range(df.index[0], periods=2, freq=window_str)
+        nshift = (df.index < rng[1]).sum()
+        index_shift = pd.Series(np.append(np.zeros(nshift-1), np.arange(len(df)-(nshift-1))), index=df.index)
+        argmax_df = argmax_df.add(index_shift, axis=0)
+        argmin_df = argmin_df.add(index_shift, axis=0)
+         # Convert to int
+        argmax_df = argmax_df.astype(int)
+        argmin_df = argmin_df.astype(int)
+        
+        # Extract the max/min time in each window
+        tmax_df = pd.DataFrame(argmax_df.index[argmax_df], 
+                               columns=argmax_df.columns, index=argmax_df.index)
+        tmin_df = pd.DataFrame(argmin_df.index[argmin_df], 
+                               columns=argmin_df.columns, index=argmin_df.index)
+        
+        # Compute max difference in each window
+        diff_df = (df.rolling(window_str).apply(np.nanmax) - df.rolling(window_str).apply(np.nanmin))
+        diff_df.iloc[0:nshift-1,:] = np.nan # reset values without full window to nan
+        if not absolute_value:
+            reverse_order = tmax_df < tmin_df 
+            diff_df[reverse_order] = -diff_df[reverse_order]
+            
+        def extract_mask(thresh, tmin_df, tmax_df):
+            mask = pd.DataFrame(False, columns=thresh.columns, index=thresh.index)
+            reverse_order = tmax_df < tmin_df   
+            # Loop over thresh where condition is true
+            for t,col in list(thresh[thresh > 0].stack().index): 
+                start_time = tmin_df.loc[t,col]
+                end_time = tmax_df.loc[t,col]
+                if reverse_order.loc[t,col]:
+                    start_time = tmax_df.loc[t,col]
+                    end_time = tmin_df.loc[t,col]
+                mask.loc[t,col] = False # set the initial flaged location to false
+                mask.loc[start_time:end_time,col] = True # set the time between max and min to true
+            return mask
+        
+        # Evaluate strings for bound values
+        for i in range(len(bound)):
+            if bound[i] in none_list:
+                bound[i] = None
+            elif type(bound[i]) is str:
+                bound[i] = self.evaluate_string('', bound[i], specs)
+        
+        if absolute_value:
+            error_flag_prefix = '|Delta|'
+        else:
+            error_flag_prefix = 'Delta'
+            
+        # Lower Bound
+        if bound[0] is not None:
+            mask = (diff_df < bound[0])
+            mask = extract_mask(mask, tmin_df, tmax_df)
+            if not tfilter.empty:
+                mask[~tfilter] = False
+            if mask.sum(axis=1).sum(axis=0) > 0:
+                self.append_test_results(mask, error_flag_prefix+' < lower bound, '+str(bound[0]), 
+                                         min_failures=min_failures) 
+
+        # Upper Bound
+        if bound[1] is not None:
+            mask = (diff_df > bound[1])
+            mask = extract_mask(mask, tmin_df, tmax_df)
+            if not tfilter.empty:
+                mask[~tfilter] = False
+            if mask.sum(axis=1).sum(axis=0) > 0:
+                self.append_test_results(mask, error_flag_prefix+' > upper bound, '+str(bound[1]), 
+                                         min_failures=min_failures) 
 
     def check_missing(self, key=None, min_failures=1):
         """
