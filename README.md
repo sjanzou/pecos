@@ -1,4 +1,4 @@
-![Pecos](documentation/figures/logo.png =250x)
+![Pecos](documentation/figures/logo.png)
 =======================================
 
 [![TravisCI](https://travis-ci.org/sandialabs/pecos.svg?branch=master)](https://travis-ci.org/sandialabs/pecos)
