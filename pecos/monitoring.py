@@ -24,7 +24,7 @@ class PerformanceMonitoring(object):
                                                 'Start Date', 'End Date',
                                                 'Timesteps', 'Error Flag'])
 
-    def add_dataframe(self, df, system_name, add_identity_translation_dictionary = False):
+    def add_dataframe(self, df, system_name, add_identity_translation_dictionary=False):
         """
         Add DataFrame to the PerformanceMonitoring object.
 
@@ -465,7 +465,7 @@ class PerformanceMonitoring(object):
         Check bounds on the difference between max and min data values within 
 		 a rolling window (Note, this method is currently NOT efficient for large 
         data sets (> 100000 pts) because it uses df.rolling().apply() to find 
-        the index of min and max and to work with NaNs).
+        the position of the min and max).
 
         Parameters
         ----------
@@ -543,25 +543,27 @@ class PerformanceMonitoring(object):
                                columns=argmin_df.columns, index=argmin_df.index)
         
         # Compute max difference in each window
-        diff_df = (df.rolling(window_str).apply(np.nanmax) - df.rolling(window_str).apply(np.nanmin))
+        diff_df = df.rolling(window_str).max() - df.rolling(window_str).min() # ignores nan
         diff_df.iloc[0:nshift-1,:] = np.nan # reset values without full window to nan
         if not absolute_value:
             reverse_order = tmax_df < tmin_df 
             diff_df[reverse_order] = -diff_df[reverse_order]
             
-        def extract_mask(thresh, tmin_df, tmax_df):
-            mask = pd.DataFrame(False, columns=thresh.columns, index=thresh.index)
-            reverse_order = tmax_df < tmin_df   
-            # Loop over thresh where condition is true
-            for t,col in list(thresh[thresh > 0].stack().index): 
+        def extract_exact_position(mask1, tmin_df, tmax_df):
+            mask2 = pd.DataFrame(False, columns=mask1.columns, index=mask1.index)
+            # Loop over t, col in mask1 where condition is True
+            for t,col in list(mask1[mask1 > 0].stack().index): 
+                # set the initially flaged location to False
+                mask2.loc[t,col] = False 
+                # extract the start and end time
                 start_time = tmin_df.loc[t,col]
                 end_time = tmax_df.loc[t,col]
-                if reverse_order.loc[t,col]:
-                    start_time = tmax_df.loc[t,col]
-                    end_time = tmin_df.loc[t,col]
-                mask.loc[t,col] = False # set the initial flaged location to false
-                mask.loc[start_time:end_time,col] = True # set the time between max and min to true
-            return mask
+                # update mask2
+                if start_time < end_time:
+                    mask2.loc[start_time:end_time,col] = True # set the time between max and min to true
+                else:
+                    mask2.loc[end_time:start_time,col] = True # set the time between max and min to true
+            return mask2
         
         # Evaluate strings for bound values
         for i in range(len(bound)):
@@ -574,24 +576,24 @@ class PerformanceMonitoring(object):
             error_flag_prefix = '|Delta|'
         else:
             error_flag_prefix = 'Delta'
-            
+        
         # Lower Bound
         if bound[0] is not None:
             mask = (diff_df < bound[0])
-            mask = extract_mask(mask, tmin_df, tmax_df)
             if not tfilter.empty:
                 mask[~tfilter] = False
             if mask.sum(axis=1).sum(axis=0) > 0:
+                mask = extract_exact_position(mask, tmin_df, tmax_df)
                 self.append_test_results(mask, error_flag_prefix+' < lower bound, '+str(bound[0]), 
                                          min_failures=min_failures) 
 
         # Upper Bound
         if bound[1] is not None:
             mask = (diff_df > bound[1])
-            mask = extract_mask(mask, tmin_df, tmax_df)
             if not tfilter.empty:
                 mask[~tfilter] = False
             if mask.sum(axis=1).sum(axis=0) > 0:
+                mask = extract_exact_position(mask, tmin_df, tmax_df)
                 self.append_test_results(mask, error_flag_prefix+' > upper bound, '+str(bound[1]), 
                                          min_failures=min_failures) 
 

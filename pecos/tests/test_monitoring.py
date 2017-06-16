@@ -163,7 +163,7 @@ class Test_simple_example(unittest.TestCase):
 
         """
         Column B is below the expected lower bound of 0 at 6:30 and above the expected upper bound of 1 at 15:30
-        Column D is occasionally below the expected lower bound of -1 around midday (2 timesteps) and above the expected upper bound of 1 in the early morning and late evening (10 timesteps).
+        Column D is occasionally below the expected lower bound of -1 around midday (2 time steps) and above the expected upper bound of 1 in the early morning and late evening (10 time steps).
         """
         expected = pd.DataFrame(
             [('Simple', 'B', pd.Timestamp('2015-01-01 06:30:00'), pd.Timestamp('2015-01-01 06:30:00'), 1.0, 'Data < lower bound, 0'),
@@ -213,7 +213,7 @@ class Test_simple_example(unittest.TestCase):
         """
         expected = pd.DataFrame(
             [('Simple', 'A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:15:00'), 9.0, '|Delta| < lower bound, 0.0001'),
-             ('Simple', 'C', pd.Timestamp('2015-01-01 09:45:00'), pd.Timestamp('2015-01-01 09:45:00'), 1.0, '|Delta| < lower bound, 0.0001'), # this is included because of the preceding NaNs
+             ('Simple', 'C', pd.Timestamp('2015-01-01 07:15:00'), pd.Timestamp('2015-01-01 07:15:00'), 1.0, '|Delta| < lower bound, 0.0001'), # this is included because of the preceding NaNs
              ('Simple', 'C', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 13:00:00'), 2.0, '|Delta| > upper bound, 0.6')],
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
         
@@ -425,8 +425,6 @@ class Test_check_delta(unittest.TestCase):
             columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
-        print(self.pm.test_results)
-        
         assert_frame_equal(expected, self.pm.test_results)
         
     def test_abrupt_change(self):
@@ -440,7 +438,7 @@ class Test_check_delta(unittest.TestCase):
             index=RangeIndex(start=0, stop=3, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
-        
+    
     def test_abrupt_positive_change(self):
         # abrupt positive change = > 7 in 3 hours
         self.pm.check_delta([None, 7], window=3*3600+1, absolute_value=False)

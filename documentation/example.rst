@@ -36,7 +36,7 @@ of expected range, data that doesn't change, and data that changes abruptly, as 
 
 * Column D is missing data from 17:45 until 18:15
 
-* Column D is occasionally below the expected lower bound of -1 around midday (2 timesteps) and above the expected upper bound of 1 in the early morning and late evening (10 timesteps).
+* Column D is occasionally below the expected lower bound of -1 around midday (2 time steps) and above the expected upper bound of 1 in the early morning and late evening (10 time steps).
 
 The script, **simple_example.py** (shown below), is used to run quality control analysis using Pecos.
 The script performs the following steps:

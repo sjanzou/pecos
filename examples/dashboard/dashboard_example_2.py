@@ -1,6 +1,6 @@
 """
 This example is similar to dashboard_example_1.py, but the dashboard contains a
-colorblock for each system and location.  The color (red, yellow, green) 
+color indicator for each system and location.  The color (red, yellow, green) 
 is an indicator of the number of test failures.
 """
 import pecos
@@ -63,7 +63,7 @@ for location_name in locations:
         # Generate graphics
         test_results_graphics = pecos.graphics.plot_test_results(graphics_file_rootname, pm)
         plt.figure(figsize = (0.2,0.2))
-        pecos.graphics.plot_colorblock(QCI.values)
+        pecos.graphics.plot_heatmap(QCI)
         plt.savefig(colorblock_graphics_file, dpi=90, bbox_inches='tight', pad_inches = 0)
         
         plt.figure(figsize = (6.0,2.0))
