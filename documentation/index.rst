@@ -1,3 +1,8 @@
+.. _fig-logo:
+.. figure:: figures/logo.png
+   :scale: 75 %
+   :alt: Logo
+   
 Performance Monitoring using Pecos
 ================================================================
 

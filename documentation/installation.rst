@@ -51,6 +51,8 @@ Optional Python packages dependencies include:
   http://pyyaml.org/
 * PVLIB [SHFH16]_: used to simulate the performance of photovoltaic energy systems,
   http://pvlib-python.readthedocs.io/
+* Plotly [SPHC16]_: used to produce interactive scalable figures, 
+  https://plot.ly/
 
 All other dependencies are part of the Python Standard Library.
 

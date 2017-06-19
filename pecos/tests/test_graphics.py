@@ -92,6 +92,88 @@ def test_plot_timeseries2():
     
     assert_true(isfile(filename))
 
+def test_plot_interactive_timeseries1():
+    filename = abspath(join(testdir, 'plot_interactive_timeseries1.html'))
+    if isfile(filename):
+        os.remove(filename)
+        
+    periods = 5
+    index = pd.date_range('1/1/2016', periods=periods, freq='D')
+    data = np.random.rand(periods, 4)
+    df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C', 'D'])
+
+    pecos.graphics.plot_interactive_timeseries(df, filename=filename, auto_open=False)
+    
+    assert_true(isfile(filename))
+    
+def test_plot_heatmap1():
+    filename = abspath(join(testdir, 'plot_heatmap1.png'))
+    if isfile(filename):
+        os.remove(filename)
+        
+    periods = 5
+    index = pd.date_range('1/1/2016', periods=periods, freq='D')
+    data = np.random.rand(periods, 4)
+    df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C', 'D'])
+    
+    plt.figure()
+    pecos.graphics.plot_heatmap(df)
+    plt.savefig(filename, format='png', bbox_inches='tight', pad_inches = 0)
+    plt.close()
+    
+    assert_true(isfile(filename))
+
+def test_plot_heatmap2():
+    filename = abspath(join(testdir, 'plot_heatmap2.png'))
+    if isfile(filename):
+        os.remove(filename)
+        
+    data = np.array([[1,2],[3,4]])
+    
+    plt.figure()
+    pecos.graphics.plot_heatmap(data, cmap='jet', show_axis=True)
+    plt.savefig(filename, format='png')
+    plt.close()
+    
+    assert_true(isfile(filename))
+    
+def test_plot_doy_heatmap1():
+    filename = abspath(join(testdir, 'plot_doy_heatmap1.png'))
+    if isfile(filename):
+        os.remove(filename)
+        
+    periods = 5*24 # 5 days
+    index = pd.date_range('3/1/2016', periods=periods, freq='H')
+    data = np.random.rand(periods)
+    df = pd.DataFrame(data=data, index=index, columns=['A'])
+    
+    plt.figure()
+    pecos.graphics.plot_doy_heatmap(df['A'])
+    plt.savefig(filename, format='png')
+    plt.close()
+    
+    assert_true(isfile(filename))
+
+def test_plot_doy_heatmap2():
+    filename = abspath(join(testdir, 'plot_doy_heatmap2.png'))
+    if isfile(filename):
+        os.remove(filename)
+        
+    periods = 365*12
+    index = pd.date_range('1/1/2016', periods=periods, freq='2H')
+    data = np.random.rand(periods)
+    df = pd.DataFrame(data=data, index=index, columns=['A'])
+    overlay = pd.DataFrame(index=[1,100,200,300,365], 
+                           data={'A': [40000,20000,60000,10000,5000],
+                                 'B': [60000,70000,75000,50000,65000]})
+    
+    plt.figure()
+    pecos.graphics.plot_doy_heatmap(df['A'], cmap='gray', overlay=overlay)
+    plt.savefig(filename, format='png')
+    plt.close()
+    
+    assert_true(isfile(filename))
+    
 def test_plot_test_results1():
     filename_root = abspath(join(testdir, 'plot_test_results1'))
     pm = pecos.monitoring.PerformanceMonitoring()

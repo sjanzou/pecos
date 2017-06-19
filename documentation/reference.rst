@@ -20,4 +20,6 @@ References
 
 .. [SHFH16] Stein, J.S., Holmgren, W.F., Forbess, J., & Hansen, C.W. (2016). PVLIB: Open Source Photovoltaic Performance Modeling Functions for Matlab and Python, in 43rd Photovoltaic Specialists Conference.
 
+.. [SPHC16] Sievert, C., Parmer, C., Hocking, T., Chamberlain, S., Ram, K., Corvellec, M., and Despouy, P. (2016). plotly: Create interactive web graphics via Plotly’s JavaScript graphing library [Software].
+
 .. [VaCV11] van der Walt, S., Colbert, S.C., & Varoquaux, G. (2011). The NumPy array: A structure for efficient numerical computation. Computing in Science & Engineering, 13, 22-30.
