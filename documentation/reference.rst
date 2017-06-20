@@ -14,11 +14,17 @@ References
 
 .. [Hunt07] Hunter, J.D. (2007). Matplotlib: A 2D graphics environment. Computing in Science & Engineering, 3(9), 90-95.
 
+.. [KlSt16a] Klise, K.A., Stein, J.S. (2016). Performance Monitoring using Pecos, Technical Report SAND2016-3583, Sandia National Laboratories.
+
+.. [KlSt16b] Klise, K.A., Stein, J.S. (2016). Automated Performance Monitoring for PV Systems using Pecos, 43th Photovoltaic Specialists Conference (PVSC), Portland, OR, June 5-10.
+
+.. [KlSC17] Klise, K.A., Stein, J.S., Cunningham, J. (2017). Application of IEC 61724 Standards to Analyze PV System Performance in Different Climates, 44th Photovoltaic Specialists Conference (PVSC), Washington, DC, June 25-30.
+
 .. [Mcki13] McKinney W. (2013). Python for Data Analysis: Data Wrangling with Pandas, NumPy, and IPython. O'Reilly Media, 1 edition, 466P.
 
 .. [Rona08] Ronacher, A. (2008). Template Designer Documentation, http://jinja.pocoo.org/docs/dev/templates/ accessed July 1, 2016.
 
-.. [SHFH16] Stein, J.S., Holmgren, W.F., Forbess, J., & Hansen, C.W. (2016). PVLIB: Open Source Photovoltaic Performance Modeling Functions for Matlab and Python, in 43rd Photovoltaic Specialists Conference.
+.. [SHFH16] Stein, J.S., Holmgren, W.F., Forbess, J., & Hansen, C.W. (2016). PVLIB: Open Source Photovoltaic Performance Modeling Functions for Matlab and Python, 43rd Photovoltaic Specialists Conference (PVSC), Portland, OR, June 5-10.
 
 .. [SPHC16] Sievert, C., Parmer, C., Hocking, T., Chamberlain, S., Ram, K., Corvellec, M., and Despouy, P. (2016). plotly: Create interactive web graphics via Plotly’s JavaScript graphing library [Software].
 

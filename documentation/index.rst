@@ -1,4 +1,3 @@
-.. _fig-logo:
 .. figure:: figures/logo.png
    :scale: 75 %
    :alt: Logo
@@ -18,9 +17,17 @@ Pecos includes built-in functionality to monitor performance of time series data
 The software can be used to automatically run a series of quality control 
 tests and generate customized reports which include performance metrics, 
 test results, and graphics.  The software was developed specifically for 
-solar photovoltaic system monitoring, but it can be customized for other 
-applications.
+solar photovoltaic system monitoring, but is designed to be used for a 
+wide range of applications. 
+:numref:`fig-index` shows example graphics and dashboard created using Pecos.
 
+.. _fig-index:
+.. figure:: figures/index.png
+   :scale: 75 %
+   :alt: Sample-graphics
+   
+   Example graphics and dashboard created using Pecos.
+   
 Citing Pecos
 --------------
 To cite Pecos, use one of the following references:
