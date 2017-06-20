@@ -18,7 +18,7 @@ subject to a series of quality control tests.
 The Python package includes methods to run quality control tests defined by the user
 and generate reports which include performance metrics, test results, and graphics.
 The software was developed specifically for solar photovoltaic system 
-monitoring, but it can be customized for other applications.
+monitoring, but is designed to be used for a wide range of applications. 
 
 For more information, go to http://pecos.readthedocs.io
 

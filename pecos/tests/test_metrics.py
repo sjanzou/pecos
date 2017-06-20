@@ -34,7 +34,7 @@ def test_time_integral():
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     
-    df_integral = pecos.pv.time_integral(df)
+    df_integral = pecos.metrics.time_integral(df)
     
     assert_equal(df_integral['Time integral of A'].values[0], 100800)
     assert_equal(df_integral['Time integral of B'].values[0], 115200)
