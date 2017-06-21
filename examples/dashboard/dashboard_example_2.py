@@ -63,7 +63,7 @@ for location_name in locations:
         # Generate graphics
         test_results_graphics = pecos.graphics.plot_test_results(graphics_file_rootname, pm)
         plt.figure(figsize = (0.2,0.2))
-        pecos.graphics.plot_heatmap(QCI)
+        pecos.graphics.plot_heatmap(QCI, vmin=0, vmax=1)
         plt.savefig(colorblock_graphics_file, dpi=90, bbox_inches='tight', pad_inches = 0)
         
         plt.figure(figsize = (6.0,2.0))

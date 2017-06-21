@@ -157,7 +157,7 @@ def normalized_current(I, G_poa, I_sco, G_ref=1000):
     logger.info("Compute Normalized Current")
     
     if type(I) is pd.core.frame.DataFrame:
-        I = pd.Series(I.values.values[:,0], index=I.index)
+        I = pd.Series(I.values[:,0], index=I.index)
     if type(G_poa) is pd.core.frame.DataFrame:
         G_poa = pd.Series(G_poa.values[:,0], index=G_poa.index)
         
@@ -203,7 +203,7 @@ def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
     logger.info("Compute Normalized Efficiency")
     
     if type(P) is pd.core.frame.DataFrame:
-        P = pd.Series(P.values.values[:,0], index=P.index)
+        P = pd.Series(P.values[:,0], index=P.index)
     if type(G_poa) is pd.core.frame.DataFrame:
         G_poa = pd.Series(G_poa.values[:,0], index=G_poa.index)
         

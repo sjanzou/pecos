@@ -34,7 +34,7 @@ def test_time_integral():
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     
-    df_integral = pecos.pv.time_integral(df)
+    df_integral = pecos.metrics.time_integral(df)
     
     assert_equal(df_integral['Time integral of A'].values[0], 100800)
     assert_equal(df_integral['Time integral of B'].values[0], 115200)
@@ -143,3 +143,14 @@ def test_qci_perday():
     QCI = pecos.metrics.qci(mask, per_day = True)
     assert_equal(QCI['Quality Control Index'][0], (72-5)/72.0)
     assert_equal(QCI['Quality Control Index'][1], 1.0)
+
+def test_rmse():
+    
+    periods = 5
+    index = pd.date_range('1/1/2016', periods=periods, freq='H')
+    x1 = pd.DataFrame(data=np.array([4, 4, 4.5, 2.7, 6]), index=index, columns=['Power'])
+    x2 = pd.DataFrame(data=np.array([5,10,4.5,3,4]), index=index, columns=['Expected Power'])
+    
+    RMSE = pecos.metrics.rmse(x1, x2)
+    
+    assert_almost_equal(RMSE.iloc[0,0], 2.8667, 4)
