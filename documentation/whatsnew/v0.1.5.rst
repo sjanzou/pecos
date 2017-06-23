@@ -1,7 +1,7 @@
 .. _whatsnew_0150:
 
-v0.1.5 (Master branch)
------------------------
+v0.1.5 (June 23, 2017)
+------------------------
 
 * Added ability to check for regular or irregular timestamps in check_timestamp.
 * Added probability of detection and false alarm metrics.
