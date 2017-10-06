@@ -1,0 +1,6 @@
+.. _whatsnew_0170:
+
+v0.1.7 (Master branch)
+------------------------
+
+* Added quality control test to identify outliers

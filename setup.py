@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from distutils.core import Extension
 
 DISTNAME = 'pecos'
-VERSION = '0.1.6'
+VERSION = '0.1.7'
 PACKAGES = ['pecos']
 EXTENSIONS = []
 DESCRIPTION = 'Python package for performance monitoring of time series data.'

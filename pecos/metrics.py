@@ -22,10 +22,10 @@ def qci(mask, tfilter=None, per_day=True):
     
     Parameters
     ----------
-    mask : pd.Dataframe
+    mask : pandas DataFrame
         Test results mask, returned from pm.get_test_results_mask()
     
-    tfilter : pd.Series (optional)
+    tfilter : pandas Series (optional)
         Time filter containing boolean values for each time index
         
     per_day : boolean (optional)
@@ -33,8 +33,7 @@ def qci(mask, tfilter=None, per_day=True):
     
     Returns
     -------
-    QCI : pd.DataFrame
-        Quality control index
+    pandas DataFrame with quality control index
     """
     logger.info("Compute QCI")
     
@@ -74,13 +73,13 @@ def rmse(x1, x2, tfilter=None, per_day=True):
     
     Parameters
     -----------
-    x1 : pd.DataFrame with a single column or pd.Series
+    x1 : pandas DataFrame with a single column or pandas Series
         Data
         
-    x2 : pd.DataFrame with a single column or pd.Series
+    x2 : pandas DataFrame with a single column or pandas Series
         Data
          
-    tfilter : pd.Series (optional)
+    tfilter : pandas Series (optional)
         Time filter containing boolean values for each time index
         
     per_day : boolean (optional)
@@ -88,8 +87,7 @@ def rmse(x1, x2, tfilter=None, per_day=True):
     
     Returns
     -------
-    RMSE : pd.DataFrame
-        Root mean squared error of the data
+    pandas DataFrame with root mean squared error
     """
     logger.info("Compute RMSE")
     
@@ -135,10 +133,10 @@ def time_integral(data, tfilter=None, per_day=True):
     
     Parameters
     -----------
-    data : pd.DataFrame
+    data : pandas DataFrame
         Data
          
-    tfilter : pd.Series (optional)
+    tfilter : pandas Series (optional)
         Time filter containing boolean values for each time index
         
     per_day : boolean (doptional)
@@ -146,8 +144,8 @@ def time_integral(data, tfilter=None, per_day=True):
     
     Returns
     -------
-    F : pd.DataFrame
-        Time integral of the data, each column is named 'Time integral of ' + original column name.
+    pandas DataFrame with time integral of the data, each column is named 
+    'Time integral of ' + original column name
     """
     logger.info("Compute time integral")
     
@@ -189,17 +187,16 @@ def probability_of_detection(observed, actual, tfilter=None):
     
     Parameters
     ----------
-    observed : pd.Dataframe
+    observed : pandas DataFrame
         Estimated conditions (True = background, False = anomolous), 
         returned from pm.get_test_results_mask()
     
-    actual : pd.Dataframe
+    actual : pandas DataFrame
         Actual conditions, (True = background, False = anomolous)
    
     Returns
     -------
-    PD : float
-        Probability of detection
+    Probability of detection, float
     """
     # Remove time filter
     if tfilter is not None:
@@ -233,17 +230,16 @@ def false_alarm_rate(observed, actual, tfilter=None):
     
     Parameters
     ----------
-    estimated : pd.Dataframe
+    estimated : pandas DataFrame
         Estimated conditions (True = background, False = anomolous), 
         returned from pm.get_test_results_mask()
     
-    actual : pd.Dataframe
+    actual : pandas DataFrame
         Actual conditions, (True = background, False = anomolous)
     
     Returns
     -------
-    FAR : float
-        False alarm rate
+    False alarm rate, float
     """
     # Remove time filter
     if tfilter is not None:

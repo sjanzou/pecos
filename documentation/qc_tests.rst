@@ -4,7 +4,7 @@ Quality control tests
 Pecos includes several quality control tests.
 When a test fails, information is stored in a summary table.  This
 information can be saved to a file, database, or included in reports.
-Quality controls tests fall into five categories:
+Quality controls tests fall into seven categories:
 
 * Timestamp
 * Missing data
@@ -12,6 +12,7 @@ Quality controls tests fall into five categories:
 * Range
 * Increment
 * Delta
+* Outlier
 
 Timestamp test
 --------------------
@@ -158,3 +159,30 @@ checks if data changes by more than 0.000001 in 1 hour::
 	pm.check_delta([-800, None], window=1800, absolute_value=False)
 
 checks if data decrease by more than -800 in 30 minutes.
+
+Outlier test
+--------------------
+The :class:`~pecos.monitoring.PerformanceMonitoring.check_outlier` method is used to check if normalized data 
+falls outside expected bounds.  Data is normalized using the mean and standard deviation, using either a 
+moving window or using the entire data set.  If multiple columns of data are used, each column is normalized separately.
+Like the check_range method, the user can specify if the data
+should be smoothed using a rolling mean before the test is run.  
+Input includes:
+
+* Upper and lower bound (in standard deviations)
+
+* Data column (default = all columns)
+
+* Size of the moving window used to normalize the data (default = 3600 seconds)
+
+* Flag indicating if the absolute value is taken (default = True)
+
+* Rolling window used to smooth the data before test is run (default = 0)
+
+* Minimum number of consecutive failures for reporting (default = 1)
+
+For example::
+
+	pm.check_outlier([None, 3], window=12*3600)
+
+checks if the normalized data changes by more than 3 standard deviations within a 12 hour moving window.
