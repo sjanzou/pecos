@@ -472,3 +472,32 @@ class Test_check_delta(unittest.TestCase):
             )
         assert_frame_equal(expected, self.pm.test_results)
 
+class Test_check_outlier(unittest.TestCase):
+
+    @classmethod
+    def setUp(self):
+        index = pd.date_range('1/1/2017', periods=24, freq='H')
+        data = {'A': [112,114,113,132,134,127,150,120,117,112,107,99,140,
+                      98,88,98,106,110,107,79,102,115,np.nan,91]}
+        df = pd.DataFrame(data, index=index)
+        trans = dict(zip(df.columns, [[col] for col in df.columns]))
+        
+        self.pm = pecos.monitoring.PerformanceMonitoring()
+        self.pm.add_dataframe(df, 'Test')
+        self.pm.add_translation_dictionary(trans, 'Test')
+        
+    @classmethod
+    def tearDown(self):
+        pass
+    
+    def test_outlier(self):
+        # outlier if stdev > 1.9
+        self.pm.check_outlier([-1.9, 1.9], window=None, absolute_value=False)
+        expected = pd.DataFrame(
+            array([['Test', 'A', Timestamp('2017-01-01 19:00:00'), Timestamp('2017-01-01 19:00:00'), 1, 'Outlier < lower bound, -1.9'],
+                   ['Test', 'A', Timestamp('2017-01-01 06:00:00'), Timestamp('2017-01-01 06:00:00'), 1, 'Outlier > upper bound, 1.9']], dtype=object),
+            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            index=RangeIndex(start=0, stop=2, step=1)
+            )
+        assert_frame_equal(expected, self.pm.test_results)
+        

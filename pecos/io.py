@@ -48,13 +48,12 @@ def read_campbell_scientific(file_name, index_col='TIMESTAMP', encoding=None):
     
     Returns
     ---------
-    df : pd.DataFrame
-        Data
+    pandas DataFrame with data
     """
     logger.info("Reading Campbell Scientific CSV file " + file_name)
 
     try:
-        df = pd.read_csv(file_name, skiprows=1, encoding=encoding, index_col=index_col, parse_dates=True, dtype ='unicode') #, low_memory=False)
+        df = pd.read_csv(file_name, skiprows=1, encoding=encoding, index_col=index_col, parse_dates=True, dtype ='unicode', error_bad_lines=False) #, low_memory=False)
         df = df[2:]
         index = pd.to_datetime(df.index)
         Unnamed = df.filter(regex='Unnamed')
@@ -145,7 +144,7 @@ def write_metrics(filename, metrics):
     filename : string
         File name, with full path
     
-    metrics : pd.DataFrame
+    metrics : pandas DataFrame
         Data to add to the metrics file
     """
     logger.info("Write metrics file")
@@ -172,7 +171,7 @@ def write_test_results(filename, test_results):
     filename : string
         File name, with full path
 
-    test_results : pd.DataFrame
+    test_results : pandas DataFrame
         Test results stored in pm.test_results
     """
 
@@ -198,7 +197,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     filename : string
         File name, with full path
 
-    pm : PerformanceMonitoring object
+    pm : pecos PerformanceMonitoring object
         Contains data (pm.df) and test results (pm.test_results)
     
     test_results_graphics : list of strings (optional)
@@ -208,7 +207,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     custom_graphics : list of strings (optional)
         Custom files, with full path.  Created by the user.
     
-    metrics : pd.DataFrame (optional)
+    metrics : pandas DataFrame (optional)
         Performance metrics to add as a table to the monitoring report
     
     title : string (optional)
@@ -316,8 +315,8 @@ def write_dashboard(filename, column_names, row_names, content,
         
         - text (string) =  text at the top of each cell
         - graphics (list of strings) =  a list of graphics file names.  Each file name includes the full path
-        - table (string) = a table in html format, for example a table of performance metrics.  DataFrames can be converted to an html string using df.to_html() or df.transpose().to_html().  Values in the table can be colorcoded using pandas Styler class. 
-        - link (dict) = a dictonary where keys define the name of the link and values define the html link (with full path)
+        - table (string) = a table in html format, for example a table of performance metrics.  DataFrames can be converted to an html string using df.to_html() or df.transpose().to_html().  Values in the table can be color coded using pandas Styler class. 
+        - link (dict) = a dictionary where keys define the name of the link and values define the html link (with full path)
         
         For example::
         
@@ -412,8 +411,8 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
 def device_to_client(config):
     """
     Read channels on modbus device, scale and calibrate the values, and store teh data in a MySQL database.
-    The inputs are provided by a configuration dictonary that describe general information for
-    data aquistion and the devices.
+    The inputs are provided by a configuration dictionary that describe general information for
+    data acquisition and the devices.
     
     Parameters
     ----------

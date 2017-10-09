@@ -21,10 +21,10 @@ def insolation(G, tfilter=None, per_day=True):
     
      Parameters
     -----------
-    G : pd.DataFrame
+    G : pandas DataFrame
         Irradiance time series
         
-    tfilter : pd.Series (optional)
+    tfilter : pandas Series (optional)
         Time filter containing boolean values for each time index
         
     per_day : boolean (optional)
@@ -32,8 +32,7 @@ def insolation(G, tfilter=None, per_day=True):
     
     Returns
     -------
-    H : pd.DataFrame
-        Insolation
+    Insolation in a pandas DataFrame
     """
     if type(G) is pd.core.series.Series:
         G = G.to_frame('Irradiance')
@@ -56,10 +55,10 @@ def energy(P, tfilter=None, per_day=True):
     
     Parameters
     -----------
-    P : pd.DataFrame
+    P : pandas DataFrame
         Power time series
          
-    tfilter : pd.Series (optional)
+    tfilter : pandas Series (optional)
         Time filter containing boolean values for each time index
         
     per_day : boolean (optional)
@@ -67,8 +66,7 @@ def energy(P, tfilter=None, per_day=True):
     
     Returns
     -------
-    E : pd.DataFrame
-        Energy
+    Energy in a pandas DataFrame 
     """
     if type(P) is pd.core.series.Series:
         P = P.to_frame('Power')
@@ -91,10 +89,10 @@ def performance_ratio(E, H_poa, P_ref, G_ref=1000):
     
     Parameters
     -----------
-    E : pd.DataFrame with a single column or pd.Series
+    E : pandas DataFrame with a single column or pandas Series
         Energy (AC or DC) 
         
-    H_poa : pd.DataFrame with a single column or pd.Series
+    H_poa : pandas DataFrame with a single column or pandas Series
          Plane of array insolation
          
     P_ref : float
@@ -105,8 +103,7 @@ def performance_ratio(E, H_poa, P_ref, G_ref=1000):
         
     Returns
     -------
-    PR : pd.DataFrame
-        Performance ratio
+    Performance ratio in a pandas DataFrame
     """
     logger.info("Compute Performance Ratio")
     
@@ -137,10 +134,10 @@ def normalized_current(I, G_poa, I_sco, G_ref=1000):
     
     Parameters
     -----------
-    I : pd.DataFrame with a single column or pd.Series
+    I : pandas DataFrame with a single column or pandas Series
         Current
         
-    G_poa : pd.DataFrame with a single column or pd.Series
+    G_poa : pandas DataFrame with a single column or pandas Series
          Plane of array irradiance
          
     I_sco : float
@@ -151,8 +148,7 @@ def normalized_current(I, G_poa, I_sco, G_ref=1000):
         
     Returns
     -------
-    NI : pd.DataFrame
-        Normalized current
+    Normalized current in a pandas DataFrame
     """
     logger.info("Compute Normalized Current")
     
@@ -183,10 +179,10 @@ def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
     
     Parameters
     -----------
-    P : pd.DataFrame with a single column or pd.Series
+    P : pandas DataFrame with a single column or pandas Series
         Power (AC or DC) 
         
-    G_poa : pd.DataFrame with a single column or pd.Series
+    G_poa : pandas DataFrame with a single column or pandas Series
          Plane of array irradiance
          
     P_ref : float
@@ -197,8 +193,7 @@ def normalized_efficiency(P, G_poa, P_ref, G_ref=1000):
         
     Returns
     -------
-    NE : pd.DataFrame
-        Normalized efficiency
+    Normalized efficiency in a pandas DataFrame
     """
     logger.info("Compute Normalized Efficiency")
     
@@ -233,16 +228,15 @@ def performance_index(E, E_predicted):
     
     Parameters
     -----------
-    E : pd.DataFrame with a single column or pd.Series
+    E : pandas DataFrame with a single column or pandas Series
         Observed energy
     
-    E_predicted : pd.DataFrame with a single column or pd.Series
+    E_predicted : pandas DataFrame with a single column or pandas Series
         Predicted energy
         
     Returns
     ---------
-    PI : pd.DataFrame
-        Performance index 
+    Performance index in a pandas DataFrame
     """
     logger.info("Compute Performance Index")
     
@@ -269,7 +263,7 @@ def energy_yield(E, P_ref):
     
     Parameters
     -----------
-    E : pd.DataFrame with a single column or pd.Series
+    E : pandas DataFrame with a single column or pandas Series
         Observed energy
     
     P_ref : float
@@ -277,8 +271,7 @@ def energy_yield(E, P_ref):
         
     Returns
     ---------
-    EY : pd.DataFrame
-        Energy yield  
+    Energy yield in a pandas DataFrame
     """
     logger.info("Compute Energy Yield")
     
@@ -306,16 +299,15 @@ def clearness_index(H_dn, H_ea):
     
     Parameters
     -----------
-    H_dn : pd.DataFrame with a single column or pd.Series
+    H_dn : pandas DataFrame with a single column or pandas Series
         Direct normal insolation
     
-    H_ea : pd.DataFrame with a single column or pd.Series
+    H_ea : pandas DataFrame with a single column or pandas Series
         Extraterrestrial insolation
         
     Returns
     -------
-    Kt : pd.DataFrame
-        Clearness index
+    Clearness index in a pandas DataFrame
     """
     logger.info("Compute Clearness Index")
     

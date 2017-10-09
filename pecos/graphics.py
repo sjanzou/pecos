@@ -31,10 +31,10 @@ def plot_scatter(x,y,xaxis_min=None, xaxis_max=None, yaxis_min=None,
     
     Parameters
     ----------
-    x : pd.DataFrame
+    x : pandas DataFrame
         X data
     
-    y : pd.DataFrame
+    y : pandas DataFrame
         Y data
     
     xaxis_min : float (optional)
@@ -103,13 +103,13 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
     
     Parameters
     ----------
-    data : pd.DataFrame
+    data : pandas DataFrame
         Data, indexed by time
         
-    tfilter : pd.Series (optional)
+    tfilter : pandas Series (optional)
         Boolean values used to include time filter in the plot, default = None 
         
-    test_results_group : pd.DataFrame (optional)
+    test_results_group : pandas DataFrame (optional)
         Test results for a particular variable. To group test results by variable, use
         grouped = pm.test_results.groupby(['System Name', 'Variable Name']), 
         default = None 
@@ -194,27 +194,18 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
                 if error_flag in ['Duplicate timestamp', 'Missing data', 
                                   'Corrupt data', 'Nonmonotonic timestamp']:
                     continue
-                if "Data <" in error_flag:
-                    try:
-                        ax.scatter(data2.index, data2.values, c='r', marker='+', 
-                                   linewidths=1, label=error_label)   
-                    except:
-                        ax.scatter(data2.index[0], data2.values[0], c='r', marker='+', 
-                                   linewidths=1, label=error_label) 
-                elif "Data >" in error_flag:
-                    try:
-                        ax.scatter(data2.index, data2.values, c='r', marker='+', 
-                                   linewidths=1, label=error_label) 
-                    except:
-                        ax.scatter(data2.index[0], data2.values[0], c='r', marker='+', 
-                                   linewidths=1, label=error_label) 
-                else:
-                    try:
-                        ax.scatter(data2.index, data2.values, c='g', marker='+', 
-                                   linewidths=1, label=error_label)  
-                    except:
-                        ax.scatter(data2.index[0], data2.values[0], c='g', marker='+', 
-                                   linewidths=1, label=error_label) 
+                if "Data" in error_flag:
+                    color='r'
+                elif "Delta" in error_flag:
+                    color = 'g'
+                else: # Outlier
+                    color = 'b'
+                try:
+                    ax.scatter(data2.index, data2.values, c=color, marker='+', 
+                               linewidths=1, label=error_label)   
+                except:
+                    ax.scatter(data2.index[0], data2.values[0], c=color, marker='+', 
+                               linewidths=1, label=error_label) 
         
         # Format axis
         xmin_plt, xmax_plt = plt.xlim()
@@ -257,7 +248,7 @@ def plot_interactive_timeseries(data, xaxis_min=None, xaxis_max=None, yaxis_min=
     
     Parameters
     ----------
-    data : pd.DataFrame
+    data : pandas DataFrame
         Data, indexed by time
     
     xaxis_min : float (optional)
@@ -307,7 +298,7 @@ def plot_heatmap(data, colors=[(0.75, 0.15, 0.15), (1, 0.75, 0.15), (0.15, 0.75,
     
     Parameters
     -----------
-    data : pd.DataFrame or np.ndarray
+    data : pandas DataFrame or numpy ndarray
         Data
     
     colors : list (optional)
@@ -357,7 +348,7 @@ def plot_doy_heatmap(data, cmap='nipy_spectral', vmin=None, vmax=None,
     
     Parameters
     ----------
-    data : pd.DataFrame or pd.Series
+    data : pandas DataFrame or pandas Series
         Data (single column), indexed by time
         
     cmap : string (optional)
@@ -369,7 +360,7 @@ def plot_doy_heatmap(data, cmap='nipy_spectral', vmin=None, vmax=None,
     vmax : float (optional)
         Colomap maximum, default = None (autoscale)
         
-    overlay : pd.DataFrame (optional)
+    overlay : pandas DataFrame (optional)
         Data to overlay on the heatmap.  
         Time index should be in day-of-year (X-axis) 
         Values should be in time-of-day in minutes (Y-axis)

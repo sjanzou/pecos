@@ -30,8 +30,7 @@ def round_index(dt, frequency, how='nearest'):
         
     Returns
     -------
-    rounded _dt : DatetimeIndex
-        Rounded time series index
+    Rounded time series index, DatetimeIndex
     """
     freq=str(frequency) + 's'
     freq = to_offset(freq).nanos
