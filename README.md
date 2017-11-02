@@ -22,6 +22,13 @@ designed to be used for a wide range of applications.
 
 For more information, go to http://pecos.readthedocs.io
 
+Citing Pecos
+--------------
+To cite Pecos, use one of the following references:
+
+* K.A. Klise and J.S. Stein (2016), Performance Monitoring using Pecos, Technical Report SAND2016-3583, Sandia National Laboratories. 
+* K.A. Klise and J.S. Stein (2016), Automated Performance Monitoring for PV Systems using Pecos, 43rd IEEE Photovoltaic Specialists Conference (PVSC), Portland, OR, June 5-10. 
+
 License
 ------------
 
