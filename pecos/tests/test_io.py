@@ -79,10 +79,13 @@ def test_write_monitoring_report1(): # empty database
 def test_write_monitoring_report2():# with test results and graphics (encoded and linked)
     filename1 = abspath(join(testdir, 'test_write_monitoring_report2_linked_graphics.html'))
     filename2 = abspath(join(testdir, 'test_write_monitoring_report2_encoded_graphics.html'))
+    graphics_filename = abspath(join(testdir, 'custom_graphic.png'))
     if isfile(filename1):
         os.remove(filename1)
     if isfile(filename2):
         os.remove(filename2)
+    if isfile(graphics_filename):
+        os.remove(graphics_filename)
         
     pecos.logger.initialize()
     logger = logging.getLogger('pecos')
@@ -100,13 +103,19 @@ def test_write_monitoring_report2():# with test results and graphics (encoded an
     filename_root = abspath(join(testdir, 'monitoring_report_graphic'))
     test_results_graphics = pecos.graphics.plot_test_results(filename_root, pm)
     
+    plt.figure()
+    plt.plot([1, 2, 3],[1, 2, 3])
+    plt.savefig(graphics_filename, format='png')
+    plt.close()
+    custom_graphics = [graphics_filename]
+    
     logger.warning('Add a note')
     
-    pecos.io.write_monitoring_report(filename1, pm, test_results_graphics, encode=False)
+    pecos.io.write_monitoring_report(filename1, pm, test_results_graphics, custom_graphics, encode=False)
     
     assert_true(isfile(filename1))
     
-    pecos.io.write_monitoring_report(filename2, pm, test_results_graphics, encode=True)
+    pecos.io.write_monitoring_report(filename2, pm, test_results_graphics, custom_graphics, encode=True)
     
     assert_true(isfile(filename2))
 
