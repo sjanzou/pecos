@@ -107,6 +107,21 @@ def send_email(subject, body, recipient, sender, attachment=None,
     
     logger.info("Sending email")
     
+    msg = _create_email_message(subject, body, recipient, sender, 
+                                attachment=None)
+    
+    s = smtplib.SMTP(host)
+    try: # Authentication
+        s.ehlo()
+        s.starttls()
+        s.login(username, password)
+    except:
+        pass
+    s.sendmail(sender, recipient, msg.as_string())
+    s.quit()
+    
+def _create_email_message(subject, body, recipient, sender, attachment=None):
+    
     msg = MIMEMultipart()
     msg['Subject'] = subject
     msg['To'] = ', '.join(recipient)
@@ -122,20 +137,13 @@ def send_email(subject, body, recipient, sender, attachment=None,
     if attachment is not None:
         fp = open(attachment, "rb")  # Read as a binary file, even if it's text  
         att = MIMEApplication(fp.read())
-        att.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment))
+        att.add_header('Content-Disposition', 'attachment', 
+                       filename=os.path.basename(attachment))
         fp.close()
         msg.attach(att)
     
-    s = smtplib.SMTP(host)
-    try: # Authentication
-        s.ehlo()
-        s.starttls()
-        s.login(username, password)
-    except:
-        pass
-    s.sendmail(sender, recipient, msg.as_string())
-    s.quit()
-
+    return msg
+        
 def write_metrics(filename, metrics):
     """
     Write metrics file.
@@ -474,7 +482,7 @@ def device_to_client(config):
             df.columns = labels
             df = df.where((pd.notnull(df)),None)
 
-            # Insert datat into database 
+            # Insert data into database 
             try:
                 # Connect to database
                 engine = create_engine('mysql://'+config['Client']['Username']+ \

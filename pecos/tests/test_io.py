@@ -176,3 +176,21 @@ def test_write_dashboard2(): # with text, graphics (encoded and linked), tables,
     
     assert_true(isfile(filename2))
     
+def test_email_message():
+    subject = 'test subject'
+    body = 'test body'
+    recipient = ['recipient.email.address']
+    sender = 'sender.email.address'
+    attachment = 'file.txt'
+    f = open('file.txt','w')
+    f.write('test attachment')
+    f.close()
+    
+    msg = pecos.io._create_email_message(subject, body, recipient, sender, 
+                                         attachment)
+
+    assert_true(subject in msg.as_string())
+    assert_true(body in msg.as_string())
+    assert_true(recipient[0] in msg.as_string())
+    assert_true(sender in msg.as_string())
+    assert_true(attachment in msg.as_string())
