@@ -14,6 +14,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
+import base64
 
 try:
     from sqlalchemy import create_engine
@@ -154,7 +155,7 @@ def write_metrics(filename, metrics):
     except:
         previous_metrics = pd.DataFrame()
         
-    metrics.index = metrics.index.to_native_types() # this is nessisary when using timezones
+    metrics.index = metrics.index.to_native_types() # this is necessary when using time zones
     metrics = metrics.combine_first(previous_metrics) 
     
     fout = open(filename, 'w')
@@ -245,7 +246,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     
     # Collect notes (from the logger file)
     try:
-        logfiledir = logfiledir = os.path.join(dirname(abspath(__file__)))
+        logfiledir = os.path.join(dirname(abspath(__file__)))
         f = open(join(logfiledir,'logfile'), 'r')
         notes = f.read()
         f.close()
@@ -346,7 +347,7 @@ def write_dashboard(filename, column_names, row_names, content,
     """
     
     logger.info("Writing dashboard")
-    
+        
     # Set pandas display option     
     pd.set_option('display.max_colwidth', -1)
     pd.set_option('display.width', 40)
@@ -366,15 +367,11 @@ def _html_template_monitoring_report(content, title, logo, im_width_test_results
     img_dic = {}
     if encode:
         for im in content['custom_graphics']:
-            with open(im, "rb") as f:
-                data = f.read()
-                img_encode = data.encode("base64")
-                img_dic[im] = img_encode
+            img_encode = base64.b64encode(open(im, "rb").read()).decode("utf-8")
+            img_dic[im] = img_encode
         for im in content['test_results_graphics']:
-            with open(im, "rb") as f:
-                data = f.read()
-                img_encode = data.encode("base64")
-                img_dic[im] = img_encode
+            img_encode = base64.b64encode(open(im, "rb").read()).decode("utf-8")
+            img_dic[im] = img_encode
 
     template = env.get_template('monitoring_report.html')
 
@@ -392,12 +389,12 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
     if encode:
         for column in column_names:
             for row in row_names:
-                for im in content[row, column]['graphics']:
-                    with open(im, "rb") as f:
-                        data = f.read()
-                        img_encode = data.encode("base64")
-                        img_dic[im] = img_encode
-
+                try: # not all row/columns have graphics
+                    for im in content[row, column]['graphics']:
+                       img_encode = base64.b64encode(open(im, "rb").read()).decode("utf-8")
+                       img_dic[im] = img_encode 
+                except:
+                    pass
     
     template = env.get_template('dashboard.html')
 
@@ -410,7 +407,7 @@ def _html_template_dashboard(column_names, row_names, content, title, footnote, 
 
 def device_to_client(config):
     """
-    Read channels on modbus device, scale and calibrate the values, and store teh data in a MySQL database.
+    Read channels on modbus device, scale and calibrate the values, and store the data in a MySQL database.
     The inputs are provided by a configuration dictionary that describe general information for
     data acquisition and the devices.
     
