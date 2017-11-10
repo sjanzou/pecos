@@ -304,7 +304,7 @@ class PerformanceMonitoring(object):
             expected_end_time = max(self.df.index)
 
         rng = pd.date_range(start=expected_start_time, end=expected_end_time,
-                            freq=str(frequency) + 's')
+                            freq=str(int(frequency*1e6)) + 'us') # microseconds
 
         # Check to see if timestamp is monotonic
 #        mask = pd.TimeSeries(self.df.index).diff() < 0
@@ -437,7 +437,11 @@ class PerformanceMonitoring(object):
         df = self._setup_data(key, rolling_mean)
         if df is None:
             return
-
+        
+        if df.isnull().all().all():
+            logger.warning("Check increment range failed (all data is Null): " + key)
+            return
+        
         # Compute interval
         if absolute_value:
             df = np.abs(df.diff(periods=increment))
