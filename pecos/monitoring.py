@@ -638,7 +638,7 @@ class PerformanceMonitoring(object):
         else:
             error_prefix = 'Outlier'
         
-        df[df.index[0]:df.index[0]+datetime.timedelta(seconds=window)] = np.nan
+        #df[df.index[0]:df.index[0]+datetime.timedelta(seconds=window)] = np.nan
              
         self._generate_test_results(df, bound, specs, min_failures, error_prefix)
       
