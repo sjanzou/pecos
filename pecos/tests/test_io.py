@@ -181,16 +181,10 @@ def test_email_message():
     body = 'test body'
     recipient = ['recipient.email.address']
     sender = 'sender.email.address'
-    attachment = 'file.txt'
-    f = open('file.txt','w')
-    f.write('test attachment')
-    f.close()
     
-    msg = pecos.io._create_email_message(subject, body, recipient, sender, 
-                                         attachment)
+    msg = pecos.io._create_email_message(subject, body, recipient, sender)
 
     assert_true(subject in msg.as_string())
     assert_true(body in msg.as_string())
     assert_true(recipient[0] in msg.as_string())
     assert_true(sender in msg.as_string())
-    assert_true(attachment in msg.as_string())

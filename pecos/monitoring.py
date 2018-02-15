@@ -5,6 +5,7 @@ quality control tests and store results.
 import pandas as pd
 import numpy as np
 import re
+import datetime
 import logging
 
 none_list = ['','none','None','NONE', None, [], {}]
@@ -160,7 +161,7 @@ class PerformanceMonitoring(object):
                 frame_t = frame.transpose()
                 self.test_results = self.test_results.append(frame_t, ignore_index=True)
     
-    def add_dataframe(self, df, system_name, add_identity_translation_dictionary=False):
+    def add_dataframe(self, df, system_name=None, add_identity_translation_dictionary=False):
         """
         Add DataFrame to the PerformanceMonitoring object.
 
@@ -169,7 +170,7 @@ class PerformanceMonitoring(object):
         df : pandas DataFrame
             DataFrame to add to the PerformanceMonitoring object
 
-        system_name : string
+        system_name : string (optional)
             System name
 
         add_identity_translation_dictionary : boolean (optional)
@@ -179,7 +180,8 @@ class PerformanceMonitoring(object):
         temp = df.copy()
 
         # Combine variable name with system name (System: Variable)
-        temp.columns = [system_name + ':' + s  for s in temp.columns]
+        if system_name:
+            temp.columns = [system_name + ':' + s  for s in temp.columns]
 
         if self.df is not None:
             self.df = self.df.combine_first(temp)
@@ -194,7 +196,7 @@ class PerformanceMonitoring(object):
 
             self.add_translation_dictionary(trans, system_name)
 
-    def add_translation_dictionary(self, trans, system_name):
+    def add_translation_dictionary(self, trans, system_name=None):
         """
         Add translation dictionary to the PerformanceMonitoring object.
 
@@ -203,15 +205,18 @@ class PerformanceMonitoring(object):
         trans : dictionary
             Translation dictionary
 
-        system_name : string
+        system_name : string (optional)
             System name
         """
         # Combine variable name with system name (System: Variable)
         for key, values in trans.items():
             self.trans[key] = []
             for value in values:
-                self.trans[key].append(system_name + ':' + value)
-
+                if system_name:
+                    self.trans[key].append(system_name + ':' + value)
+                else:
+                    self.trans[key].append(value)
+                
     def add_time_filter(self, time_filter):
         """
         Add a time filter to the PerformanceMonitoring object.
@@ -497,7 +502,7 @@ class PerformanceMonitoring(object):
         if df is None:
             return
         
-        window_str = str(window) + 's' 
+        window_str = str(int(window*1e6)) + 'us'
 
         # Extract the max/min position in each window
         argmax_df = df.rolling(window_str).apply(np.nanargmax) 
@@ -620,7 +625,7 @@ class PerformanceMonitoring(object):
 
         # Compute normalized data
         if window is not None:
-            window_str = str(window) + 's' 
+            window_str = str(int(window*1e6)) + 'us'
             df = (df - df.rolling(window_str).mean())/df.rolling(window_str).std()
         else:
             df = (df - df.mean())/df.std()
@@ -632,7 +637,9 @@ class PerformanceMonitoring(object):
             error_prefix = '|Outlier|'
         else:
             error_prefix = 'Outlier'
-            
+        
+        df[df.index[0]:df.index[0]+datetime.timedelta(seconds=window)] = np.nan
+             
         self._generate_test_results(df, bound, specs, min_failures, error_prefix)
       
     def check_missing(self, key=None, min_failures=1):

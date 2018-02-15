@@ -107,8 +107,15 @@ def send_email(subject, body, recipient, sender, attachment=None,
     
     logger.info("Sending email")
     
-    msg = _create_email_message(subject, body, recipient, sender, 
-                                attachment=None)
+    msg = _create_email_message(subject, body, recipient, sender)
+    
+    if attachment is not None:
+        fp = open(attachment, "rb")  # Read as a binary file, even if it's text  
+        att = MIMEApplication(fp.read())
+        att.add_header('Content-Disposition', 'attachment', 
+                       filename=os.path.basename(attachment))
+        fp.close()
+        msg.attach(att)
     
     s = smtplib.SMTP(host)
     try: # Authentication
@@ -120,7 +127,7 @@ def send_email(subject, body, recipient, sender, attachment=None,
     s.sendmail(sender, recipient, msg.as_string())
     s.quit()
     
-def _create_email_message(subject, body, recipient, sender, attachment=None):
+def _create_email_message(subject, body, recipient, sender):
     
     msg = MIMEMultipart()
     msg['Subject'] = subject
@@ -133,14 +140,6 @@ def _create_email_message(subject, body, recipient, sender, attachment=None):
         content = MIMEText(body, 'plain')
     
     msg.attach(content)
-
-    if attachment is not None:
-        fp = open(attachment, "rb")  # Read as a binary file, even if it's text  
-        att = MIMEApplication(fp.read())
-        att.add_header('Content-Disposition', 'attachment', 
-                       filename=os.path.basename(attachment))
-        fp.close()
-        msg.attach(att)
     
     return msg
         
@@ -195,7 +194,8 @@ def write_test_results(filename, test_results):
 
 def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graphics=[], metrics=None, 
                             title='Pecos Monitoring Report', config={}, logo=False, 
-                            im_width_test_results=700, im_width_custom=700, encode=False):
+                            im_width_test_results=700, im_width_custom=700, encode=False,
+                            drop_system_column=False):
     """
     Generate a monitoring report.  
     The monitoring report is used to report quality control test results for a single system.
@@ -265,6 +265,10 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     
     pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
+    #pm.test_results.reset_index(inplace=True)
+    if drop_system_column:
+        del pm.test_results['System Name']
+    
     
     # Convert to html format
     if metrics is None:
