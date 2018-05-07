@@ -183,7 +183,7 @@ def write_test_results(filename, test_results):
         Test results stored in pm.test_results
     """
 
-    test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
+    test_results.sort_values(['Variable Name', 'Start Date', 'End Date'], inplace=True)
     test_results.index = np.arange(1, test_results.shape[0]+1)
 
     logger.info("Writing test results csv file " + filename)
@@ -194,8 +194,7 @@ def write_test_results(filename, test_results):
 
 def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graphics=[], metrics=None, 
                             title='Pecos Monitoring Report', config={}, logo=False, 
-                            im_width_test_results=700, im_width_custom=700, encode=False,
-                            drop_system_column=False):
+                            im_width_test_results=700, im_width_custom=700, encode=False):
     """
     Generate a monitoring report.  
     The monitoring report is used to report quality control test results for a single system.
@@ -263,12 +262,9 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     except:
         notes_df = pd.DataFrame()
     
-    pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
+    pm.test_results.sort_values(['Variable Name'], inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     #pm.test_results.reset_index(inplace=True)
-    if drop_system_column:
-        del pm.test_results['System Name']
-    
     
     # Convert to html format
     if metrics is None:
@@ -304,7 +300,7 @@ def write_dashboard(filename, column_names, row_names, content,
                     title='Pecos Dashboard', footnote='', logo=False, im_width=250, datatables=False, encode=False):
     """
     Generate a dashboard.  
-    The dashboard is used to compare multiple systems.
+    The dashboard is used to compare results across multiple systems.
     Each cell in the dashboard includes custom system graphics and metrics.
     
     Parameters

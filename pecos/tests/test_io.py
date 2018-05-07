@@ -55,7 +55,7 @@ def test_write_test_results1():
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     tfilter = pd.Series(data = (df.index < index[3]), index = df.index)
-    pm.add_dataframe(df, 'test', True)
+    pm.add_dataframe(df)
     pm.add_time_filter(tfilter)    
     pm.check_range([0,7]) # 2 test failures
     
@@ -63,7 +63,7 @@ def test_write_test_results1():
     from_file = pd.read_csv(filename)
     
     assert_true(isfile(filename))
-    assert_equals(from_file.shape, (2,7))
+    assert_equals(from_file.shape, (2,6))
 
 def test_write_monitoring_report1(): # empty database
     filename = abspath(join(testdir, 'test_write_monitoring_report1.html'))
@@ -96,7 +96,7 @@ def test_write_monitoring_report2():# with test results and graphics (encoded an
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     tfilter = pd.Series(data = (df.index < index[3]), index = df.index)
-    pm.add_dataframe(df, 'test', True)
+    pm.add_dataframe(df)
     pm.add_time_filter(tfilter)    
     pm.check_range([0,7]) # 2 test failures
     

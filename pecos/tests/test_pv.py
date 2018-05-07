@@ -75,7 +75,6 @@ def test_performance_index():
     P_expected = pd.DataFrame(data=np.array([5,10,4.5,3,4]), index=index, columns=['Expected Power'])
     
     PI = pecos.pv.performance_index(P, P_expected)
-    print(PI)
     expected = pd.DataFrame(data=np.array([0.8,0.4,1,0.9,1.5]), index=index, columns=['Performance Index'])
     assert_frame_equal(PI, expected, check_dtype=False)
 

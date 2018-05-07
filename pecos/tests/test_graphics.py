@@ -191,7 +191,7 @@ def test_plot_test_results2():
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     tfilter = pd.Series(data = (df.index < index[3]), index = df.index)
     
-    pm.add_dataframe(df, 'test', True)
+    pm.add_dataframe(df)
     pm.add_time_filter(tfilter)
     
     pm.check_range([0,7]) # 2 test failures

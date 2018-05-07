@@ -7,31 +7,41 @@ time series analysis and date-time functionality.  By using Pandas DataFrames,
 Pecos is able to take advantage of a wide range of timestamp strings, including
 UTC offset. 
 
-To import pandas::
-
-	import pandas as pd
-
 Pandas includes many built-in functions to read data from CSV, Excel, SQL, etc.
-For example, data can be loaded from an excel file using::
+For example, data can be loaded from an excel file using the following code.
 
-	df = pd.read_excel('data.xlsx')
+.. doctest::
+
+    >>> import pandas as pd
+    >>> df = pd.read_excel('data.xlsx') #doctest:+SKIP 
 
 Data can also be gathered from the web using the Python package request, http://docs.python-requests.org.
 
 The :class:`~pecos.monitoring.PerformanceMonitoring` class in Pecos is
 the base class used to define performance monitoring analysis. 
-To get started, an instance of the PerformanceMonitoring class is created::
+To get started, an instance of the PerformanceMonitoring class is created.
 
-	pm = pecos.monitoring.PerformanceMonitoring()
+.. doctest::
 
-A DataFrame can then be added to the PerformanceMonitoring object as follows::
-	
-	pm.add_dataframe(df, system_name)
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+
+A DataFrame can then be added to the PerformanceMonitoring object.
+
+.. doctest::
+    :hide:
+
+    >>> df = pd.DataFrame()
+
+.. doctest::
+
+    >>> pm.add_dataframe(df)
 
 Multiple DataFrames can be added to the PerformanceMonitoring object.  
-The 'system_name' is used to distinguish DataFrames.
+DataFrames are merged using Pandas 'combine_first' method.
 
-DataFrames are accessed using::
+DataFrames are accessed using
 
-	pm.df
+.. doctest::
+
+    >>> pm.df #doctest:+SKIP 
 

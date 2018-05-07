@@ -34,10 +34,7 @@ for location_name in locations:
         index = pd.date_range(analysis_date, periods=48, freq='30Min')
         data=np.sin(0.5*np.arange(0,48,1)) + 3*np.random.rand()**3
         df = pd.DataFrame(data=data.transpose(), index=index, columns=['A'])
-        pm.add_dataframe(df, system_name)
-        trans = dict(zip(df.columns, [[col] for col in df.columns]))
-        pm.add_translation_dictionary(trans, system_name)
-        pm.add_translation_dictionary(trans, system_name)
+        pm.add_dataframe(df)
 
         # Check range
         pm.check_range([None,1]) 

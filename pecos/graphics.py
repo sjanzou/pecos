@@ -110,8 +110,7 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
         Boolean values used to include time filter in the plot, default = None 
         
     test_results_group : pandas DataFrame (optional)
-        Test results for a particular variable. To group test results by variable, use
-        grouped = pm.test_results.groupby(['System Name', 'Variable Name']), 
+        Test results for a particular variable.
         default = None 
     
     xaxis_min : float (optional)
@@ -444,19 +443,12 @@ def plot_test_results(filename_root, pm, image_format='png', dpi=500,
 
     tfilter = pm.tfilter
     
-    pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
+    pm.test_results.sort_values(['Variable Name'], inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     
-    grouped = pm.test_results.groupby(['System Name', 'Variable Name'])
+    grouped = pm.test_results.groupby(['Variable Name'])
 
-    for name, test_results_group in grouped:
-        if name[1] == ' ':
-            continue
-        elif name[0] == '':
-            col_name = str(name[1])
-        else:
-            col_name = str(name[0]) + ":" + str(name[1])
-
+    for col_name, test_results_group in grouped:
         if test_results_group['Error Flag'].all() in ['Duplicate timestamp', 
                              'Missing data', 'Corrupt data', 'Missing timestamp', 
                              'Nonmonotonic timestamp']:

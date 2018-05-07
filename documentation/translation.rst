@@ -1,7 +1,8 @@
 Translation dictionary
 -----------------------
-A translation dictionary maps DataFrame column names into common names.  
-The translation dictionary can also be used to group columns with similar 
+Translation dictionaries are an optional feature which allows the user to map original 
+column names into common names that can be more useful for analysis.  
+Translation dictionaries can also be used to group columns with similar 
 properties into a single variable.  
 Using grouped variables, Pecos can run a signal set of quality control tests on the group.
 
@@ -10,33 +11,41 @@ Each entry in a translation dictionary is a key:value pair where
 For example, {temp: [temp1,temp2]} means that columns named 'temp1' and 'temp2' in the 
 DataFrame file are assigned to the common name 'temp' in Pecos.
 In the :ref:`simple_example`, the following translation dictionary is used to rename column
-'A' to 'Linear', 'B' to 'Random', and group columns 'C' and 'D' to 'Wave'::
- 
-	trans = {
-	  Linear: [A],
-	  Random: [B],
-	  Wave: [C,D]}
+'A' to 'Linear', 'B' to 'Random', and group columns 'C' and 'D' to 'Wave'.
 
-The translation dictionary can then be added to the PerformanceMonitoring object as follows::
+.. doctest::
+    :hide:
 
-	pm.add_translation_dictionary(trans, system_name)
+    >>> import pandas as pd
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+    >>> df = pd.DataFrame()
+    >>> pm.add_dataframe(df)
+	
+.. doctest::
 
-If no translation is desired (i.e. raw column names are used), a 1:1 map can be generated using the following code::
+    >>> trans = {Linear: [A], Random: [B], Wave: [C,D]}
 
-	trans = dict(zip(df.columns, [[col] for col in df.columns]))
-	pm.add_translation_dictionary(trans, system_name)
+The translation dictionary can then be added to the PerformanceMonitoring object.
+
+.. doctest::
+
+    >>> pm.add_translation_dictionary(trans)
 
 As with DataFrames, multiple translation dictionaries can be added to the 
-PerformanceMonitoring object, distinguished by the 'system_name'.
+PerformanceMonitoring object. 
 
 Keys defined in the translation dictionary are used in quality control tests,
-for example::
+for example,
 
-	pm.check_range([-1,1], 'Wave')
+.. doctest::
 
-Inside Pecos, the translation dictionary is used to index into the DataFrame, for example::
+    >>> pm.check_range([-1,1], 'Wave')
 
-	pm.df[pm.trans['Wave']]
+Inside Pecos, the translation dictionary is used to index into the DataFrame, for example,
+
+.. doctest::
+
+    >>> pm.df[pm.trans['Wave']] #doctest:+SKIP 
 
 returns columns C and D from the DataFrame.
 

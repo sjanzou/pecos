@@ -22,9 +22,7 @@ pm = pecos.monitoring.PerformanceMonitoring()
 system_name = 'System1'
 data_file = 'System1_2015_performance_metrics.xlsx'
 df = pd.read_excel(data_file)
-pm.add_dataframe(df, system_name)
-translation_dictionary = dict(zip(df.columns, [[col] for col in df.columns])) # 1:1 translation
-pm.add_translation_dictionary(translation_dictionary, system_name)
+pm.add_dataframe(df)
 
 # Check timestamp
 pm.check_timestamp(24*3600) 

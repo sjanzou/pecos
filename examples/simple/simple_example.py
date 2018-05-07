@@ -30,8 +30,8 @@ translation_dictionary = {
     'Linear': ['A'],
     'Random': ['B'],
     'Wave': ['C','D']}
-pm.add_dataframe(df, system_name)
-pm.add_translation_dictionary(translation_dictionary, system_name)
+pm.add_dataframe(df)
+pm.add_translation_dictionary(translation_dictionary)
 
 # Check timestamp
 pm.check_timestamp(900)

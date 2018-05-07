@@ -49,19 +49,17 @@ increment_bounds = config['Increment Bounds']
 pm = pecos.monitoring.PerformanceMonitoring()
 
 # Populate the object with pv and weather dataframes and translation dictionaries
-database_name = 'Baseline6kW'
-database_file = database_name + analysis_date.strftime('_%Y_%m_%d') + '.dat'
+database_file = 'Baseline6kW' + analysis_date.strftime('_%Y_%m_%d') + '.dat'
 df = pecos.io.read_campbell_scientific(database_file)
 df.index = df.index.tz_localize(location['Timezone'])
-pm.add_dataframe(df, database_name)
-pm.add_translation_dictionary(BASE_translation_dictionary, database_name)
+pm.add_dataframe(df)
+pm.add_translation_dictionary(BASE_translation_dictionary)
 
-database_name = 'MET'
-database_file = database_name + analysis_date.strftime('_%Y_%m_%d') + '.dat'
+database_file = 'MET' + analysis_date.strftime('_%Y_%m_%d') + '.dat'
 df = pecos.io.read_campbell_scientific(database_file)
 df.index = df.index.tz_localize(location['Timezone'])
-pm.add_dataframe(df, database_name)
-pm.add_translation_dictionary(MET_translation_dictionary, database_name)
+pm.add_dataframe(df)
+pm.add_translation_dictionary(MET_translation_dictionary)
 
 # Check timestamp
 pm.check_timestamp(60) 

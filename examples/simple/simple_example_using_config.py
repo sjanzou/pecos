@@ -31,8 +31,8 @@ pm = pecos.monitoring.PerformanceMonitoring()
 system_name = 'Simple'
 data_file = 'simple.xlsx'
 df = pd.read_excel(data_file)
-pm.add_dataframe(df, system_name)
-pm.add_translation_dictionary(translation_dictionary, system_name)
+pm.add_dataframe(df)
+pm.add_translation_dictionary(translation_dictionary)
 
 # Check timestamp
 pm.check_timestamp(specs['Frequency'])

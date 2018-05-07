@@ -21,7 +21,7 @@ class PerformanceMonitoring(object):
         self.df = pd.DataFrame()
         self.trans = {}
         self.tfilter = pd.Series()
-        self.test_results = pd.DataFrame(columns=['System Name', 'Variable Name',
+        self.test_results = pd.DataFrame(columns=['Variable Name',
                                                 'Start Date', 'End Date',
                                                 'Timesteps', 'Error Flag'])
 
@@ -94,7 +94,7 @@ class PerformanceMonitoring(object):
 
         use_mask_only : boolean  (optional)
             When True, the mask is used directly to determine test 
-            results and the system/variable name is not included in the 
+            results and the variable name is not included in the 
             test_results. When False, the mask is used in combination with 
             pm.df to extract test results. Default = False
         """
@@ -143,25 +143,22 @@ class PerformanceMonitoring(object):
             if length >= min_failures:
                 if use_mask_only:
                     var_name = ''
-                    system_name = ''
                 else:
                     var_name = sub_df.iloc[:,block['Start Col'][i]].name #sub_df.icol(block['Start Col'][i]).name
-                    system_name = ''
                     temp = var_name.split(':')
                     if len(temp) == 2:
                         var_name = temp[1]
-                        system_name = temp[0]
                     
-                frame = pd.DataFrame([system_name, var_name,
+                frame = pd.DataFrame([var_name,
                     sub_df.index[block['Start Row'][i]],
                     sub_df.index[block['Stop Row'][i]],
                     length, error_msg],
-                    index=['System Name', 'Variable Name', 'Start Date', 
+                    index=['Variable Name', 'Start Date', 
                     'End Date', 'Timesteps', 'Error Flag'])
                 frame_t = frame.transpose()
                 self.test_results = self.test_results.append(frame_t, ignore_index=True)
     
-    def add_dataframe(self, df, system_name=None, add_identity_translation_dictionary=False):
+    def add_dataframe(self, df):
         """
         Add DataFrame to the PerformanceMonitoring object.
 
@@ -169,34 +166,22 @@ class PerformanceMonitoring(object):
         -----------
         df : pandas DataFrame
             DataFrame to add to the PerformanceMonitoring object
-
-        system_name : string (optional)
-            System name
-
-        add_identity_translation_dictionary : boolean (optional)
-            Add a 1:1 translation dictionary to the PerformanceMonitoring 
-            object using all column names in df, default = False
         """
         temp = df.copy()
-
-        # Combine variable name with system name (System: Variable)
-        if system_name:
-            temp.columns = [system_name + ':' + s  for s in temp.columns]
 
         if self.df is not None:
             self.df = self.df.combine_first(temp)
         else:
             self.df = temp.copy()
 
-        # define identity translation
-        if add_identity_translation_dictionary:
-            trans = {}
-            for col in df.columns:
-                trans[col] = [col]
+        # Add identity 1:1 translation dictionary
+        trans = {}
+        for col in df.columns:
+            trans[col] = [col]
+        
+        self.add_translation_dictionary(trans)
 
-            self.add_translation_dictionary(trans, system_name)
-
-    def add_translation_dictionary(self, trans, system_name=None):
+    def add_translation_dictionary(self, trans):
         """
         Add translation dictionary to the PerformanceMonitoring object.
 
@@ -204,18 +189,11 @@ class PerformanceMonitoring(object):
         -----------
         trans : dictionary
             Translation dictionary
-
-        system_name : string (optional)
-            System name
         """
-        # Combine variable name with system name (System: Variable)
         for key, values in trans.items():
             self.trans[key] = []
             for value in values:
-                if system_name:
-                    self.trans[key].append(system_name + ':' + value)
-                else:
-                    self.trans[key].append(value)
+                self.trans[key].append(value)
                 
     def add_time_filter(self, time_filter):
         """
@@ -833,7 +811,6 @@ class PerformanceMonitoring(object):
 
         test_results_mask = ~pd.isnull(df)
         for i in self.test_results.index:
-            system = self.test_results.loc[i, 'System Name']
             variable = self.test_results.loc[i, 'Variable Name']
             start_date = self.test_results.loc[i, 'Start Date']
             end_date = self.test_results.loc[i, 'End Date']
@@ -843,10 +820,6 @@ class PerformanceMonitoring(object):
             if variable == '': # occurs when data is missing
                 test_results_mask.loc[start_date:end_date] = False
             else:
-                if system == '': # occurs when data is a composite signal
-                    column_name = variable
-                else:
-                    column_name = system + ':'+ variable
-                test_results_mask.loc[start_date:end_date,column_name] = False
+                test_results_mask.loc[start_date:end_date,variable] = False
 
         return test_results_mask
