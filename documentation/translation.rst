@@ -33,9 +33,9 @@ The translation dictionary can then be added to the PerformanceMonitoring object
     >>> pm.add_translation_dictionary(trans)
 
 As with DataFrames, multiple translation dictionaries can be added to the 
-PerformanceMonitoring object. 
+PerformanceMonitoring object. Duplicate keys are ignored.
 
-Keys defined in the translation dictionary are used in quality control tests,
+Keys defined in the translation dictionary can be used in quality control tests,
 for example,
 
 .. doctest::

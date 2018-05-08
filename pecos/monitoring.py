@@ -191,6 +191,9 @@ class PerformanceMonitoring(object):
             Translation dictionary
         """
         for key, values in trans.items():
+            if key in self.trans.keys():
+                logger.info(key + ' already exists in df.trans')
+                return
             self.trans[key] = []
             for value in values:
                 self.trans[key].append(value)

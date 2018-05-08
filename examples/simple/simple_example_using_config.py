@@ -27,41 +27,41 @@ increment_bounds = config['Increment Bounds']
 # Create a Pecos PerformanceMonitoring data object
 pm = pecos.monitoring.PerformanceMonitoring()
 
-# Populate the object with a dataframe and translation dictionary
+# Populate the object with a DataFrame and translation dictionary
 system_name = 'Simple'
 data_file = 'simple.xlsx'
 df = pd.read_excel(data_file)
 pm.add_dataframe(df)
 pm.add_translation_dictionary(translation_dictionary)
 
-# Check timestamp
+# Check the expected frequency of the timestamp
 pm.check_timestamp(specs['Frequency'])
  
-# Generate a time filter
+# Generate a time filter to exclude data points early and late in the day
 time_filter = pm.evaluate_string('Time Filter', time_filter)
 pm.add_time_filter(time_filter)
 
-# Check missing
+# Check for missing data
 pm.check_missing()
         
-# Check corrupt
+# Check for corrupt data values
 pm.check_corrupt(corrupt_values) 
 
-# Add composite signals
+# Add a composite signal which compares measurements to a model
 for composite_signal in composite_signals:
     for key, value in composite_signal.items():
         signal = pm.evaluate_string(key, value, specs)
         pm.add_signal(key, signal)
 
-# Check range
+# Check data for expected ranges
 for key,value in range_bounds.items():
     pm.check_range(value, key)
 
-# Check increment
+# Check data for stagnant and abrupt changes
 for key,value in increment_bounds.items():
     pm.check_increment(value, key) 
     
-# Compute metrics
+# Compute the quality control index
 mask = pm.get_test_results_mask()
 QCI = pecos.metrics.qci(mask, pm.tfilter)
 

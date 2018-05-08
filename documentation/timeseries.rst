@@ -37,12 +37,48 @@ A DataFrame can then be added to the PerformanceMonitoring object.
 
     >>> pm.add_dataframe(df)
 
-Multiple DataFrames can be added to the PerformanceMonitoring object.  
-DataFrames are merged using Pandas 'combine_first' method.
-
 DataFrames are accessed using
 
 .. doctest::
 
     >>> pm.df #doctest:+SKIP 
 
+Multiple DataFrames can be added to the PerformanceMonitoring object.  
+DataFrames are merged using Pandas 'combine_first' method.  
+The second DataFrame does not override the first if they share indexes and columns.  
+Missing indexes and columns are filled with NaN.  An example is shown below.
+
+.. doctest::
+    :hide:
+
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import pecos
+    >>> index1 = pd.date_range('1/1/2018', periods=3, freq='D')
+    >>> data1 = {'A': np.arange(3), 'B': np.arange(3)+5}
+    >>> df1 = pd.DataFrame(data1, index=index1)
+    >>> index2 = pd.date_range('1/2/2018', periods=3, freq='D')
+    >>> data2 = {'B': np.arange(3), 'C': np.arange(3)+5}
+    >>> df2 = pd.DataFrame(data2, index=index2)
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+
+.. doctest::
+
+    >>> print(df1)
+                A  B
+    2018-01-01  0  5
+    2018-01-02  1  6
+    2018-01-03  2  7
+    >>> print(df2)
+                B  C
+    2018-01-02  0  5
+    2018-01-03  1  6
+    2018-01-04  2  7
+    >>> pm.add_dataframe(df1)
+    >>> pm.add_dataframe(df2)
+    >>> print(pm.df)
+                  A    B    C
+    2018-01-01  0.0  5.0  NaN
+    2018-01-02  1.0  6.0  5.0
+    2018-01-03  2.0  7.0  6.0
+    2018-01-04  NaN  2.0  7.0
