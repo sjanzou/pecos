@@ -23,6 +23,7 @@ To get started, an instance of the PerformanceMonitoring class is created.
 
 .. doctest::
 
+    >>> import pecos
     >>> pm = pecos.monitoring.PerformanceMonitoring()
 
 A DataFrame can then be added to the PerformanceMonitoring object.

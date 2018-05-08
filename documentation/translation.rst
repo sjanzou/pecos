@@ -1,8 +1,8 @@
 Translation dictionary
 -----------------------
-Translation dictionaries are an optional feature which allows the user to map original 
+A translation dictionary is an optional feature which allows the user to map original 
 column names into common names that can be more useful for analysis.  
-Translation dictionaries can also be used to group columns with similar 
+A translation dictionary can also be used to group columns with similar 
 properties into a single variable.  
 Using grouped variables, Pecos can run a signal set of quality control tests on the group.
 
@@ -17,13 +17,14 @@ In the :ref:`simple_example`, the following translation dictionary is used to re
     :hide:
 
     >>> import pandas as pd
+    >>> import pecos
     >>> pm = pecos.monitoring.PerformanceMonitoring()
     >>> df = pd.DataFrame()
     >>> pm.add_dataframe(df)
 	
 .. doctest::
 
-    >>> trans = {Linear: [A], Random: [B], Wave: [C,D]}
+    >>> trans = {'Linear': ['A'], 'Random': ['B'], 'Wave': ['C','D']}
 
 The translation dictionary can then be added to the PerformanceMonitoring object.
 

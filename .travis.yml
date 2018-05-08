@@ -61,7 +61,7 @@ install:
     - python setup.py install
 
 script:
-    - nosetests -v --with-coverage --cover-package=pecos pecos
+    - nosetests -v --nologcapture --with-coverage --with-doctest --doctest-extension=.rst --cover-package=pecos documentation/*.rst pecos
 
 after_success:
     coveralls
