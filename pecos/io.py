@@ -183,7 +183,7 @@ def write_test_results(filename, test_results):
         Test results stored in pm.test_results
     """
 
-    test_results.sort_values(['Variable Name', 'Start Date', 'End Date'], inplace=True)
+    test_results.sort_values(list(test_results.columns), inplace=True)
     test_results.index = np.arange(1, test_results.shape[0]+1)
 
     logger.info("Writing test results csv file " + filename)
@@ -262,7 +262,7 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     except:
         notes_df = pd.DataFrame()
     
-    pm.test_results.sort_values(['Variable Name'], inplace=True)
+    pm.test_results.sort_values(list(pm.test_results.columns), inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     #pm.test_results.reset_index(inplace=True)
     

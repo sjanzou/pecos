@@ -442,22 +442,24 @@ def plot_test_results(filename_root, pm, image_format='png', dpi=500,
         return test_results_graphics
 
     graphic = 0
-
-    tfilter = pm.tfilter
     
-    pm.test_results.sort_values(['Variable Name'], inplace=True)
+    pm.test_results.sort_values(list(pm.test_results.columns), inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
     
-    grouped = pm.test_results.groupby(['Variable Name'])
+    # Remove specific error flags
+    remove_error_flags = ['Duplicate timestamp', 
+                          'Missing data', 
+                          'Corrupt data', 
+                          'Missing timestamp', 
+                          'Nonmonotonic timestamp']
+    test_results = pm.test_results[-pm.test_results['Error Flag'].isin(remove_error_flags)]
+                    
+    grouped = test_results.groupby(['Variable Name'])
 
     for col_name, test_results_group in grouped:
-        if test_results_group['Error Flag'].all() in ['Duplicate timestamp', 
-                             'Missing data', 'Corrupt data', 'Missing timestamp', 
-                             'Nonmonotonic timestamp']:
-            continue
         logger.info("Creating graphic for " + col_name)
         
-        plot_timeseries(pm.df[col_name], tfilter, 
+        plot_timeseries(pm.df[col_name], pm.tfilter, 
                         test_results_group=test_results_group, figsize = figsize)
 
         ax = plt.gca()
