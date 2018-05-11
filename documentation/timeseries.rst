@@ -44,8 +44,7 @@ DataFrames are accessed using
     >>> pm.df #doctest:+SKIP 
 
 Multiple DataFrames can be added to the PerformanceMonitoring object.  
-DataFrames are merged using Pandas 'combine_first' method.  
-The second DataFrame does not override the first if they share indexes and columns.  
+New data overrides existing data if DataFrames share indexes and columns.  
 Missing indexes and columns are filled with NaN.  An example is shown below.
 
 .. doctest::
@@ -79,6 +78,6 @@ Missing indexes and columns are filled with NaN.  An example is shown below.
     >>> print(pm.df)
                   A    B    C
     2018-01-01  0.0  5.0  NaN
-    2018-01-02  1.0  6.0  5.0
-    2018-01-03  2.0  7.0  6.0
+    2018-01-02  1.0  0.0  5.0
+    2018-01-03  2.0  1.0  6.0
     2018-01-04  NaN  2.0  7.0

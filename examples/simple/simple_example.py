@@ -26,9 +26,8 @@ pm = pecos.monitoring.PerformanceMonitoring()
 system_name = 'Simple'
 data_file = 'simple.xlsx'
 df = pd.read_excel(data_file)
-translation_dictionary = {'Wave': ['C','D']} # group C and D
 pm.add_dataframe(df)
-pm.add_translation_dictionary(translation_dictionary)
+pm.add_translation_dictionary({'Wave': ['C','D']}) # group C and D
 
 # Check the expected frequency of the timestamp
 pm.check_timestamp(900)
@@ -47,15 +46,15 @@ pm.check_corrupt([-999])
 # Add a composite signal which compares measurements to a model
 elapsed_time= pm.get_elapsed_time()
 wave_model = np.sin(10*(elapsed_time/86400))
-wave_model.columns=['Wave Model']
 wave_model_abs_error = np.abs(np.subtract(pm.df[pm.trans['Wave']], wave_model))
-wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-pm.add_signal('Wave Absolute Error', wave_model_abs_error)
+wave_model_abs_error.columns=['Wave Error C', 'Wave Error D']
+pm.add_dataframe(wave_model_abs_error)
+pm.add_translation_dictionary({'Wave Error': ['Wave Error C', 'Wave Error D']})
 
 # Check data for expected ranges
 pm.check_range([0, 1], 'B')
 pm.check_range([-1, 1], 'Wave')
-pm.check_range([None, 0.25], 'Wave Absolute Error')
+pm.check_range([None, 0.25], 'Wave Error')
 
 # Check data for stagnant and abrupt changes
 pm.check_increment([0.0001, None], 'A') 

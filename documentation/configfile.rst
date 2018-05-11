@@ -47,8 +47,8 @@ Strings are evaluated and added to the DataFrame using the following code,
 .. doctest::
 
     >>> signal = pm.evaluate_string('Signal', string, specs) #doctest:+SKIP 
-    >>> pm.add_signal('Signal', signal) #doctest:+SKIP 
+    >>> pm.add_dataframe(signal) #doctest:+SKIP 
 	
 If the string evaluation fails, the error message is printed.  
-See the :class:`~pecos.monitoring.PerformanceMonitoring.evaluate_string` and 
-:class:`~pecos.monitoring.PerformanceMonitoring.add_signal` methods for more details.
+See the :class:`~pecos.monitoring.PerformanceMonitoring.evaluate_string` 
+for more details.

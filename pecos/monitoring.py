@@ -170,7 +170,7 @@ class PerformanceMonitoring(object):
         temp = df.copy()
 
         if self.df is not None:
-            self.df = self.df.combine_first(temp)
+            self.df = temp.combine_first(self.df)
         else:
             self.df = temp.copy()
 
@@ -191,9 +191,6 @@ class PerformanceMonitoring(object):
             Translation dictionary
         """
         for key, values in trans.items():
-            if key in self.trans.keys():
-                logger.info(key + ' already exists in df.trans')
-                return
             self.trans[key] = []
             for value in values:
                 self.trans[key].append(value)
@@ -797,7 +794,7 @@ class PerformanceMonitoring(object):
         --------
         pandas DataFrame containing boolean values for each data point, True =
         data point pass all tests, False = data point did not pass at least 
-        one test.
+        one test (or data is NaN).
         """
         if self.df.empty:
             logger.info("Empty database")
@@ -812,17 +809,15 @@ class PerformanceMonitoring(object):
         else:
             df = self.df
 
-        test_results_mask = ~pd.isnull(df)
+        test_results_mask = ~pd.isnull(df) # False if NaN
         for i in self.test_results.index:
             variable = self.test_results.loc[i, 'Variable Name']
             start_date = self.test_results.loc[i, 'Start Date']
             end_date = self.test_results.loc[i, 'End Date']
-            error_flag = self.test_results.loc[i, 'Error Flag']
-            if error_flag in ['Nonmonotonic timestamp', 'Duplicate timestamp']:
-                continue
-            if variable == '': # occurs when data is missing
-                test_results_mask.loc[start_date:end_date] = False
-            else:
-                test_results_mask.loc[start_date:end_date,variable] = False
-
+            if variable in test_results_mask.columns:
+                try:
+                    test_results_mask.loc[start_date:end_date,variable] = False
+                except:
+                    pass
+                
         return test_results_mask

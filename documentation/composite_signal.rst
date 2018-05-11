@@ -46,4 +46,4 @@ the PerformanceMonitoring object.
     >>> elapsed_time= pm.get_elapsed_time()
     >>> wave_model = np.sin(10*(elapsed_time/86400))
     >>> wave_model.columns=['Wave Model']
-    >>> pm.add_signal('Wave Model', wave_model)
+    >>> pm.add_dataframe(wave_model)

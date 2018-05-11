@@ -51,7 +51,9 @@ pm.check_corrupt(corrupt_values)
 for composite_signal in composite_signals:
     for key, value in composite_signal.items():
         signal = pm.evaluate_string(key, value, specs)
-        pm.add_signal(key, signal)
+        pm.add_dataframe(signal)
+        pm.add_translation_dictionary({key: list(signal.columns)})
+del pm.df['Wave Model']
 
 # Check data for expected ranges
 for key,value in range_bounds.items():

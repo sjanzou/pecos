@@ -17,19 +17,16 @@ simpleexampledir = join(testdir,'..', '..', 'examples','simple')
 def simple_example_run_analysis(df):
     # Input
     system_name = 'Simple'
-    translation_dictionary = {
-        'Linear': ['A'],
-        'Random': ['B'],
-        'Wave': ['C','D']}
+    translation_dictionary = {'Wave': ['C','D']}
     expected_frequency = 900 # s
     corrupt_values = [-999]
     range_bounds = {
-        'Random': [0, 1],
+        'B': [0, 1],
         'Wave': [-1, 1],
-        'Wave Absolute Error': [None, 0.25]}
+        'Wave Error': [None, 0.25]}
     increment_bounds = {
-        'Linear': [0.0001, None],
-        'Random': [0.0001, None],
+        'A': [0.0001, None],
+        'B': [0.0001, None],
         'Wave': [0.0001, 0.6]}
 
      # Define output files
@@ -60,11 +57,10 @@ def simple_example_run_analysis(df):
     # Add composite signals
     elapsed_time= pm.get_elapsed_time()
     wave_model = np.sin(10*(elapsed_time/86400))
-    wave_model.columns=['Wave Model']
-    pm.add_signal('Wave Model', wave_model)
     wave_model_abs_error = np.abs(np.subtract(pm.df[pm.trans['Wave']], wave_model))
-    wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-    pm.add_signal('Wave Absolute Error', wave_model_abs_error)
+    wave_model_abs_error.columns=['Wave Error C', 'Wave Error D']
+    pm.add_dataframe(wave_model_abs_error)
+    pm.add_translation_dictionary({'Wave Error': ['Wave Error C', 'Wave Error D']})
 
     # Check range
     for key,value in range_bounds.items():
@@ -234,19 +230,18 @@ class Test_simple_example(unittest.TestCase):
 
         elapsed_time = self.pm.get_elapsed_time()
         wave_model = np.sin(10*(elapsed_time/86400))
-        wave_model.columns=['Wave Model']
-        self.pm.add_signal('Wave Model', wave_model)
         wave_model_abs_error = np.abs(np.subtract(self.pm.df[self.pm.trans['Wave']], wave_model))
-        wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-        self.pm.add_signal('Wave Absolute Error', wave_model_abs_error)
+        wave_model_abs_error.columns=['Wave Error C', 'Wave Error D']
+        self.pm.add_dataframe(wave_model_abs_error)
+        self.pm.add_translation_dictionary({'Wave Error': ['Wave Error C', 'Wave Error D']})
 
-        self.pm.check_range([None, 0.25], 'Wave Absolute Error')
+        self.pm.check_range([None, 0.25], 'Wave Error')
 
         temp = self.pm.test_results[['Data' in ef for ef in self.pm.test_results['Error Flag']]]
         temp.index = np.arange(temp.shape[0])
 
         expected = pd.DataFrame(
-            [('Wave Absolute Error C',pd.Timestamp('2015-01-01 13:00:00'),pd.Timestamp('2015-01-01 14:45:00'),8.0,'Data > upper bound, 0.25')],
+            [('Wave Error C',pd.Timestamp('2015-01-01 13:00:00'),pd.Timestamp('2015-01-01 14:45:00'),8.0,'Data > upper bound, 0.25')],
             columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
@@ -257,7 +252,7 @@ class Test_simple_example(unittest.TestCase):
 
         (QCI, test_results_file) = simple_example_run_analysis(df)
 
-        assert_almost_equal(QCI.iloc[0,0],0.871227,6)
+        assert_almost_equal(QCI.iloc[0,0],0.852113,6)
 
         actual = pd.read_csv(test_results_file, index_col=0)
         # Convert back to datetime just so that they are in the same format
@@ -278,7 +273,7 @@ class Test_simple_example(unittest.TestCase):
 
         (QCI, test_results_file) = simple_example_run_analysis(df)
 
-        assert_almost_equal(QCI.iloc[0,0],0.871227,6)
+        assert_almost_equal(QCI.iloc[0,0],0.852113,6)
 
         actual = pd.read_csv(test_results_file, index_col=0)
         expected = pd.read_csv(join(datadir,'Simple_test_results_with_timezone.csv'), index_col=0)
