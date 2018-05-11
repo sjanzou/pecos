@@ -143,14 +143,14 @@ used in the analysis.
 * **Configuration Options:**
   Configuration options used in the analysis.
 
-:numref:`fig-monitor` shows a subset of the monitoring report from the :ref:`simple_example`. 
+:numref:`fig-monitor-2` shows the monitoring report from the :ref:`simple_example`. 
 
-.. _fig-monitor:
+.. _fig-monitor-2:
 .. figure:: figures/monitoring_report.png
    :scale: 100 %
    :alt: Monitoring report
    
-   Example monitoring report (subset).
+   Example monitoring report.
 
 .. _dashboards:
    

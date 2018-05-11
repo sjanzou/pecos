@@ -53,11 +53,15 @@ The script performs the following steps:
 
 Results are saved in examples/simple/Results.  Results include:
 
-* HTML report, **Simple.html** (shown below), includes summary tables and graphics
+* HTML monitoring report, **Simple.html** (:numref:`fig-monitor-1`), includes summary tables and graphics
 
 * Test results CSV file, **Simple_test_results.csv**, includes information from the summary tables
 
 * Performance metric CSV file, **Simple_metrics.csv**, includes a quality control index based on the analysis.  
 
-.. raw:: html
-	:file: figures/Simple.html
+.. _fig-monitor-1:
+.. figure:: figures/monitoring_report.png
+   :scale: 100 %
+   :alt: Monitoring report
+   
+   Example monitoring report.
