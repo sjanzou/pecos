@@ -147,7 +147,7 @@ used in the analysis.
 
 .. _fig-monitor-2:
 .. figure:: figures/monitoring_report.png
-   :scale: 100 %
+   :scale: 75 %
    :alt: Monitoring report
    
    Example monitoring report.

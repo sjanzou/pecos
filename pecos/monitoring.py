@@ -209,39 +209,39 @@ class PerformanceMonitoring(object):
         else:
             self.tfilter = time_filter
 
-    def add_signal(self, col_name, data):
-        """
-        Add signal to the PerformanceMonitoring DataFrame.
-
-        Parameters
-        -----------
-        col_name : string
-            Column name to add to translation dictionary
-
-        data : pandas DataFrame or pandas Series
-            Data to add to df
-        """
-        if type(data) is pd.core.series.Series:
-            data = data.to_frame(col_name)
-        if type(data) is not pd.core.frame.DataFrame:
-            logger.warning("Add signal failed")
-            return
-
-        if col_name in self.trans.keys():
-            logger.info(col_name + ' already exists in trans')
-            return
-        for col in data.columns.values.tolist():
-            if col in self.df.columns.values.tolist():
-                logger.info(col + ' already exists in df')
-                return
-        try:
-            self.trans[col_name] = data.columns.values.tolist()
-            #self.df[df.columns] = df
-            for col in data.columns:
-                self.df[col] = data[col]
-        except:
-            logger.warning("Add signal failed: " + col_name)
-            return
+#    def add_signal(self, col_name, data):
+#        """
+#        Add signal to the PerformanceMonitoring DataFrame.
+#
+#        Parameters
+#        -----------
+#        col_name : string
+#            Column name to add to translation dictionary
+#
+#        data : pandas DataFrame or pandas Series
+#            Data to add to df
+#        """
+#        if type(data) is pd.core.series.Series:
+#            data = data.to_frame(col_name)
+#        if type(data) is not pd.core.frame.DataFrame:
+#            logger.warning("Add signal failed")
+#            return
+#
+#        if col_name in self.trans.keys():
+#            logger.info(col_name + ' already exists in trans')
+#            return
+#        for col in data.columns.values.tolist():
+#            if col in self.df.columns.values.tolist():
+#                logger.info(col + ' already exists in df')
+#                return
+#        try:
+#            self.trans[col_name] = data.columns.values.tolist()
+#            #self.df[df.columns] = df
+#            for col in data.columns:
+#                self.df[col] = data[col]
+#        except:
+#            logger.warning("Add signal failed: " + col_name)
+#            return
 
     def check_timestamp(self, frequency, expected_start_time=None,
                         expected_end_time=None, min_failures=1,

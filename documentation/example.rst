@@ -61,7 +61,7 @@ Results are saved in examples/simple/Results.  Results include:
 
 .. _fig-monitor-1:
 .. figure:: figures/monitoring_report.png
-   :scale: 100 %
+   :scale: 75 %
    :alt: Monitoring report
    
    Example monitoring report.
