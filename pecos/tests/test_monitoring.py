@@ -212,6 +212,7 @@ class Test_simple_example(unittest.TestCase):
 
         temp = self.pm.test_results[['Delta' in ef for ef in self.pm.test_results['Error Flag']]]
         temp.index = np.arange(temp.shape[0])
+        print(temp)
 
         """
         Column A has the same value (0.5) from 12:00 until 14:30
