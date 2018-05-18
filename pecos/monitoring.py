@@ -483,8 +483,8 @@ class PerformanceMonitoring(object):
         window_str = str(int(window*1e6)) + 'us'
 
         # Extract the max/min position in each window
-        argmax_df = df.rolling(window_str).apply(np.nanargmax) 
-        argmin_df = df.rolling(window_str).apply(np.nanargmin) 
+        argmax_df = df.rolling(window_str).apply(np.nanargmax, raw=True) 
+        argmin_df = df.rolling(window_str).apply(np.nanargmin, raw=True) 
         # Replace nan with 0
         argmax_df[argmax_df.isnull()] = 0 
         argmin_df[argmin_df.isnull()] = 0               
