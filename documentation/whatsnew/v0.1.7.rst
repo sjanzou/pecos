@@ -14,4 +14,6 @@ v0.1.7 (Master branch)
   column names is generated when data is added to the PerformanceMonitoring object 
   using add_dataframe.
 * Added Python 3.6 tests.
+* Removed Python 3.4 tests (Pandas dropped support for Python 3.4 with version 0.21.0).
+* Updates to check_range requires Pandas 0.23.0.
 * Updated documentation, added doctests.
