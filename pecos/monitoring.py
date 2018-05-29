@@ -22,7 +22,7 @@ class PerformanceMonitoring(object):
         self.trans = {}
         self.tfilter = pd.Series()
         self.test_results = pd.DataFrame(columns=['Variable Name',
-                                                'Start Date', 'End Date',
+                                                'Start Time', 'End Time',
                                                 'Timesteps', 'Error Flag'])
 
     def _setup_data(self, key, rolling_mean):
@@ -153,8 +153,8 @@ class PerformanceMonitoring(object):
                     sub_df.index[block['Start Row'][i]],
                     sub_df.index[block['Stop Row'][i]],
                     length, error_msg],
-                    index=['Variable Name', 'Start Date', 
-                    'End Date', 'Timesteps', 'Error Flag'])
+                    index=['Variable Name', 'Start Time', 
+                    'End Time', 'Timesteps', 'Error Flag'])
                 frame_t = frame.transpose()
                 self.test_results = self.test_results.append(frame_t, ignore_index=True)
     
@@ -649,7 +649,7 @@ class PerformanceMonitoring(object):
         missing_timestamps = self.test_results[
                 self.test_results['Error Flag'] == 'Missing timestamp']
         for index, row in missing_timestamps.iterrows():
-            mask.loc[row['Start Date']:row['End Date']] = False
+            mask.loc[row['Start Time']:row['End Time']] = False
 
         self._append_test_results(mask, 'Missing data', min_failures=min_failures)
 
@@ -815,8 +815,8 @@ class PerformanceMonitoring(object):
         test_results_mask = ~pd.isnull(df) # False if NaN
         for i in self.test_results.index:
             variable = self.test_results.loc[i, 'Variable Name']
-            start_date = self.test_results.loc[i, 'Start Date']
-            end_date = self.test_results.loc[i, 'End Date']
+            start_date = self.test_results.loc[i, 'Start Time']
+            end_date = self.test_results.loc[i, 'End Time']
             if variable in test_results_mask.columns:
                 try:
                     test_results_mask.loc[start_date:end_date,variable] = False

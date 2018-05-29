@@ -183,8 +183,8 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
                 
                 date_idx2 = np.array([False]*len(data.index))
                 for row2 in range(len(test_results_group2.index)):
-                    s_index = test_results_group2.columns.get_loc("Start Date")
-                    e_index = test_results_group2.columns.get_loc("End Date")
+                    s_index = test_results_group2.columns.get_loc("Start Time")
+                    e_index = test_results_group2.columns.get_loc("End Time")
                     date_idx2 = date_idx2 + ((data.index >= test_results_group2.iloc[row2,s_index]) & 
                                              (data.index <= test_results_group2.iloc[row2,e_index]))
                 

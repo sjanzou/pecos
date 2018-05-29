@@ -1,4 +1,4 @@
-,Variable Name,Start Date,End Date,Timesteps,Error Flag
+,Variable Name,Start Time,End Time,Timesteps,Error Flag
 1,,2015-01-01 05:00:00-07:00,2015-01-01 05:00:00-07:00,1,Missing timestamp
 2,,2015-01-01 17:00:00-07:00,2015-01-01 17:00:00-07:00,1,Duplicate timestamp
 3,,2015-01-01 19:30:00-07:00,2015-01-01 19:30:00-07:00,1,Nonmonotonic timestamp

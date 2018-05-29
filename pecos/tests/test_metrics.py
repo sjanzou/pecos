@@ -72,16 +72,16 @@ def test_qci_with_test_results():
     
     test_result = {
     'Variable Name': 'A', 
-    'Start Date': '2016-01-01 01:00:00', 
-    'End Date': '2016-01-01 04:00:00', 
+    'Start Time': '2016-01-01 01:00:00', 
+    'End Time': '2016-01-01 04:00:00', 
     'Timesteps': 4, 
     'Error Flag': 'Error Flag'}
     pm.test_results = pm.test_results.append(pd.DataFrame(test_result, index=[1]))
     
     test_result = {
     'Variable Name': 'B', 
-    'Start Date': '2016-01-01 01:00:00', 
-    'End Date': '2016-01-01 01:00:00', 
+    'Start Time': '2016-01-01 01:00:00', 
+    'End Time': '2016-01-01 01:00:00', 
     'Timesteps': 1, 
     'Error Flag': 'Error Flag'}
     pm.test_results = pm.test_results.append(pd.DataFrame(test_result, index=[2]))
@@ -115,16 +115,16 @@ def test_qci_perday():
     
     test_result = {
     'Variable Name': 'A', 
-    'Start Date': '2016-01-01 01:00:00', 
-    'End Date': '2016-01-01 04:00:00', 
+    'Start Time': '2016-01-01 01:00:00', 
+    'End Time': '2016-01-01 04:00:00', 
     'Timesteps': 4, 
     'Error Flag': 'Error Flag'}
     pm.test_results = pm.test_results.append(pd.DataFrame(test_result, index=[1]))
     
     test_result = {
     'Variable Name': 'B', 
-    'Start Date': '2016-01-01 00:00:00', 
-    'End Date': '2016-01-01 00:00:00', 
+    'Start Time': '2016-01-01 00:00:00', 
+    'End Time': '2016-01-01 00:00:00', 
     'Timesteps': 1, 
     'Error Flag': 'Error Flag'}
     pm.test_results = pm.test_results.append(pd.DataFrame(test_result, index=[2]))

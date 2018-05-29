@@ -127,7 +127,7 @@ class Test_simple_example(unittest.TestCase):
             [('', pd.Timestamp('2015-01-01 19:30:00'), pd.Timestamp('2015-01-01 19:30:00'), 1.0, 'Nonmonotonic timestamp'),
              ('', pd.Timestamp('2015-01-01 17:00:00'), pd.Timestamp('2015-01-01 17:00:00'), 1.0, 'Duplicate timestamp'),
              ('', pd.Timestamp('2015-01-01 05:00:00'), pd.Timestamp('2015-01-01 05:00:00'), 1.0, 'Missing timestamp')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(test_results, expected, check_dtype=False)
 
@@ -141,7 +141,7 @@ class Test_simple_example(unittest.TestCase):
         """
         expected = pd.DataFrame(
             [('D', pd.Timestamp('2015-01-01 17:45:00'), pd.Timestamp('2015-01-01 18:15:00'), 3.0, 'Missing data')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -155,7 +155,7 @@ class Test_simple_example(unittest.TestCase):
         """
         expected = pd.DataFrame(
             [('C', pd.Timestamp('2015-01-01 07:30:00'), pd.Timestamp('2015-01-01 09:30:00'), 9.0, 'Corrupt data')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -181,7 +181,7 @@ class Test_simple_example(unittest.TestCase):
              ('D', pd.Timestamp('2015-01-01 04:30:00'), pd.Timestamp('2015-01-01 04:45:00'), 2.0, 'Data > upper bound, 1'),
              ('D', pd.Timestamp('2015-01-01 18:30:00'), pd.Timestamp('2015-01-01 18:45:00'), 2.0, 'Data > upper bound, 1'),
              ('D', pd.Timestamp('2015-01-01 19:15:00'), pd.Timestamp('2015-01-01 19:45:00'), 3.0, 'Data > upper bound, 1')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -201,7 +201,7 @@ class Test_simple_example(unittest.TestCase):
         expected = pd.DataFrame(
             [('A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:30:00'), 10.0, '|Increment| < lower bound, 0.0001'),
              ('C', pd.Timestamp('2015-01-01 13:00:00'), pd.Timestamp('2015-01-01 13:00:00'), 1.0, '|Increment| > upper bound, 0.6')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
     
@@ -220,7 +220,7 @@ class Test_simple_example(unittest.TestCase):
         expected = pd.DataFrame(
             [('A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:15:00'), 9.0, '|Delta| < lower bound, 0.0001'),
              ('C', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 13:00:00'), 2.0, '|Delta| > upper bound, 0.6')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
         
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -241,7 +241,7 @@ class Test_simple_example(unittest.TestCase):
 
         expected = pd.DataFrame(
             [('Wave Error C',pd.Timestamp('2015-01-01 13:00:00'),pd.Timestamp('2015-01-01 14:45:00'),8.0,'Data > upper bound, 0.25')],
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -255,13 +255,13 @@ class Test_simple_example(unittest.TestCase):
 
         actual = pd.read_csv(test_results_file, index_col=0)
         # Convert back to datetime just so that they are in the same format
-        actual['Start Date'] = pd.to_datetime(actual['Start Date'])
-        actual['End Date'] = pd.to_datetime(actual['End Date'])
+        actual['Start Time'] = pd.to_datetime(actual['Start Time'])
+        actual['End Time'] = pd.to_datetime(actual['End Time'])
         
         expected = pd.read_csv(join(datadir,'Simple_test_results.csv'), index_col=0)
         # Convert back to datetime just so that they are in the same format
-        expected['Start Date'] = pd.to_datetime(expected['Start Date'])
-        expected['End Date'] = pd.to_datetime(expected['End Date'])
+        expected['Start Time'] = pd.to_datetime(expected['Start Time'])
+        expected['End Time'] = pd.to_datetime(expected['End Time'])
         
         assert_frame_equal(actual, expected, check_dtype=False)
 
@@ -341,7 +341,7 @@ class Test_check_timestamp(unittest.TestCase):
             array([['', Timestamp('2016-10-17 02:05:00'),
                    Timestamp('2016-10-17 03:05:00'), 2,
                    'Missing timestamp']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -351,7 +351,7 @@ class Test_check_timestamp(unittest.TestCase):
         expected = pd.DataFrame(
             array([['', Timestamp('2016-10-17 02:00:00'),
                     Timestamp('2016-10-17 02:00:00'), 1, 'Missing timestamp']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -362,7 +362,7 @@ class Test_check_timestamp(unittest.TestCase):
             array([['', Timestamp('2016-10-17 01:00:00'),
                    Timestamp('2016-10-17 03:00:00'), 3,
                    'Missing timestamp']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -391,7 +391,7 @@ class Test_check_delta(unittest.TestCase):
         expected = pd.DataFrame(
             array([['A', Timestamp('2017-01-01 00:00:00'), Timestamp('2017-01-01 05:00:00'), 6, '|Delta| < lower bound, 1'],
                    ['A', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 23:00:00'), 8, '|Delta| < lower bound, 1']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -403,7 +403,7 @@ class Test_check_delta(unittest.TestCase):
             array([['A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, '|Delta| > upper bound, 7'],
                    ['B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, '|Delta| > upper bound, 7'],
                    ['B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, '|Delta| > upper bound, 7']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=3, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -414,7 +414,7 @@ class Test_check_delta(unittest.TestCase):
         expected = pd.DataFrame(
             array([['A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, 'Delta > upper bound, 7'],
                    ['B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, 'Delta > upper bound, 7']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -424,7 +424,7 @@ class Test_check_delta(unittest.TestCase):
         self.pm.check_delta([-7, None], window=3*3600+1, absolute_value=False)
         expected = pd.DataFrame(
             array([['B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, 'Delta < lower bound, -7']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -453,7 +453,7 @@ class Test_check_outlier(unittest.TestCase):
         expected = pd.DataFrame(
             array([['A', Timestamp('2017-01-01 19:00:00'), Timestamp('2017-01-01 19:00:00'), 1, 'Outlier < lower bound, -1.9'],
                    ['A', Timestamp('2017-01-01 06:00:00'), Timestamp('2017-01-01 06:00:00'), 1, 'Outlier > upper bound, 1.9']], dtype=object),
-            columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)

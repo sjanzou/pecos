@@ -16,9 +16,9 @@ Test results includes the following information:
 
 * Variable Name: Column name in the DataFrame
 
-* Start Date: Start time of the failure
+* Start Time: Start time of the failure
 
-* End Date: : End time of the failure
+* End Time: : End time of the failure
 
 * Timesteps: The number of consecutive time steps involved in the failure
 
@@ -58,7 +58,7 @@ A subset of quality control test results from the :ref:`simple_example` are show
 .. doctest::
 
     >>> print(pm.test_results)
-      Variable Name      Start Date        End Date  Timesteps                         Error Flag
+      Variable Name      Start Time        End Time  Timesteps                         Error Flag
     1           NaN   1/1/2015 5:00   1/1/2015 5:00          1                  Missing timestamp
     2           NaN  1/1/2015 17:00  1/1/2015 17:00          1                Duplicate timestamp
     3           NaN  1/1/2015 19:30  1/1/2015 19:30          1             Nonmonotonic timestamp
