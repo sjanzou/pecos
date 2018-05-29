@@ -442,9 +442,9 @@ class PerformanceMonitoring(object):
                     absolute_value=True, rolling_mean=0, min_failures=1):
         """
         Check bounds on the difference between max and min data values within 
-		 a rolling window (Note, this method is currently NOT efficient for large 
+		  a rolling window (Note, this method is currently NOT efficient for large 
         data sets (> 100000 pts) because it uses df.rolling().apply() to find 
-        the position of the min and max).
+        the position of the min and max). This method requires pandas 0.23 or greater.
 
         Parameters
         ----------
@@ -482,35 +482,38 @@ class PerformanceMonitoring(object):
         
         window_str = str(int(window*1e6)) + 'us'
 
-        # Extract the max/min position in each window
-        argmax_df = df.rolling(window_str).apply(np.nanargmax) 
-        argmin_df = df.rolling(window_str).apply(np.nanargmin) 
-        # Replace nan with 0
-        argmax_df[argmax_df.isnull()] = 0 
-        argmin_df[argmin_df.isnull()] = 0               
-        # Shift the position to account for the moving window
-        rng = pd.date_range(df.index[0], periods=2, freq=window_str)
-        nshift = (df.index < rng[1]).sum()
-        index_shift = pd.Series(np.append(np.zeros(nshift-1), np.arange(len(df)-(nshift-1))), index=df.index)
-        argmax_df = argmax_df.add(index_shift, axis=0)
-        argmin_df = argmin_df.add(index_shift, axis=0)
-         # Convert to int
-        argmax_df = argmax_df.astype(int)
-        argmin_df = argmin_df.astype(int)
+        def f(data=None, method=None):
+            if data.notnull().sum() < 2: # there has to be at least two numbers
+                return np.nan
+            else:
+                if method == 'idxmin':
+                    # Can't return a timestamp, convert to num, then back to timestamp
+                    return data.idxmin().value 
+                elif method == 'min':
+                    return data.min()
+                elif method == 'idxmax':
+                    return data.idxmax().value
+                elif method == 'max':
+                    return data.max()
+                else:
+                    return np.nan
+                
+        tmin_df = df.rolling(window_str).apply(lambda x: f(x, 'idxmin'), raw=False) # raw = False passes a Series
+        tmin_df = tmin_df.astype('datetime64[ns]')
+        # Note, the next line should be replaced with df.rolling(window_str).min(), 
+        # but the solution is not the same with pandas 0.23
+        min_df = df.rolling(window_str).apply(lambda x: f(x, 'min'), raw=False)
         
-        # Extract the max/min time in each window
-        tmax_df = pd.DataFrame(argmax_df.index[argmax_df], 
-                               columns=argmax_df.columns, index=argmax_df.index)
-        tmin_df = pd.DataFrame(argmin_df.index[argmin_df], 
-                               columns=argmin_df.columns, index=argmin_df.index)
+        tmax_df = df.rolling(window_str).apply(lambda x: f(x, 'idxmax'), raw=False)
+        tmax_df = tmax_df.astype('datetime64[ns]')
+        # Same note as above, for max
+        max_df = df.rolling(window_str).apply(lambda x: f(x, 'max'), raw=False)
         
-        # Compute max difference in each window
-        diff_df = df.rolling(window_str).max() - df.rolling(window_str).min() # ignores nan
-        diff_df.iloc[0:nshift-1,:] = np.nan # reset values without full window to nan
+        diff_df = max_df - min_df
         if not absolute_value:
             reverse_order = tmax_df < tmin_df 
             diff_df[reverse_order] = -diff_df[reverse_order]
-            
+
         if absolute_value:
             error_prefix = '|Delta|'
         else:

@@ -212,7 +212,6 @@ class Test_simple_example(unittest.TestCase):
 
         temp = self.pm.test_results[['Delta' in ef for ef in self.pm.test_results['Error Flag']]]
         temp.index = np.arange(temp.shape[0])
-        print(temp)
 
         """
         Column A has the same value (0.5) from 12:00 until 14:30
@@ -220,7 +219,6 @@ class Test_simple_example(unittest.TestCase):
         """
         expected = pd.DataFrame(
             [('A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:15:00'), 9.0, '|Delta| < lower bound, 0.0001'),
-             ('C', pd.Timestamp('2015-01-01 07:15:00'), pd.Timestamp('2015-01-01 07:15:00'), 1.0, '|Delta| < lower bound, 0.0001'), # this is included because of the preceding NaNs
              ('C', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 13:00:00'), 2.0, '|Delta| > upper bound, 0.6')],
             columns=['Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
         
