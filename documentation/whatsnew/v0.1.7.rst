@@ -5,8 +5,9 @@ v0.1.7 (Master branch)
 
 * Added quality control test to identify outliers.
 * Bug fix to allow for sub-second data frequency.
-* Dropped 'System Name' from the analysis, this added assumptions about column names 
+* Dropped 'System Name' from the analysis and test results, this added assumptions about column names 
   in the code.
+* Changed 'Start Date' and 'End Date' to 'Start Time' and 'End Time' in the test results.
 * New data added to a PerformanceMonitoring object using add_dataframe now overrides 
   existing data if there are shared indexes and columns.
 * Removed add_signal method, use add_dataframe instead.
