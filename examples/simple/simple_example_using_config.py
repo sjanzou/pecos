@@ -53,7 +53,6 @@ for composite_signal in composite_signals:
         signal = pm.evaluate_string(key, value, specs)
         pm.add_dataframe(signal)
         pm.add_translation_dictionary({key: list(signal.columns)})
-del pm.df['Wave Model']
 
 # Check data for expected ranges
 for key,value in range_bounds.items():
@@ -65,6 +64,7 @@ for key,value in increment_bounds.items():
     
 # Compute the quality control index
 mask = pm.get_test_results_mask()
+del mask['Wave Model'] # Not counted in the QCI
 QCI = pecos.metrics.qci(mask, pm.tfilter)
 
  # Define output files and directories
