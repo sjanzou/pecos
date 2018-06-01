@@ -453,7 +453,6 @@ def plot_test_results(filename_root, pm, image_format='png', dpi=500,
                           'Missing timestamp', 
                           'Nonmonotonic timestamp']
     test_results = pm.test_results[-pm.test_results['Error Flag'].isin(remove_error_flags)]
-                    
     grouped = test_results.groupby(['Variable Name'])
 
     for col_name, test_results_group in grouped:

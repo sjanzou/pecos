@@ -145,9 +145,6 @@ class PerformanceMonitoring(object):
                     var_name = ''
                 else:
                     var_name = sub_df.iloc[:,block['Start Col'][i]].name #sub_df.icol(block['Start Col'][i]).name
-                    temp = var_name.split(':')
-                    if len(temp) == 2:
-                        var_name = temp[1]
                     
                 frame = pd.DataFrame([var_name,
                     sub_df.index[block['Start Row'][i]],
@@ -178,7 +175,7 @@ class PerformanceMonitoring(object):
         trans = {}
         for col in df.columns:
             trans[col] = [col]
-        
+
         self.add_translation_dictionary(trans)
 
     def add_translation_dictionary(self, trans):
@@ -194,7 +191,7 @@ class PerformanceMonitoring(object):
             self.trans[key] = []
             for value in values:
                 self.trans[key].append(value)
-                
+
     def add_time_filter(self, time_filter):
         """
         Add a time filter to the PerformanceMonitoring object.
@@ -732,10 +729,10 @@ class PerformanceMonitoring(object):
 
         try:
             signal = eval(string_to_eval)
-            if type(signal) is tuple:
+            if type(signal) is tuple: # A tuple of series
                 col_name = [col_name + " " + str(i+1)  for i in range(len(signal))]
                 signal = pd.concat(signal, axis=1)
-                signal.columns = [col_name]
+                signal.columns = col_name
                 signal.index = self.df.index
             elif type(signal) is float:
                 signal = signal

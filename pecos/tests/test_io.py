@@ -121,7 +121,7 @@ def test_write_monitoring_report2():# with test results and graphics (encoded an
 
     
 def test_write_dashboard1(): # empty content
-    filename = abspath(join(testdir, 'test_write_dashboard1.html'))
+    filename = abspath(join(testdir, 'test_write_dashboard1_empty.html'))
     if isfile(filename):
         os.remove(filename)
         
