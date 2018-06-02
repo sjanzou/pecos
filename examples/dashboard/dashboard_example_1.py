@@ -43,8 +43,8 @@ for location_name in locations:
         index = pd.date_range(analysis_date, periods=24, freq='H')
         data=np.sin(np.random.rand(3,1)*np.arange(0,24,1))
         df = pd.DataFrame(data=data.transpose(), index=index, columns=['A', 'B', 'C'])
-        pm.add_dataframe(df, system_name)
-        pm.add_translation_dictionary(trans, system_name)
+        pm.add_dataframe(df)
+        pm.add_translation_dictionary(trans)
 
         # Check timestamp
         pm.check_timestamp(specs['Frequency']) 

@@ -41,18 +41,6 @@ of expected range, data that doesn't change, and data that changes abruptly, as 
 The script, **simple_example.py** (shown below), is used to run quality control analysis using Pecos.
 The script performs the following steps:
 
-* Define input for quality control tests, including 
-  
-  * Expected frequency of the timestamp
-  
-  * Time filter to exclude data points early and late in the day
-  
-  * Corrupt data values
-  
-  * Upper and lower bounds for expected data range and data increments 
-  
-  * sine wave model to compute measurement error
-  
 * Load time series data from an excel file
 
 * Run quality control tests
@@ -65,11 +53,15 @@ The script performs the following steps:
 
 Results are saved in examples/simple/Results.  Results include:
 
-* HTML report, **Simple.html** (shown below), includes summary tables and graphics
+* HTML monitoring report, **Simple.html** (:numref:`fig-monitor-1`), includes summary tables and graphics
 
 * Test results CSV file, **Simple_test_results.csv**, includes information from the summary tables
 
 * Performance metric CSV file, **Simple_metrics.csv**, includes a quality control index based on the analysis.  
 
-.. raw:: html
-	:file: figures/Simple.html
+.. _fig-monitor-1:
+.. figure:: figures/monitoring_report.png
+   :scale: 100 %
+   :alt: Monitoring report
+   
+   Example monitoring report.

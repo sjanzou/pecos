@@ -17,19 +17,16 @@ simpleexampledir = join(testdir,'..', '..', 'examples','simple')
 def simple_example_run_analysis(df):
     # Input
     system_name = 'Simple'
-    translation_dictionary = {
-        'Linear': ['A'],
-        'Random': ['B'],
-        'Wave': ['C','D']}
+    translation_dictionary = {'Wave': ['C','D']}
     expected_frequency = 900 # s
     corrupt_values = [-999]
     range_bounds = {
-        'Random': [0, 1],
+        'B': [0, 1],
         'Wave': [-1, 1],
-        'Wave Absolute Error': [None, 0.25]}
+        'Wave Error': [None, 0.25]}
     increment_bounds = {
-        'Linear': [0.0001, None],
-        'Random': [0.0001, None],
+        'A': [0.0001, None],
+        'B': [0.0001, None],
         'Wave': [0.0001, 0.6]}
 
      # Define output files
@@ -40,8 +37,8 @@ def simple_example_run_analysis(df):
     pm = pecos.monitoring.PerformanceMonitoring()
 
     # Populate the PerformanceMonitoring instance
-    pm.add_dataframe(df, system_name)
-    pm.add_translation_dictionary(translation_dictionary, system_name)
+    pm.add_dataframe(df)
+    pm.add_translation_dictionary(translation_dictionary)
 
     # Check timestamp
     pm.check_timestamp(expected_frequency)
@@ -60,11 +57,10 @@ def simple_example_run_analysis(df):
     # Add composite signals
     elapsed_time= pm.get_elapsed_time()
     wave_model = np.sin(10*(elapsed_time/86400))
-    wave_model.columns=['Wave Model']
-    pm.add_signal('Wave Model', wave_model)
     wave_model_abs_error = np.abs(np.subtract(pm.df[pm.trans['Wave']], wave_model))
-    wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-    pm.add_signal('Wave Absolute Error', wave_model_abs_error)
+    wave_model_abs_error.columns=['Wave Error C', 'Wave Error D']
+    pm.add_dataframe(wave_model_abs_error)
+    pm.add_translation_dictionary({'Wave Error': ['Wave Error C', 'Wave Error D']})
 
     # Check range
     for key,value in range_bounds.items():
@@ -93,13 +89,12 @@ class Test_simple_example(unittest.TestCase):
             'Random': ['B'],
             'Wave': ['C','D']}
 
-        system_name = 'Simple'
         file_name = join(simpleexampledir,'simple.xlsx')
 
         df = pd.read_excel(file_name)
         self.pm = pecos.monitoring.PerformanceMonitoring()
-        self.pm.add_dataframe(df, system_name)
-        self.pm.add_translation_dictionary(trans, system_name)
+        self.pm.add_dataframe(df)
+        self.pm.add_translation_dictionary(trans)
         self.pm.check_timestamp(900)
         clock_time = self.pm.get_clock_time()
         time_filter = (clock_time > 3*3600) & (clock_time < 21*3600)
@@ -112,7 +107,6 @@ class Test_simple_example(unittest.TestCase):
     def test_evaluate_string(self):
         time_filter_string = "({CLOCK_TIME} > 3*3600) & ({CLOCK_TIME} < 21*3600)"
         time_filter = self.pm.evaluate_string('Time Filter', time_filter_string)
-        print(time_filter)
         
         expected = pd.DataFrame(index=self.pm.df.index, columns=['Time Filter'])
         expected['Time Filter'] = False
@@ -130,10 +124,10 @@ class Test_simple_example(unittest.TestCase):
         Non-monotonic timestamp 19:30
         """
         expected = pd.DataFrame(
-            [('', '', pd.Timestamp('2015-01-01 19:30:00'), pd.Timestamp('2015-01-01 19:30:00'), 1.0, 'Nonmonotonic timestamp'),
-             ('', '', pd.Timestamp('2015-01-01 17:00:00'), pd.Timestamp('2015-01-01 17:00:00'), 1.0, 'Duplicate timestamp'),
-             ('', '', pd.Timestamp('2015-01-01 05:00:00'), pd.Timestamp('2015-01-01 05:00:00'), 1.0, 'Missing timestamp')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('', pd.Timestamp('2015-01-01 19:30:00'), pd.Timestamp('2015-01-01 19:30:00'), 1.0, 'Nonmonotonic timestamp'),
+             ('', pd.Timestamp('2015-01-01 17:00:00'), pd.Timestamp('2015-01-01 17:00:00'), 1.0, 'Duplicate timestamp'),
+             ('', pd.Timestamp('2015-01-01 05:00:00'), pd.Timestamp('2015-01-01 05:00:00'), 1.0, 'Missing timestamp')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(test_results, expected, check_dtype=False)
 
@@ -146,8 +140,8 @@ class Test_simple_example(unittest.TestCase):
         Column D is missing data from 17:45 until 18:15
         """
         expected = pd.DataFrame(
-            [('Simple', 'D', pd.Timestamp('2015-01-01 17:45:00'), pd.Timestamp('2015-01-01 18:15:00'), 3.0, 'Missing data')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('D', pd.Timestamp('2015-01-01 17:45:00'), pd.Timestamp('2015-01-01 18:15:00'), 3.0, 'Missing data')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -160,8 +154,8 @@ class Test_simple_example(unittest.TestCase):
         Column C has corrupt data (-999) between 7:30 and 9:30
         """
         expected = pd.DataFrame(
-            [('Simple', 'C', pd.Timestamp('2015-01-01 07:30:00'), pd.Timestamp('2015-01-01 09:30:00'), 9.0, 'Corrupt data')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('C', pd.Timestamp('2015-01-01 07:30:00'), pd.Timestamp('2015-01-01 09:30:00'), 9.0, 'Corrupt data')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -178,16 +172,16 @@ class Test_simple_example(unittest.TestCase):
         Column D is occasionally below the expected lower bound of -1 around midday (2 time steps) and above the expected upper bound of 1 in the early morning and late evening (10 time steps).
         """
         expected = pd.DataFrame(
-            [('Simple', 'B', pd.Timestamp('2015-01-01 06:30:00'), pd.Timestamp('2015-01-01 06:30:00'), 1.0, 'Data < lower bound, 0'),
-             ('Simple', 'B', pd.Timestamp('2015-01-01 15:30:00'), pd.Timestamp('2015-01-01 15:30:00'), 1.0, 'Data > upper bound, 1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 11:15:00'), pd.Timestamp('2015-01-01 11:15:00'), 1.0, 'Data < lower bound, -1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 12:45:00'), 1.0, 'Data < lower bound, -1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 03:15:00'), pd.Timestamp('2015-01-01 03:30:00'), 2.0, 'Data > upper bound, 1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 04:00:00'), pd.Timestamp('2015-01-01 04:00:00'), 1.0, 'Data > upper bound, 1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 04:30:00'), pd.Timestamp('2015-01-01 04:45:00'), 2.0, 'Data > upper bound, 1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 18:30:00'), pd.Timestamp('2015-01-01 18:45:00'), 2.0, 'Data > upper bound, 1'),
-             ('Simple', 'D', pd.Timestamp('2015-01-01 19:15:00'), pd.Timestamp('2015-01-01 19:45:00'), 3.0, 'Data > upper bound, 1')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('B', pd.Timestamp('2015-01-01 06:30:00'), pd.Timestamp('2015-01-01 06:30:00'), 1.0, 'Data < lower bound, 0'),
+             ('B', pd.Timestamp('2015-01-01 15:30:00'), pd.Timestamp('2015-01-01 15:30:00'), 1.0, 'Data > upper bound, 1'),
+             ('D', pd.Timestamp('2015-01-01 11:15:00'), pd.Timestamp('2015-01-01 11:15:00'), 1.0, 'Data < lower bound, -1'),
+             ('D', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 12:45:00'), 1.0, 'Data < lower bound, -1'),
+             ('D', pd.Timestamp('2015-01-01 03:15:00'), pd.Timestamp('2015-01-01 03:30:00'), 2.0, 'Data > upper bound, 1'),
+             ('D', pd.Timestamp('2015-01-01 04:00:00'), pd.Timestamp('2015-01-01 04:00:00'), 1.0, 'Data > upper bound, 1'),
+             ('D', pd.Timestamp('2015-01-01 04:30:00'), pd.Timestamp('2015-01-01 04:45:00'), 2.0, 'Data > upper bound, 1'),
+             ('D', pd.Timestamp('2015-01-01 18:30:00'), pd.Timestamp('2015-01-01 18:45:00'), 2.0, 'Data > upper bound, 1'),
+             ('D', pd.Timestamp('2015-01-01 19:15:00'), pd.Timestamp('2015-01-01 19:45:00'), 3.0, 'Data > upper bound, 1')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -205,9 +199,9 @@ class Test_simple_example(unittest.TestCase):
         Column C does not follow the expected sine function from 13:00 until 16:15. The change is abrupt and gradually corrected.
         """
         expected = pd.DataFrame(
-            [('Simple', 'A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:30:00'), 10.0, '|Increment| < lower bound, 0.0001'),
-             ('Simple', 'C', pd.Timestamp('2015-01-01 13:00:00'), pd.Timestamp('2015-01-01 13:00:00'), 1.0, '|Increment| > upper bound, 0.6')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:30:00'), 10.0, '|Increment| < lower bound, 0.0001'),
+             ('C', pd.Timestamp('2015-01-01 13:00:00'), pd.Timestamp('2015-01-01 13:00:00'), 1.0, '|Increment| > upper bound, 0.6')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
     
@@ -224,13 +218,10 @@ class Test_simple_example(unittest.TestCase):
         Column C does not follow the expected sine function from 13:00 until 16:15. The change is abrupt and gradually corrected.
         """
         expected = pd.DataFrame(
-            [('Simple', 'A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:15:00'), 9.0, '|Delta| < lower bound, 0.0001'),
-             ('Simple', 'C', pd.Timestamp('2015-01-01 07:15:00'), pd.Timestamp('2015-01-01 07:15:00'), 1.0, '|Delta| < lower bound, 0.0001'), # this is included because of the preceding NaNs
-             ('Simple', 'C', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 13:00:00'), 2.0, '|Delta| > upper bound, 0.6')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('A', pd.Timestamp('2015-01-01 12:15:00'), pd.Timestamp('2015-01-01 14:15:00'), 9.0, '|Delta| < lower bound, 0.0001'),
+             ('C', pd.Timestamp('2015-01-01 12:45:00'), pd.Timestamp('2015-01-01 13:00:00'), 2.0, '|Delta| > upper bound, 0.6')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
         
-        print(temp)
-        print(expected)
         assert_frame_equal(temp, expected, check_dtype=False)
 
     def test_composite_signal(self):
@@ -238,20 +229,19 @@ class Test_simple_example(unittest.TestCase):
 
         elapsed_time = self.pm.get_elapsed_time()
         wave_model = np.sin(10*(elapsed_time/86400))
-        wave_model.columns=['Wave Model']
-        self.pm.add_signal('Wave Model', wave_model)
         wave_model_abs_error = np.abs(np.subtract(self.pm.df[self.pm.trans['Wave']], wave_model))
-        wave_model_abs_error.columns=['Wave Absolute Error C', 'Wave Absolute Error D']
-        self.pm.add_signal('Wave Absolute Error', wave_model_abs_error)
+        wave_model_abs_error.columns=['Wave Error C', 'Wave Error D']
+        self.pm.add_dataframe(wave_model_abs_error)
+        self.pm.add_translation_dictionary({'Wave Error': ['Wave Error C', 'Wave Error D']})
 
-        self.pm.check_range([None, 0.25], 'Wave Absolute Error')
+        self.pm.check_range([None, 0.25], 'Wave Error')
 
         temp = self.pm.test_results[['Data' in ef for ef in self.pm.test_results['Error Flag']]]
         temp.index = np.arange(temp.shape[0])
 
         expected = pd.DataFrame(
-            [('','Wave Absolute Error C',pd.Timestamp('2015-01-01 13:00:00'),pd.Timestamp('2015-01-01 14:45:00'),8.0,'Data > upper bound, 0.25')],
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'])
+            [('Wave Error C',pd.Timestamp('2015-01-01 13:00:00'),pd.Timestamp('2015-01-01 14:45:00'),8.0,'Data > upper bound, 0.25')],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'])
 
         assert_frame_equal(temp, expected, check_dtype=False)
 
@@ -261,31 +251,18 @@ class Test_simple_example(unittest.TestCase):
 
         (QCI, test_results_file) = simple_example_run_analysis(df)
 
-        """
-           System Name          Variable Name           Start Date             End Date Timesteps                       Error Flag
-1                                      2015-01-01 19:30:00  2015-01-01 19:30:00         1           Nonmonotonic timestamp
-2                                      2015-01-01 17:00:00  2015-01-01 17:00:00         1              Duplicate timestamp
-3                                      2015-01-01 05:00:00  2015-01-01 05:00:00         1                Missing timestamp
-4               Wave Absolute Error C  2015-01-01 13:00:00  2015-01-01 14:45:00         8         Data > upper bound, 0.25
-5       Simple                      A  2015-01-01 12:15:00  2015-01-01 14:30:00        10  Increment < lower bound, 0.0001
-6       Simple                      B  2015-01-01 06:30:00  2015-01-01 06:30:00         1            Data < lower bound, 0
-7       Simple                      B  2015-01-01 15:30:00  2015-01-01 15:30:00         1            Data > upper bound, 1
-8       Simple                      C  2015-01-01 07:30:00  2015-01-01 09:30:00         9                     Corrupt data
-9       Simple                      C  2015-01-01 13:00:00  2015-01-01 13:00:00         1     Increment > upper bound, 0.6
-10      Simple                      D  2015-01-01 17:45:00  2015-01-01 18:15:00         3                     Missing data
-11      Simple                      D  2015-01-01 11:15:00  2015-01-01 11:15:00         1           Data < lower bound, -1
-12      Simple                      D  2015-01-01 12:45:00  2015-01-01 12:45:00         1           Data < lower bound, -1
-13      Simple                      D  2015-01-01 03:15:00  2015-01-01 03:30:00         2            Data > upper bound, 1
-14      Simple                      D  2015-01-01 04:00:00  2015-01-01 04:00:00         1            Data > upper bound, 1
-15      Simple                      D  2015-01-01 04:30:00  2015-01-01 04:45:00         2            Data > upper bound, 1
-16      Simple                      D  2015-01-01 18:30:00  2015-01-01 18:45:00         2            Data > upper bound, 1
-17      Simple                      D  2015-01-01 19:15:00  2015-01-01 19:45:00         3            Data > upper bound, 1
-"""
-
-        assert_almost_equal(QCI.iloc[0,0],0.871227,6)
+        assert_almost_equal(QCI.iloc[0,0],0.852113,6)
 
         actual = pd.read_csv(test_results_file, index_col=0)
+        # Convert back to datetime just so that they are in the same format
+        actual['Start Time'] = pd.to_datetime(actual['Start Time'])
+        actual['End Time'] = pd.to_datetime(actual['End Time'])
+        
         expected = pd.read_csv(join(datadir,'Simple_test_results.csv'), index_col=0)
+        # Convert back to datetime just so that they are in the same format
+        expected['Start Time'] = pd.to_datetime(expected['Start Time'])
+        expected['End Time'] = pd.to_datetime(expected['End Time'])
+        
         assert_frame_equal(actual, expected, check_dtype=False)
 
     def test_full_example_with_timezone(self):
@@ -295,27 +272,7 @@ class Test_simple_example(unittest.TestCase):
 
         (QCI, test_results_file) = simple_example_run_analysis(df)
 
-        """
-   System Name          Variable Name                 Start Date                   End Date Timesteps                       Error Flag
-1                                      2015-01-01 19:30:00-07:00  2015-01-01 19:30:00-07:00         1           Nonmonotonic timestamp
-2                                      2015-01-01 17:00:00-07:00  2015-01-01 17:00:00-07:00         1              Duplicate timestamp
-3                                      2015-01-01 05:00:00-07:00  2015-01-01 05:00:00-07:00         1                Missing timestamp
-4               Wave Absolute Error C  2015-01-01 13:00:00-07:00  2015-01-01 14:45:00-07:00         8         Data > upper bound, 0.25
-5       Simple                      A  2015-01-01 12:15:00-07:00  2015-01-01 14:30:00-07:00        10  |Increment| < lower bound, 0.0001
-6       Simple                      B  2015-01-01 06:30:00-07:00  2015-01-01 06:30:00-07:00         1            Data < lower bound, 0
-7       Simple                      B  2015-01-01 15:30:00-07:00  2015-01-01 15:30:00-07:00         1            Data > upper bound, 1
-8       Simple                      C  2015-01-01 07:30:00-07:00  2015-01-01 09:30:00-07:00         9                     Corrupt data
-9       Simple                      C  2015-01-01 13:00:00-07:00  2015-01-01 13:00:00-07:00         1     |Increment| > upper bound, 0.6
-10      Simple                      D  2015-01-01 17:45:00-07:00  2015-01-01 18:15:00-07:00         3                     Missing data
-11      Simple                      D  2015-01-01 11:15:00-07:00  2015-01-01 11:15:00-07:00         1           Data < lower bound, -1
-12      Simple                      D  2015-01-01 12:45:00-07:00  2015-01-01 12:45:00-07:00         1           Data < lower bound, -1
-13      Simple                      D  2015-01-01 03:15:00-07:00  2015-01-01 03:30:00-07:00         2            Data > upper bound, 1
-14      Simple                      D  2015-01-01 04:00:00-07:00  2015-01-01 04:00:00-07:00         1            Data > upper bound, 1
-15      Simple                      D  2015-01-01 04:30:00-07:00  2015-01-01 04:45:00-07:00         2            Data > upper bound, 1
-16      Simple                      D  2015-01-01 18:30:00-07:00  2015-01-01 18:45:00-07:00         2            Data > upper bound, 1
-17      Simple                      D  2015-01-01 19:15:00-07:00  2015-01-01 19:45:00-07:00         3            Data > upper bound, 1
-"""
-        assert_almost_equal(QCI.iloc[0,0],0.871227,6)
+        assert_almost_equal(QCI.iloc[0,0],0.852113,6)
 
         actual = pd.read_csv(test_results_file, index_col=0)
         expected = pd.read_csv(join(datadir,'Simple_test_results_with_timezone.csv'), index_col=0)
@@ -331,7 +288,7 @@ class Test_get_time(unittest.TestCase):
         df = pd.DataFrame(data=data, index=index, columns=['test'])
 
         self.pm = pecos.monitoring.PerformanceMonitoring()
-        self.pm.add_dataframe(df, 'Test')
+        self.pm.add_dataframe(df)
 
     @classmethod
     def tearDown(self):
@@ -372,7 +329,7 @@ class Test_check_timestamp(unittest.TestCase):
         df = pd.DataFrame({'A': [0, 2, 3], 'B': [4, np.nan, 6]}, index=index)
 
         self.pm = pecos.monitoring.PerformanceMonitoring()
-        self.pm.add_dataframe(df, 'Test')
+        self.pm.add_dataframe(df)
 
     @classmethod
     def tearDown(self):
@@ -381,10 +338,10 @@ class Test_check_timestamp(unittest.TestCase):
     def test_check_exact_times_true(self):
         self.pm.check_timestamp(3600, exact_times=True)
         expected = pd.DataFrame(
-            array([['', '', Timestamp('2016-10-17 02:05:00'),
+            array([['', Timestamp('2016-10-17 02:05:00'),
                    Timestamp('2016-10-17 03:05:00'), 2,
                    'Missing timestamp']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -392,9 +349,9 @@ class Test_check_timestamp(unittest.TestCase):
     def test_check_exact_times_false(self):
         self.pm.check_timestamp(3600, exact_times=False)
         expected = pd.DataFrame(
-            array([['', '', Timestamp('2016-10-17 02:00:00'),
+            array([['', Timestamp('2016-10-17 02:00:00'),
                     Timestamp('2016-10-17 02:00:00'), 1, 'Missing timestamp']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -402,10 +359,10 @@ class Test_check_timestamp(unittest.TestCase):
     def test_check_exact_times_true_with_start_time(self):
         self.pm.check_timestamp(3600, expected_start_time=Timestamp('2016-10-17 01:00:00'), exact_times=True)
         expected = pd.DataFrame(
-            array([['', '', Timestamp('2016-10-17 01:00:00'),
+            array([['', Timestamp('2016-10-17 01:00:00'),
                    Timestamp('2016-10-17 03:00:00'), 3,
                    'Missing timestamp']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -421,8 +378,8 @@ class Test_check_delta(unittest.TestCase):
         trans = dict(zip(df.columns, [[col] for col in df.columns]))
         
         self.pm = pecos.monitoring.PerformanceMonitoring()
-        self.pm.add_dataframe(df, 'Test')
-        self.pm.add_translation_dictionary(trans, 'Test')
+        self.pm.add_dataframe(df)
+        self.pm.add_translation_dictionary(trans)
 
     @classmethod
     def tearDown(self):
@@ -432,9 +389,9 @@ class Test_check_delta(unittest.TestCase):
         # dead sensor = < 1 in 5 hours
         self.pm.check_delta([1, None], window=5*3600+1, absolute_value=True)
         expected = pd.DataFrame(
-            array([['Test', 'A', Timestamp('2017-01-01 00:00:00'), Timestamp('2017-01-01 05:00:00'), 6, '|Delta| < lower bound, 1'],
-                   ['Test', 'A', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 23:00:00'), 8, '|Delta| < lower bound, 1']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            array([['A', Timestamp('2017-01-01 00:00:00'), Timestamp('2017-01-01 05:00:00'), 6, '|Delta| < lower bound, 1'],
+                   ['A', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 23:00:00'), 8, '|Delta| < lower bound, 1']], dtype=object),
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -443,10 +400,10 @@ class Test_check_delta(unittest.TestCase):
         # abrupt change = > 7 in 3 hours
         self.pm.check_delta([None, 7], window=3*3600+1, absolute_value=True)
         expected = pd.DataFrame(
-            array([['Test', 'A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, '|Delta| > upper bound, 7'],
-                   ['Test', 'B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, '|Delta| > upper bound, 7'],
-                   ['Test', 'B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, '|Delta| > upper bound, 7']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            array([['A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, '|Delta| > upper bound, 7'],
+                   ['B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, '|Delta| > upper bound, 7'],
+                   ['B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, '|Delta| > upper bound, 7']], dtype=object),
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=3, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -455,9 +412,9 @@ class Test_check_delta(unittest.TestCase):
         # abrupt positive change = > 7 in 3 hours
         self.pm.check_delta([None, 7], window=3*3600+1, absolute_value=False)
         expected = pd.DataFrame(
-            array([['Test', 'A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, 'Delta > upper bound, 7'],
-                   ['Test', 'B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, 'Delta > upper bound, 7']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            array([['A', Timestamp('2017-01-01 13:00:00'), Timestamp('2017-01-01 16:00:00'), 4, 'Delta > upper bound, 7'],
+                   ['B', Timestamp('2017-01-01 16:00:00'), Timestamp('2017-01-01 19:00:00'), 4, 'Delta > upper bound, 7']], dtype=object),
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -466,8 +423,8 @@ class Test_check_delta(unittest.TestCase):
         # abrupt negative change = < -7 in 3 hours
         self.pm.check_delta([-7, None], window=3*3600+1, absolute_value=False)
         expected = pd.DataFrame(
-            array([['Test', 'B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, 'Delta < lower bound, -7']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            array([['B', Timestamp('2017-01-01 10:00:00'), Timestamp('2017-01-01 12:00:00'), 3, 'Delta < lower bound, -7']], dtype=object),
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=1, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)
@@ -483,8 +440,8 @@ class Test_check_outlier(unittest.TestCase):
         trans = dict(zip(df.columns, [[col] for col in df.columns]))
         
         self.pm = pecos.monitoring.PerformanceMonitoring()
-        self.pm.add_dataframe(df, 'Test')
-        self.pm.add_translation_dictionary(trans, 'Test')
+        self.pm.add_dataframe(df)
+        self.pm.add_translation_dictionary(trans)
         
     @classmethod
     def tearDown(self):
@@ -494,9 +451,9 @@ class Test_check_outlier(unittest.TestCase):
         # outlier if stdev > 1.9
         self.pm.check_outlier([-1.9, 1.9], window=None, absolute_value=False)
         expected = pd.DataFrame(
-            array([['Test', 'A', Timestamp('2017-01-01 19:00:00'), Timestamp('2017-01-01 19:00:00'), 1, 'Outlier < lower bound, -1.9'],
-                   ['Test', 'A', Timestamp('2017-01-01 06:00:00'), Timestamp('2017-01-01 06:00:00'), 1, 'Outlier > upper bound, 1.9']], dtype=object),
-            columns=['System Name', 'Variable Name', 'Start Date', 'End Date', 'Timesteps', 'Error Flag'],
+            array([['A', Timestamp('2017-01-01 19:00:00'), Timestamp('2017-01-01 19:00:00'), 1, 'Outlier < lower bound, -1.9'],
+                   ['A', Timestamp('2017-01-01 06:00:00'), Timestamp('2017-01-01 06:00:00'), 1, 'Outlier > upper bound, 1.9']], dtype=object),
+            columns=['Variable Name', 'Start Time', 'End Time', 'Timesteps', 'Error Flag'],
             index=RangeIndex(start=0, stop=2, step=1)
             )
         assert_frame_equal(expected, self.pm.test_results)

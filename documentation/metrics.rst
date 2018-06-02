@@ -17,10 +17,24 @@ For example, if the data consists of 10 columns and 720 times and
 7000 data points pass all quality control tests, then the QCI is (7000/(10*720)) = 0.972.
 QCI is computed using the :class:`~pecos.metrics.qci` method.
 
-To compute QCI::
+To compute QCI,
 
-	mask = pm.get_test_results_mask()
-	QCI = pecos.metrics.qci(mask)
+.. doctest::
+    :hide:
+
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import pecos
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+    >>> index = pd.date_range('1/1/2017', periods=24, freq='H')
+    >>> data = {'A': np.arange(24)}
+    >>> df = pd.DataFrame(data, index=index)
+    >>> pm.add_dataframe(df)
+	
+.. doctest::
+
+    >>> mask = pm.get_test_results_mask()
+    >>> QCI = pecos.metrics.qci(mask)
 
 Root mean square error
 -------------------------

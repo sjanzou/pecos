@@ -64,6 +64,8 @@ for location_name in locations:
 
 # Create dashboard  
 results_directory = 'Results_3'
+if not os.path.exists(results_directory):
+    os.makedirs(results_directory)
 dashboard_filename = os.path.join(results_directory, 'Dashboard_example.html')  
 footnote = 'DA = Data availability <br>QCI = Quality control index <br>EPI = Energy performance index'
 pecos.io.write_dashboard(dashboard_filename, systems, locations, 

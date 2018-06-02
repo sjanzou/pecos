@@ -5,6 +5,7 @@ quality control tests and store results.
 import pandas as pd
 import numpy as np
 import re
+import datetime
 import logging
 
 none_list = ['','none','None','NONE', None, [], {}]
@@ -20,8 +21,8 @@ class PerformanceMonitoring(object):
         self.df = pd.DataFrame()
         self.trans = {}
         self.tfilter = pd.Series()
-        self.test_results = pd.DataFrame(columns=['System Name', 'Variable Name',
-                                                'Start Date', 'End Date',
+        self.test_results = pd.DataFrame(columns=['Variable Name',
+                                                'Start Time', 'End Time',
                                                 'Timesteps', 'Error Flag'])
 
     def _setup_data(self, key, rolling_mean):
@@ -93,7 +94,7 @@ class PerformanceMonitoring(object):
 
         use_mask_only : boolean  (optional)
             When True, the mask is used directly to determine test 
-            results and the system/variable name is not included in the 
+            results and the variable name is not included in the 
             test_results. When False, the mask is used in combination with 
             pm.df to extract test results. Default = False
         """
@@ -142,25 +143,19 @@ class PerformanceMonitoring(object):
             if length >= min_failures:
                 if use_mask_only:
                     var_name = ''
-                    system_name = ''
                 else:
                     var_name = sub_df.iloc[:,block['Start Col'][i]].name #sub_df.icol(block['Start Col'][i]).name
-                    system_name = ''
-                    temp = var_name.split(':')
-                    if len(temp) == 2:
-                        var_name = temp[1]
-                        system_name = temp[0]
                     
-                frame = pd.DataFrame([system_name, var_name,
+                frame = pd.DataFrame([var_name,
                     sub_df.index[block['Start Row'][i]],
                     sub_df.index[block['Stop Row'][i]],
                     length, error_msg],
-                    index=['System Name', 'Variable Name', 'Start Date', 
-                    'End Date', 'Timesteps', 'Error Flag'])
+                    index=['Variable Name', 'Start Time', 
+                    'End Time', 'Timesteps', 'Error Flag'])
                 frame_t = frame.transpose()
                 self.test_results = self.test_results.append(frame_t, ignore_index=True)
     
-    def add_dataframe(self, df, system_name, add_identity_translation_dictionary=False):
+    def add_dataframe(self, df):
         """
         Add DataFrame to the PerformanceMonitoring object.
 
@@ -168,33 +163,22 @@ class PerformanceMonitoring(object):
         -----------
         df : pandas DataFrame
             DataFrame to add to the PerformanceMonitoring object
-
-        system_name : string
-            System name
-
-        add_identity_translation_dictionary : boolean (optional)
-            Add a 1:1 translation dictionary to the PerformanceMonitoring 
-            object using all column names in df, default = False
         """
         temp = df.copy()
 
-        # Combine variable name with system name (System: Variable)
-        temp.columns = [system_name + ':' + s  for s in temp.columns]
-
         if self.df is not None:
-            self.df = self.df.combine_first(temp)
+            self.df = temp.combine_first(self.df)
         else:
             self.df = temp.copy()
 
-        # define identity translation
-        if add_identity_translation_dictionary:
-            trans = {}
-            for col in df.columns:
-                trans[col] = [col]
+        # Add identity 1:1 translation dictionary
+        trans = {}
+        for col in df.columns:
+            trans[col] = [col]
 
-            self.add_translation_dictionary(trans, system_name)
+        self.add_translation_dictionary(trans)
 
-    def add_translation_dictionary(self, trans, system_name):
+    def add_translation_dictionary(self, trans):
         """
         Add translation dictionary to the PerformanceMonitoring object.
 
@@ -202,15 +186,11 @@ class PerformanceMonitoring(object):
         -----------
         trans : dictionary
             Translation dictionary
-
-        system_name : string
-            System name
         """
-        # Combine variable name with system name (System: Variable)
         for key, values in trans.items():
             self.trans[key] = []
             for value in values:
-                self.trans[key].append(system_name + ':' + value)
+                self.trans[key].append(value)
 
     def add_time_filter(self, time_filter):
         """
@@ -226,39 +206,39 @@ class PerformanceMonitoring(object):
         else:
             self.tfilter = time_filter
 
-    def add_signal(self, col_name, data):
-        """
-        Add signal to the PerformanceMonitoring DataFrame.
-
-        Parameters
-        -----------
-        col_name : string
-            Column name to add to translation dictionary
-
-        data : pandas DataFrame or pandas Series
-            Data to add to df
-        """
-        if type(data) is pd.core.series.Series:
-            data = data.to_frame(col_name)
-        if type(data) is not pd.core.frame.DataFrame:
-            logger.warning("Add signal failed")
-            return
-
-        if col_name in self.trans.keys():
-            logger.info(col_name + ' already exists in trans')
-            return
-        for col in data.columns.values.tolist():
-            if col in self.df.columns.values.tolist():
-                logger.info(col + ' already exists in df')
-                return
-        try:
-            self.trans[col_name] = data.columns.values.tolist()
-            #self.df[df.columns] = df
-            for col in data.columns:
-                self.df[col] = data[col]
-        except:
-            logger.warning("Add signal failed: " + col_name)
-            return
+#    def add_signal(self, col_name, data):
+#        """
+#        Add signal to the PerformanceMonitoring DataFrame.
+#
+#        Parameters
+#        -----------
+#        col_name : string
+#            Column name to add to translation dictionary
+#
+#        data : pandas DataFrame or pandas Series
+#            Data to add to df
+#        """
+#        if type(data) is pd.core.series.Series:
+#            data = data.to_frame(col_name)
+#        if type(data) is not pd.core.frame.DataFrame:
+#            logger.warning("Add signal failed")
+#            return
+#
+#        if col_name in self.trans.keys():
+#            logger.info(col_name + ' already exists in trans')
+#            return
+#        for col in data.columns.values.tolist():
+#            if col in self.df.columns.values.tolist():
+#                logger.info(col + ' already exists in df')
+#                return
+#        try:
+#            self.trans[col_name] = data.columns.values.tolist()
+#            #self.df[df.columns] = df
+#            for col in data.columns:
+#                self.df[col] = data[col]
+#        except:
+#            logger.warning("Add signal failed: " + col_name)
+#            return
 
     def check_timestamp(self, frequency, expected_start_time=None,
                         expected_end_time=None, min_failures=1,
@@ -459,9 +439,9 @@ class PerformanceMonitoring(object):
                     absolute_value=True, rolling_mean=0, min_failures=1):
         """
         Check bounds on the difference between max and min data values within 
-		 a rolling window (Note, this method is currently NOT efficient for large 
+		  a rolling window (Note, this method is currently NOT efficient for large 
         data sets (> 100000 pts) because it uses df.rolling().apply() to find 
-        the position of the min and max).
+        the position of the min and max). This method requires pandas 0.23 or greater.
 
         Parameters
         ----------
@@ -497,37 +477,40 @@ class PerformanceMonitoring(object):
         if df is None:
             return
         
-        window_str = str(window) + 's' 
+        window_str = str(int(window*1e6)) + 'us'
 
-        # Extract the max/min position in each window
-        argmax_df = df.rolling(window_str).apply(np.nanargmax) 
-        argmin_df = df.rolling(window_str).apply(np.nanargmin) 
-        # Replace nan with 0
-        argmax_df[argmax_df.isnull()] = 0 
-        argmin_df[argmin_df.isnull()] = 0               
-        # Shift the position to account for the moving window
-        rng = pd.date_range(df.index[0], periods=2, freq=window_str)
-        nshift = (df.index < rng[1]).sum()
-        index_shift = pd.Series(np.append(np.zeros(nshift-1), np.arange(len(df)-(nshift-1))), index=df.index)
-        argmax_df = argmax_df.add(index_shift, axis=0)
-        argmin_df = argmin_df.add(index_shift, axis=0)
-         # Convert to int
-        argmax_df = argmax_df.astype(int)
-        argmin_df = argmin_df.astype(int)
+        def f(data=None, method=None):
+            if data.notnull().sum() < 2: # there has to be at least two numbers
+                return np.nan
+            else:
+                if method == 'idxmin':
+                    # Can't return a timestamp, convert to num, then back to timestamp
+                    return data.idxmin().value 
+                elif method == 'min':
+                    return data.min()
+                elif method == 'idxmax':
+                    return data.idxmax().value
+                elif method == 'max':
+                    return data.max()
+                else:
+                    return np.nan
+                
+        tmin_df = df.rolling(window_str).apply(lambda x: f(x, 'idxmin'), raw=False) # raw = False passes a Series
+        tmin_df = tmin_df.astype('datetime64[ns]')
+        # Note, the next line should be replaced with df.rolling(window_str).min(), 
+        # but the solution is not the same with pandas 0.23
+        min_df = df.rolling(window_str).apply(lambda x: f(x, 'min'), raw=False)
         
-        # Extract the max/min time in each window
-        tmax_df = pd.DataFrame(argmax_df.index[argmax_df], 
-                               columns=argmax_df.columns, index=argmax_df.index)
-        tmin_df = pd.DataFrame(argmin_df.index[argmin_df], 
-                               columns=argmin_df.columns, index=argmin_df.index)
+        tmax_df = df.rolling(window_str).apply(lambda x: f(x, 'idxmax'), raw=False)
+        tmax_df = tmax_df.astype('datetime64[ns]')
+        # Same note as above, for max
+        max_df = df.rolling(window_str).apply(lambda x: f(x, 'max'), raw=False)
         
-        # Compute max difference in each window
-        diff_df = df.rolling(window_str).max() - df.rolling(window_str).min() # ignores nan
-        diff_df.iloc[0:nshift-1,:] = np.nan # reset values without full window to nan
+        diff_df = max_df - min_df
         if not absolute_value:
             reverse_order = tmax_df < tmin_df 
             diff_df[reverse_order] = -diff_df[reverse_order]
-            
+
         if absolute_value:
             error_prefix = '|Delta|'
         else:
@@ -620,7 +603,7 @@ class PerformanceMonitoring(object):
 
         # Compute normalized data
         if window is not None:
-            window_str = str(window) + 's' 
+            window_str = str(int(window*1e6)) + 'us'
             df = (df - df.rolling(window_str).mean())/df.rolling(window_str).std()
         else:
             df = (df - df.mean())/df.std()
@@ -632,7 +615,9 @@ class PerformanceMonitoring(object):
             error_prefix = '|Outlier|'
         else:
             error_prefix = 'Outlier'
-            
+        
+        #df[df.index[0]:df.index[0]+datetime.timedelta(seconds=window)] = np.nan
+             
         self._generate_test_results(df, bound, specs, min_failures, error_prefix)
       
     def check_missing(self, key=None, min_failures=1):
@@ -661,7 +646,7 @@ class PerformanceMonitoring(object):
         missing_timestamps = self.test_results[
                 self.test_results['Error Flag'] == 'Missing timestamp']
         for index, row in missing_timestamps.iterrows():
-            mask.loc[row['Start Date']:row['End Date']] = False
+            mask.loc[row['Start Time']:row['End Time']] = False
 
         self._append_test_results(mask, 'Missing data', min_failures=min_failures)
 
@@ -744,10 +729,10 @@ class PerformanceMonitoring(object):
 
         try:
             signal = eval(string_to_eval)
-            if type(signal) is tuple:
+            if type(signal) is tuple: # A tuple of series
                 col_name = [col_name + " " + str(i+1)  for i in range(len(signal))]
                 signal = pd.concat(signal, axis=1)
-                signal.columns = [col_name]
+                signal.columns = col_name
                 signal.index = self.df.index
             elif type(signal) is float:
                 signal = signal
@@ -809,7 +794,7 @@ class PerformanceMonitoring(object):
         --------
         pandas DataFrame containing boolean values for each data point, True =
         data point pass all tests, False = data point did not pass at least 
-        one test.
+        one test (or data is NaN).
         """
         if self.df.empty:
             logger.info("Empty database")
@@ -824,22 +809,15 @@ class PerformanceMonitoring(object):
         else:
             df = self.df
 
-        test_results_mask = ~pd.isnull(df)
+        test_results_mask = ~pd.isnull(df) # False if NaN
         for i in self.test_results.index:
-            system = self.test_results.loc[i, 'System Name']
             variable = self.test_results.loc[i, 'Variable Name']
-            start_date = self.test_results.loc[i, 'Start Date']
-            end_date = self.test_results.loc[i, 'End Date']
-            error_flag = self.test_results.loc[i, 'Error Flag']
-            if error_flag in ['Nonmonotonic timestamp', 'Duplicate timestamp']:
-                continue
-            if variable == '': # occurs when data is missing
-                test_results_mask.loc[start_date:end_date] = False
-            else:
-                if system == '': # occurs when data is a composite signal
-                    column_name = variable
-                else:
-                    column_name = system + ':'+ variable
-                test_results_mask.loc[start_date:end_date,column_name] = False
-
+            start_date = self.test_results.loc[i, 'Start Time']
+            end_date = self.test_results.loc[i, 'End Time']
+            if variable in test_results_mask.columns:
+                try:
+                    test_results_mask.loc[start_date:end_date,variable] = False
+                except:
+                    pass
+                
         return test_results_mask

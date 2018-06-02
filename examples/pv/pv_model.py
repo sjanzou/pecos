@@ -35,16 +35,21 @@ def sapm(pm, poa, wind, temp, sapm_parameters, location):
     # Compute the relative error between observed and predicted DC Power.  
     # Add the composite signal and run a range test
     modeled_dcpower = sapm_model['p_mp']*sapm_parameters['Ns']*sapm_parameters['Np']
-    pm.add_signal('Expected DC Power', modeled_dcpower)
+    modeled_dcpower = modeled_dcpower.to_frame('Expected DC Power')
+    pm.add_dataframe(modeled_dcpower)
+    
     observed_dcpower = pm.df[pm.trans['DC Power']].sum(axis=1)
-    dc_power_relative_error = (np.abs(observed_dcpower - modeled_dcpower))/observed_dcpower
-    pm.add_signal('DC Power Relative Error', dc_power_relative_error)
+    dc_power_relative_error = (np.abs(observed_dcpower - pm.df['Expected DC Power']))/observed_dcpower
+    dc_power_relative_error = dc_power_relative_error.to_frame('DC Power Relative Error')
+    pm.add_dataframe(dc_power_relative_error)
+    
     pm.check_range([0,0.1], 'DC Power Relative Error') 
     
     # Compute normalized efficiency, add the composite signal, and run a range test
     P_ref = sapm_parameters['Vmpo']*sapm_parameters['Impo']*sapm_parameters['Ns']*sapm_parameters['Np'] # DC Power rating
     NE = pecos.pv.normalized_efficiency(observed_dcpower, pm.df[pm.trans['POA']], P_ref)
-    pm.add_signal('Normalized Efficiency', NE)
+    pm.add_dataframe(NE)
+    pm.add_translation_dictionary({'Normalized Efficiency': list(NE.columns)})
     pm.check_range([0.8, 1.2], 'Normalized Efficiency') 
     
     # Compute energy

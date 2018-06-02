@@ -1,3 +1,6 @@
 /.project
 *.pyc
 _build/
+pecos/tests/*.html
+pecos/tests/*.csv
+pecos/tests/*.png

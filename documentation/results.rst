@@ -14,13 +14,11 @@ When a quality control test fails, information is stored in::
 
 Test results includes the following information:
 
-* System Name: System name associated with the DataFrame
-
 * Variable Name: Column name in the DataFrame
 
-* Start Date: Start time of the failure
+* Start Time: Start time of the failure
 
-* End Date: : End time of the failure
+* End Time: : End time of the failure
 
 * Timesteps: The number of consecutive time steps involved in the failure
 
@@ -34,27 +32,45 @@ Test results includes the following information:
  
   * Corrupt data
  
-  * Data > upper bound, value
+  * Data < lower bound OR Data > upper bound
  
-  * Data < lower bound, value
+  * Increment < lower bound OR Increment > upper bound
  
-  * Increment > upper bound, value
- 
-  * Increment < lower bound, value
+  * Delta < lower bound OR Delta > upper bound
+  
+  * Outlier < lower bound OR Outlier > upper bound
 
+A subset of quality control test results from the :ref:`simple_example` are shown below.
+
+.. doctest::
+    :hide:
+
+    >>> import pandas as pd
+    >>> pd.set_option('display.expand_frame_repr', False)
+    >>> from os.path import abspath, dirname, join
+    >>> import pecos
+    >>> docdir = dirname(abspath(__file__))
+    >>> datadir = join(docdir,'..','pecos', 'tests', 'data')
+	>>> pm = pecos.monitoring.PerformanceMonitoring()
+    >>> test_results = pd.read_csv(join(datadir,'Simple_test_results.csv'), index_col=0) # This file is tested against output from the Simple example
+    >>> pm.test_results = test_results.loc[0:7,:]	
+
+.. doctest::
+
+    >>> print(pm.test_results)
+      Variable Name      Start Time        End Time  Timesteps                         Error Flag
+    1           NaN   1/1/2015 5:00   1/1/2015 5:00          1                  Missing timestamp
+    2           NaN  1/1/2015 17:00  1/1/2015 17:00          1                Duplicate timestamp
+    3           NaN  1/1/2015 19:30  1/1/2015 19:30          1             Nonmonotonic timestamp
+    4             A  1/1/2015 12:15  1/1/2015 14:30         10  |Increment| < lower bound, 0.0001
+    5             B   1/1/2015 6:30   1/1/2015 6:30          1              Data < lower bound, 0
+    6             B  1/1/2015 15:30  1/1/2015 15:30          1              Data > upper bound, 1
+    7             C   1/1/2015 7:30   1/1/2015 9:30          9                       Corrupt data
+
+Note that variable names are not recorded for timestamp test failures (Test results 1, 2, and 3).
+	
 The :class:`~pecos.io.write_test_results` method is used to write quality control test results to a CSV file.
 This method can be customized to write quality control test results to a database or to other file formats.
-:numref:`fig-test_results` shows a subset of quality control test results from the :ref:`simple_example`.
-
-.. _fig-test_results:
-.. figure:: figures/test_results.png
-   :scale: 75 %
-   :alt: Test results
-   
-   Example quality control test results.
-
-Note that system and variable names are not recorded for timestamp test failures (Test results 1, 2, and 3) and 
-system names are not recorded for composite signals (Test result 4).
 
 Performance metrics
 -----------------------------
@@ -64,13 +80,33 @@ This method can be customized to write performance metrics to a database or to o
 The method can be called multiple times to appended metrics based on the timestamp of the DataFrame.
 :numref:`fig-metrics` shows a simple example where two metrics DataFrames are appended in a single file.
 
-.. _fig-metrics:
-.. figure:: figures/metrics_to_file.png
-   :scale: 65 %
-   :alt: Metrics
+.. doctest::
+    :hide:
+
+    >>> metrics_day1 = pd.DataFrame(index=[pd.Timestamp('2018-1-1')])
+    >>> metrics_day1['QCI'] = 0.871
+    >>> metrics_day1['RMSE'] = 0.952
+    >>> metrics_day2 = pd.DataFrame(index=[pd.Timestamp('2018-1-2')])
+    >>> metrics_day2['QCI'] = 0.755
+    >>> metrics_day2['RMSE'] = 0.845
+	
+.. doctest::
+
+    >>> print(metrics_day1)
+                  QCI   RMSE
+    2018-01-01  0.871  0.952
+    >>> print(metrics_day2)
+                  QCI   RMSE
+    2018-01-02  0.755  0.845
+    >>> pecos.io.write_metrics('metrics_file.csv', metrics_day1)
+    >>> pecos.io.write_metrics('metrics_file.csv', metrics_day2)
+
+The metrics_file.csv file will contain::
+
+                  QCI   RMSE
+    2018-01-01  0.871  0.952
+    2018-01-02  0.755  0.845
    
-   Example metrics from two analysis, appended in a file.
-  
 .. _monitoring_reports:
 
 Monitoring reports
@@ -107,14 +143,14 @@ used in the analysis.
 * **Configuration Options:**
   Configuration options used in the analysis.
 
-:numref:`fig-monitor` shows a subset of the monitoring report from the :ref:`simple_example`. 
+:numref:`fig-monitor-2` shows the monitoring report from the :ref:`simple_example`. 
 
-.. _fig-monitor:
+.. _fig-monitor-2:
 .. figure:: figures/monitoring_report.png
-   :scale: 100 %
+   :scale: 75 %
    :alt: Monitoring report
    
-   Example monitoring report (subset).
+   Example monitoring report.
 
 .. _dashboards:
    
