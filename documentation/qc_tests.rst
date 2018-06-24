@@ -1,7 +1,7 @@
 Quality control tests
 ======================
 
-Pecos includes several quality control tests.
+Pecos includes several built in quality control tests.
 When a test fails, information is stored in a summary table.  This
 information can be saved to a file, database, or included in reports.
 Quality controls tests fall into seven categories:
@@ -25,13 +25,28 @@ Input includes:
 
 * Expected frequency of the time series in seconds
 
+* Expected start time (default = first index of the time series)
+
+* Expected end time (default = last index of the time series)
+
 * Minimum number of consecutive failures for reporting (default = 1 timestamp)
 
 * A flag indicating if exact timestamps are expected.  When set to False, irregular timestamps can be used in the Pecos analysis.
 
-For example::
+For example,
 
-	pm.check_timestamp(60)
+.. doctest::
+    :hide:
+
+    >>> import pandas as pd
+    >>> import pecos
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+    >>> df = pd.DataFrame()
+    >>> pm.add_dataframe(df)
+	
+.. doctest::
+
+    >>> pm.check_timestamp(60)
 
 checks for missing, duplicate, and non-monotonic indexes assuming an expected 
 frequency of 60 seconds.
@@ -47,11 +62,13 @@ Input includes:
 
 * Minimum number of consecutive failures for reporting (default = 1 timestamp)
 
-For example::
+For example,
 
-	pm.check_missing('Wave', min_failures=5)
+.. doctest::
 
-checks for missing data in the columns associated with the key 'Wave'.  In this case, warnings 
+    >>> pm.check_missing('A', min_failures=5)
+
+checks for missing data in the columns associated with the key 'A'.  In this case, warnings 
 are only reported if there are 5 consecutive failures.
 
 Corrupt data test
@@ -65,9 +82,11 @@ Input includes:
 
 * Minimum number of consecutive failures for reporting (default = 1 timestamp)
 
-For example::
+For example,
 
-	pm.check_corrupt([-999, 999])
+.. doctest::
+
+    >>> pm.check_corrupt([-999, 999])
 
 checks for data with values -999 or 999 in the entire DataFrame.
 
@@ -89,9 +108,11 @@ Input includes:
 
 * Minimum number of consecutive failures for reporting (default = 1)
 
-For example::
+For example,
 
-	pm.check_range([None,1], 'A', rolling_window=2)
+.. doctest::
+
+    >>> pm.check_range([None,1], 'A', rolling_mean=2)
 
 checks for values greater than 1 in the columns associated with the key 'A', 
 using a rolling average of 2 time steps.
@@ -117,13 +138,17 @@ Input includes:
 
 * Minimum number of consecutive failures for reporting (default = 1)
 
-For example::
+For example,
 
-	pm.check_increment([None, 0.000001], min_failure=60)
+.. doctest::
 
-checks if value increments are greater than 0.000001 for 60 consecutive time steps::
+    >>> pm.check_increment([None, 0.000001], min_failures=60)
 
-	pm.check_increment([-800, None], absolute_value=False)
+checks if value increments are greater than 0.000001 for 60 consecutive time steps.
+
+.. doctest::
+
+    >>> pm.check_increment([-800, None], absolute_value=False)
 
 checks if value increments decrease by more than -800 in a single time step.
 
@@ -133,7 +158,7 @@ The :class:`~pecos.monitoring.PerformanceMonitoring.check_delta` method is used 
 the minimum and maximum data value within a moving window is within expected bounds.
 As compared to the check_increment test, this method is intended to be a more robust way of 
 checking if data is not changing or if the data has an 
-abrupt change.  Currently, this method is not efficient for large data sets (> 100000 pts). 
+abrupt change.  **Currently, this method is not efficient for large data sets (> 100000 pts).** 
 Like the check_range method, the user can specify if the data
 should be smoothed using a rolling mean before the test is run.  
 Input includes:
@@ -150,13 +175,17 @@ Input includes:
 
 * Minimum number of consecutive failures for reporting (default = 1)
 
-For example::
+For example,
 
-	pm.check_delta([None, 0.000001], window=3600)
+.. doctest::
 
-checks if data changes by more than 0.000001 in 1 hour::
+    >>> pm.check_delta([None, 0.000001], window=3600)
 
-	pm.check_delta([-800, None], window=1800, absolute_value=False)
+checks if data changes by more than 0.000001 in 1 hour.
+
+.. doctest::
+
+    >>> pm.check_delta([-800, None], window=1800, absolute_value=False)
 
 checks if data decrease by more than -800 in 30 minutes.
 
@@ -181,8 +210,10 @@ Input includes:
 
 * Minimum number of consecutive failures for reporting (default = 1)
 
-For example::
+For example,
 
-	pm.check_outlier([None, 3], window=12*3600)
+.. doctest::
+
+    >>> pm.check_outlier([None, 3], window=12*3600)
 
 checks if the normalized data changes by more than 3 standard deviations within a 12 hour moving window.

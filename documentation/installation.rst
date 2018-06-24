@@ -1,7 +1,7 @@
 Installation
 ======================================
 
-Pecos requires Python (2.7, 3.4, 3.5, or 3.6) along with several Python 
+Pecos requires Python (2.7, 3.5, or 3.6) along with several Python 
 package dependencies.  Information on installing and using Python can be found at 
 https://www.python.org/.  Python distributions, such as Anaconda,
 are recommended to manage the Python interface.  
@@ -26,8 +26,8 @@ This downloads a zip file called pecos-master.zip.
 To download a specific release, go to https://github.com/sandialabs/pecos/releases and select a zip file.
 The software can then be installed by unzipping the file and running setup.py::
 
-	unzip WNTR-master.zip
-	cd WNTR-master
+	unzip pecos-master.zip
+	cd pecos-master
 	python setup.py install
 		
 Required Python package dependencies include:

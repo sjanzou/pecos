@@ -55,7 +55,7 @@ def test_write_test_results1():
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     tfilter = pd.Series(data = (df.index < index[3]), index = df.index)
-    pm.add_dataframe(df, 'test', True)
+    pm.add_dataframe(df)
     pm.add_time_filter(tfilter)    
     pm.check_range([0,7]) # 2 test failures
     
@@ -63,7 +63,7 @@ def test_write_test_results1():
     from_file = pd.read_csv(filename)
     
     assert_true(isfile(filename))
-    assert_equals(from_file.shape, (2,7))
+    assert_equals(from_file.shape, (2,6))
 
 def test_write_monitoring_report1(): # empty database
     filename = abspath(join(testdir, 'test_write_monitoring_report1.html'))
@@ -96,7 +96,7 @@ def test_write_monitoring_report2():# with test results and graphics (encoded an
     data = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12], [13,14,15]])
     df = pd.DataFrame(data=data, index=index, columns=['A', 'B', 'C'])
     tfilter = pd.Series(data = (df.index < index[3]), index = df.index)
-    pm.add_dataframe(df, 'test', True)
+    pm.add_dataframe(df)
     pm.add_time_filter(tfilter)    
     pm.check_range([0,7]) # 2 test failures
     
@@ -121,7 +121,7 @@ def test_write_monitoring_report2():# with test results and graphics (encoded an
 
     
 def test_write_dashboard1(): # empty content
-    filename = abspath(join(testdir, 'test_write_dashboard1.html'))
+    filename = abspath(join(testdir, 'test_write_dashboard1_empty.html'))
     if isfile(filename):
         os.remove(filename)
         
@@ -181,16 +181,10 @@ def test_email_message():
     body = 'test body'
     recipient = ['recipient.email.address']
     sender = 'sender.email.address'
-    attachment = 'file.txt'
-    f = open('file.txt','w')
-    f.write('test attachment')
-    f.close()
     
-    msg = pecos.io._create_email_message(subject, body, recipient, sender, 
-                                         attachment)
+    msg = pecos.io._create_email_message(subject, body, recipient, sender)
 
     assert_true(subject in msg.as_string())
     assert_true(body in msg.as_string())
     assert_true(recipient[0] in msg.as_string())
     assert_true(sender in msg.as_string())
-    assert_true(attachment in msg.as_string())

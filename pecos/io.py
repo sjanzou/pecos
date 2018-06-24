@@ -107,8 +107,15 @@ def send_email(subject, body, recipient, sender, attachment=None,
     
     logger.info("Sending email")
     
-    msg = _create_email_message(subject, body, recipient, sender, 
-                                attachment=None)
+    msg = _create_email_message(subject, body, recipient, sender)
+    
+    if attachment is not None:
+        fp = open(attachment, "rb")  # Read as a binary file, even if it's text  
+        att = MIMEApplication(fp.read())
+        att.add_header('Content-Disposition', 'attachment', 
+                       filename=os.path.basename(attachment))
+        fp.close()
+        msg.attach(att)
     
     s = smtplib.SMTP(host)
     try: # Authentication
@@ -120,7 +127,7 @@ def send_email(subject, body, recipient, sender, attachment=None,
     s.sendmail(sender, recipient, msg.as_string())
     s.quit()
     
-def _create_email_message(subject, body, recipient, sender, attachment=None):
+def _create_email_message(subject, body, recipient, sender):
     
     msg = MIMEMultipart()
     msg['Subject'] = subject
@@ -133,14 +140,6 @@ def _create_email_message(subject, body, recipient, sender, attachment=None):
         content = MIMEText(body, 'plain')
     
     msg.attach(content)
-
-    if attachment is not None:
-        fp = open(attachment, "rb")  # Read as a binary file, even if it's text  
-        att = MIMEApplication(fp.read())
-        att.add_header('Content-Disposition', 'attachment', 
-                       filename=os.path.basename(attachment))
-        fp.close()
-        msg.attach(att)
     
     return msg
         
@@ -184,7 +183,7 @@ def write_test_results(filename, test_results):
         Test results stored in pm.test_results
     """
 
-    test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
+    test_results.sort_values(list(test_results.columns), inplace=True)
     test_results.index = np.arange(1, test_results.shape[0]+1)
 
     logger.info("Writing test results csv file " + filename)
@@ -263,8 +262,9 @@ def write_monitoring_report(filename, pm, test_results_graphics=[], custom_graph
     except:
         notes_df = pd.DataFrame()
     
-    pm.test_results.sort_values(['System Name', 'Variable Name'], inplace=True)
+    pm.test_results.sort_values(list(pm.test_results.columns), inplace=True)
     pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
+    #pm.test_results.reset_index(inplace=True)
     
     # Convert to html format
     if metrics is None:
@@ -300,7 +300,7 @@ def write_dashboard(filename, column_names, row_names, content,
                     title='Pecos Dashboard', footnote='', logo=False, im_width=250, datatables=False, encode=False):
     """
     Generate a dashboard.  
-    The dashboard is used to compare multiple systems.
+    The dashboard is used to compare results across multiple systems.
     Each cell in the dashboard includes custom system graphics and metrics.
     
     Parameters

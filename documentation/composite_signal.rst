@@ -27,9 +27,23 @@ test, or compared to existing data and the residual can be used in a quality con
 test.
 
 In the :ref:`simple_example`, a very simple 'Wave Model' composite signal is added to 
-the PerformanceMonitoring object::
+the PerformanceMonitoring object.
 
-	elapsed_time= pm.get_elapsed_time()
-	wave_model = np.sin(10*(elapsed_time/86400))
-	wave_model.columns=['Wave Model']
-	pm.add_signal('Wave Model', wave_model)
+.. doctest::
+    :hide:
+
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import pecos
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+    >>> index = pd.date_range('1/1/2017', periods=24, freq='H')
+    >>> data = {'A': np.arange(24)}
+    >>> df = pd.DataFrame(data, index=index)
+    >>> pm.add_dataframe(df)
+	
+.. doctest::
+
+    >>> elapsed_time= pm.get_elapsed_time()
+    >>> wave_model = np.sin(10*(elapsed_time/86400))
+    >>> wave_model.columns=['Wave Model']
+    >>> pm.add_dataframe(wave_model)

@@ -36,19 +36,19 @@ The configuration file can also be used to store constants that are used to
 generate a time filter, 
 define upper and lower bounds in quality control tests, 
 define system location, 
-or other input needed in composite signals, for example::
+or other input needed in composite signals, for example,
 	
-	specs = {
-	  'Frequency': 900,  
-	  'Multiplier': 10,
-	  'Latitude': 35.054,  
-	  'Longitude': -106.539}
+.. doctest::
 
-Strings are evaluated and added to the DataFrame using the following code::
+    >>> specs = {'Frequency': 900, 'Multiplier': 10, 'Latitude': 35.05, 'Longitude': -106.53}
 
-	signal = pm.evaluate_string(raw_column_name, string, specs)
-	pm.add_signal(trans_column_name, signal)
+Strings are evaluated and added to the DataFrame using the following code,
+
+.. doctest::
+
+    >>> signal = pm.evaluate_string('Signal', string, specs) #doctest:+SKIP 
+    >>> pm.add_dataframe(signal) #doctest:+SKIP 
 	
 If the string evaluation fails, the error message is printed.  
-See the :class:`~pecos.monitoring.PerformanceMonitoring.evaluate_string` and 
-:class:`~pecos.monitoring.PerformanceMonitoring.add_signal` methods for more details.
+See the :class:`~pecos.monitoring.PerformanceMonitoring.evaluate_string` 
+for more details.

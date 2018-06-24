@@ -1,24 +1,43 @@
 Time filter
 =============
 
-A time filter is a Boolean time series that indicates if specific timestamps should be
-used in quality control tests.  The time filter can be defined using
+A time filter is an optional feature which allows the user to exclude 
+specific timestamps from all quality control tests.  The time filter is 
+a Boolean time series that can be defined using
 elapsed time, clock time, or other custom algorithms. 
+
 Pecos includes methods to get the elapsed and clock time of the DataFrame (in seconds).
+The following example defines a time filter between 3 AM and 9 PM,
 
-The following example defines a time filter between 3 AM and 9 PM::
+.. doctest::
+    :hide:
 
-	clock_time = pm.get_clock_time()
-	time_filter = (clock_time > 3*3600) & (clock_time < 21*3600)
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import pecos
+    >>> pm = pecos.monitoring.PerformanceMonitoring()
+    >>> index = pd.date_range('1/1/2017', periods=24, freq='H')
+    >>> data = {'A': np.arange(24)}
+    >>> df = pd.DataFrame(data, index=index)
+    >>> pm.add_dataframe(df)
+	
+.. doctest::
 
-The time filter can also be defined based on properties of the DataFrame, for example::
+    >>> clock_time = pm.get_clock_time()
+    >>> time_filter = (clock_time > 3*3600) & (clock_time < 21*3600)
 
-	time_filter = pm.df[pm.trans['Random']] > 0.5
+The time filter can also be defined based on properties of the DataFrame, for example,
+
+.. doctest::
+
+    >>> time_filter = pm.df['A'] > 0.5
 	
 For some applications, it is useful to define the time filter based on sun position, as demonstrated in **pv_example.py** in the examples/pv directory.
 
-The time filter can then be added to the PerformanceMonitoring object as follows::
+The time filter can then be added to the PerformanceMonitoring object as follows,
 
-	pm.add_time_filter(time_filter)
+.. doctest::
+
+    >>> pm.add_time_filter(time_filter)
 
 

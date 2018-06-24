@@ -5,7 +5,6 @@
 $MINICONDA_URL = "http://repo.continuum.io/miniconda/"
 $BASE_URL = "https://www.python.org/ftp/python/"
 
-
 function DownloadMiniconda ($python_version, $platform_suffix) {
     $webclient = New-Object System.Net.WebClient
     if ($python_version -eq "3.4") {

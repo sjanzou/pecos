@@ -110,8 +110,7 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
         Boolean values used to include time filter in the plot, default = None 
         
     test_results_group : pandas DataFrame (optional)
-        Test results for a particular variable. To group test results by variable, use
-        grouped = pm.test_results.groupby(['System Name', 'Variable Name']), 
+        Test results for a particular variable.
         default = None 
     
     xaxis_min : float (optional)
@@ -184,8 +183,10 @@ def plot_timeseries(data, tfilter=None, test_results_group=None, xaxis_min=None,
                 
                 date_idx2 = np.array([False]*len(data.index))
                 for row2 in range(len(test_results_group2.index)):
-                    date_idx2 = date_idx2 + ((data.index >= test_results_group2.iloc[row2,2]) & 
-                                             (data.index <= test_results_group2.iloc[row2,3]))
+                    s_index = test_results_group2.columns.get_loc("Start Time")
+                    e_index = test_results_group2.columns.get_loc("End Time")
+                    date_idx2 = date_idx2 + ((data.index >= test_results_group2.iloc[row2,s_index]) & 
+                                             (data.index <= test_results_group2.iloc[row2,e_index]))
                 
                 if sum(date_idx2) == 0:
                     continue
@@ -441,26 +442,23 @@ def plot_test_results(filename_root, pm, image_format='png', dpi=500,
         return test_results_graphics
 
     graphic = 0
+    
+    pm.test_results.sort_values(list(pm.test_results.columns), inplace=True)
+    pm.test_results.index = np.arange(1, pm.test_results.shape[0]+1)
+    
+    # Remove specific error flags
+    remove_error_flags = ['Duplicate timestamp', 
+                          'Missing data', 
+                          'Corrupt data', 
+                          'Missing timestamp', 
+                          'Nonmonotonic timestamp']
+    test_results = pm.test_results[-pm.test_results['Error Flag'].isin(remove_error_flags)]
+    grouped = test_results.groupby(['Variable Name'])
 
-    tfilter = pm.tfilter
-
-    grouped = pm.test_results.groupby(['System Name', 'Variable Name'])
-
-    for name, test_results_group in grouped:
-        if name[1] == ' ':
-            continue
-        elif name[0] == '':
-            col_name = str(name[1])
-        else:
-            col_name = str(name[0]) + ":" + str(name[1])
-
-        if test_results_group['Error Flag'].all() in ['Duplicate timestamp', 
-                             'Missing data', 'Corrupt data', 'Missing timestamp', 
-                             'Nonmonotonic timestamp']:
-            continue
+    for col_name, test_results_group in grouped:
         logger.info("Creating graphic for " + col_name)
         
-        plot_timeseries(pm.df[col_name], tfilter, 
+        plot_timeseries(pm.df[col_name], pm.tfilter, 
                         test_results_group=test_results_group, figsize = figsize)
 
         ax = plt.gca()
